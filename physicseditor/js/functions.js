@@ -524,12 +524,12 @@ function ToggleKeyboard(){
   if($("#toggle-dir").hasClass("fa-caret-down")){
     $("#toggle-dir").removeClass("fa-caret-down");
     $("#toggle-dir").addClass("fa-caret-up");
-    $("#keyboard-container").css("top","100%");
+    $("#keyboard-container").css("bottom","0px");
   }
   else{
     $("#toggle-dir").removeClass("fa-caret-up");
     $("#toggle-dir").addClass("fa-caret-down");
-    $("#keyboard-container").css("top","calc(100% - 150px)");
+    $("#keyboard-container").css("bottom","150px");
   }
 }
 
