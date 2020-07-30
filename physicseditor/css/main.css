@@ -12,12 +12,6 @@
   padding-right: 10%;
 }
 
-#main-screen {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-}
-
 [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
   visibility: hidden !important;
 }
