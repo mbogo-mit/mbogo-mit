@@ -1,0 +1,671 @@
+#determinate-loader {
+  transition: width 2s;
+}
+#loading-screen {
+  width: 100%;
+  position: absolute;
+  height: 100%;
+  padding-top: 10%;
+  background-color: white;
+  z-index: 10;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+[type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+  visibility: hidden !important;
+}
+
+body {
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.static-physics-equation.tooltipped {
+  cursor: pointer;
+}
+
+.static-physics-equation.tooltipped:hover {
+  color: #0097a7;
+}
+
+
+.static-physics-equation .mq-empty {
+  background-color: transparent !important;
+}
+
+.static-physics-equation .mq-sqrt-prefix {
+  transform: scale(1, 2.7) !important;
+}
+
+.static-physics-equation-header {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.static-physics-equation-header i {
+  visibility: hidden;
+}
+
+.static-physics-equation-header:hover {
+  color: #0097a7;
+}
+
+.static-physics-equation-header:hover i {
+  visibility: visible;
+  color: inherit;
+  cursor: inherit;
+}
+
+.mq-sup {
+  margin-bottom: 0px !important;
+}
+
+.my-row, .my-col {
+  margin:0px !important;
+  padding: 0px !important;
+}
+
+.my_math_field {
+  display: inline-block !important;
+  border: none !important;
+  width: 100%;
+  box-shadow: none !important;
+}
+
+#define-variable-text {
+  font-size: 25px;
+  color: #424242;
+}
+
+#constant-variable-value-text {
+  color: #757575;
+  font-size: .8rem;
+}
+
+#input-exact-value-wrapper {
+  padding-left: 30px;
+  display: none;
+}
+
+.my_math_field_col {
+  padding: 5px 0px 5px 5px !important;
+  width: calc(100% - 26px) !important;
+  border: 1px solid transparent;
+  border-bottom: 1px solid #e1f5fe;
+}
+
+.my_math_field_col.active {
+  -webkit-box-shadow: 0px 0px 8px 0px rgba(132,225,235,0.5);
+  -moz-box-shadow: 0px 0px 8px 0px rgba(132,225,235,0.5);
+  box-shadow: 0px 0px 8px 0px rgba(132,225,235,0.5);
+  border: 1px rgba(132,225,235,0.5) solid;
+}
+
+.line-error svg, .line-warning svg {
+  cursor: pointer !important;
+}
+
+.editor_line {
+  margin-bottom: 0px !important;
+}
+
+.line_label {
+  padding: 6px 4px 0px 4px !important;
+  display: inline-block !important;
+  height: 23.64px;
+  width: 25px !important;
+  background-color: #eeeeee;
+}
+
+.line_label.active {
+  background-color: rgba(132,225,235,1);
+}
+.line_label span {
+  display: none;
+}
+
+.line_label span.active {
+  display: inline;
+}
+
+.line_label .fa-exclamation-triangle {
+  color: orange;
+}
+
+.line_label .fa-exclamation-circle {
+  color: red;
+}
+
+.line_label .fa-question-circle {
+  color: purple;
+}
+
+
+#equation-editor-errors.no-errors {
+  background-color: #80deea;
+}
+
+#equation-editor-errors {
+  background-color: #ec407a;
+}
+
+
+#equations_container .tabs .tab a:focus, #equations_container .tabs .tab a:focus.active {
+  background-color: rgba(48, 79, 254, 0.2);
+}
+
+#equations_container .tabs .tab a:hover, #equations_container .tabs .tab a.active {
+  color: rgba(48, 79, 254, 1.0);
+}
+
+#equations_container .tabs .indicator {
+  background-color: rgba(48, 79, 254, 1.0) !important;
+}
+
+#equations_container .tabs .tab a {
+  color: rgba(48, 79, 254, 0.7);
+}
+
+#physics-equation-a-tag {
+  padding-left: 15px;
+}
+
+#equation-editor-errors {
+  margin-top: 20px;
+}
+
+.relevant-equations-badge {
+  background-color: #f0f4c3 !important;
+  color: #424242 !important;
+  visibility: hidden;
+}
+
+.relevant-equations-badge.active {
+  visibility: visible;
+}
+
+.relevant-equation {
+  background-color: #f0f4c3 !important;
+}
+
+#my_variables .collection.no-variables-defined {
+  border: none !important;
+}
+
+#my_variables .collection #no-variables-defined {
+  display: none;
+  color: #616161;
+  padding: 10px 20px;
+}
+
+#my_variables .collection.no-variables-defined #no-variables-defined {
+  display: inline-block;
+}
+
+#my_variables .collection-item{
+  padding-right: 5px !important;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+#my_variables .collection-item.undefined-variable{
+  background-color: rgba(255, 235, 238, 0.4);
+}
+
+#my_variables .collection-item .delete-var {
+  margin-left: 5px;
+  visibility: hidden;
+}
+
+#my_variables .collection-item.active .delete-var {
+  visibility: visible;
+}
+
+#my_variables .collection-item.active .delete-var:hover {
+  cursor: pointer;
+  color: #ef5350;
+}
+
+#my_variables .collection-item.active {
+  background-color: #fafafa !important;
+  color: #212121;
+}
+
+#my_variables .collection-item.undefined-variable.active {
+  background-color: rgba(255, 235, 238, 0.8) !important;
+  color: #212121;
+}
+
+#my_variables .collection .unknown {
+  /*background-color: #ffcdd2;*/
+  background-image: linear-gradient(to bottom right, #ffcdd2, #ffebee);
+  color: #424242;
+  cursor: pointer;
+}
+
+#my_variables .collection .info.undefined-units {
+  background-image: linear-gradient(to bottom right, #ffcdd2, #ffebee) !important;
+  color: #424242;
+  cursor: pointer;
+}
+
+#my_variables .collection .known {
+  /*background-color: #b2dfdb;*/
+  background-image: linear-gradient(to bottom right, #b2dfdb, #e0f2f1);
+  color: #424242;
+  cursor: pointer;
+}
+
+#my_variables .collection .info {
+  background-color: #f5f5f5;
+  color: #424242;
+  cursor: pointer;
+}
+
+#my_variables .collection .info.units.dynamic-units {
+  background-image: linear-gradient(to bottom right, #c5cae9, #e8eaf6)  !important;;
+}
+
+#my_variables .collection .info.units {
+  background-image: linear-gradient(to bottom right, #b2ebf2, #e0f7fa)
+}
+
+#btn-log-success-indicator {
+  background-image: linear-gradient(to bottom right, #a5d6a7, #e8f5e9) !important;
+}
+
+#btn-log-info-indicator {
+  background-image: linear-gradient(to bottom right, #81d4fa, #e1f5fe) !important;
+}
+
+#btn-log-warning-indicator {
+  background-image: linear-gradient(to bottom right, #ffe082, #fff8e1) !important;
+}
+
+#btn-log-error-indicator {
+  background-image: linear-gradient(to bottom right, #ef9a9a, #ffebee) !important;
+}
+
+
+#my_variables .collection .info.uneditable {
+  color: #424242;
+  cursor: default;
+}
+#my_variables .collection .info.cantBeVector {
+  color: #424242;
+  background-color: #ef9a9a !important;
+  width: auto !important;
+  cursor: default;
+}
+
+#my_variables .collection .info.cantBeVector svg {
+  position: relative;
+  top: 2px;
+}
+
+#my_variables .collection .constant-info {
+  background-color: transparent;
+  color: #424242;
+}
+
+#my_variables .collection .physics-constant {
+  /*background-color: #e1bee7;*/
+  background-image: linear-gradient(to bottom right, #e1bee7, #ede7f6);
+  color: #424242;
+}
+
+#my_variables .collection {
+  margin: 10px;
+}
+
+#equations_container {
+  padding:0px;
+  border-left: 1px solid #eeeeee;
+}
+
+#physics_equations, #physics_constants {
+  overflow-y: scroll;
+}
+
+#physics_equations .collapsible {
+  box-shadow: none;
+  border: none !important;
+}
+
+#physics_equations .collapsible-header:hover{
+  background-color: #e1f5fe;
+  transition: background-color 0.5s;
+}
+
+#physics_equations li.active .collapsible-header{
+  background-color: #80deea;
+  transition: background-color 0.5s;
+}
+
+#physics_equations .collapsible .collapsible-header, #physics_equations .collapsible-body {
+  border: none !important;
+}
+
+#physics_equations .collapsible-body {
+  padding: 5px 0px;
+}
+
+#keyboard-container {
+  position: absolute;
+  top: calc(100% - 150px);
+  background-color: #f5f5f5;
+  height: 150px;
+  width: 100%;
+  z-index: 4;
+  transition: top 1s;
+  padding: 10px 20px 10px 0px;
+
+  -webkit-box-shadow: 0px 0px 19px -9px rgba(156,156,156,1);
+  -moz-box-shadow: 0px 0px 19px -9px rgba(156,156,156,1);
+  box-shadow: 0px 0px 19px -9px rgba(156,156,156,1);
+}
+
+#keyboard-container .simple-keyboard {
+  padding: 0px;
+  background-color: #f5f5f5 !important;
+}
+
+#keyboard-button{
+  position: absolute;
+  top: -36px;
+  left: 0px;
+  -webkit-box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
+  -moz-box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
+  box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
+}
+
+#insert-comment-button{
+  position: absolute;
+  top: -36px;
+  left: 85px;
+  -webkit-box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
+  -moz-box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
+  box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
+}
+
+
+
+#keyboard-button .fa-keyboard {
+  font-size: 1.6rem !important;
+  margin-right: 8px;
+}
+
+#line-message-box {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: none;
+  background-color: #424242;
+  color: white;
+  border-radius: 2px;
+  padding: 5px 8px;
+  opacity: 1.0;
+}
+
+#line-message-box-question, #line-message-box-warning, #line-message-box-error {
+  display: none;
+}
+
+#line-message-box-question.active, #line-message-box-warning.active, #line-message-box-error.active {
+  display: block;
+}
+
+#math_field_editor_container, #my_variables-collection-container {
+  overflow-y: scroll;
+}
+
+#my_variables-collection-container .collection {
+  border: none;
+}
+
+#similar-variables-info-container {
+  font-size: 14px;
+  color: #616161;
+  height: 0px;
+  overflow-y: hidden;
+  opacity: 0;
+}
+
+#more-info-on-similar-variables {
+  cursor: pointer;
+}
+
+#more-info-on-similar-variables:hover {
+  color: #0097a7;
+}
+
+.log-notification {
+  border-radius: 3px;
+  padding:3px 5px;
+  margin-left:3px;
+}
+
+.btn-log-notification  {
+  padding: 0px 10px;
+  font-size: 14px;
+  color: #424242;
+  margin-left: 5px;
+  margin-top: 15px;
+}
+
+.btn-log-notification svg {
+  position: relative;
+  top: 2px;
+}
+
+#editor-log-container {
+  position: absolute;
+  top: 0px;
+  right: -41.6%;
+  height: 100%;
+  width: 41.6%;
+  z-index: 3;
+  background-color: white;
+}
+
+#editor-log-container .collapsible {
+  margin: 0px;
+  box-shadow: none;
+}
+
+#editor-log-container .collapsible-header svg {
+  position: relative;
+  top: 3px;
+  margin-right: 5px;
+}
+
+#editor-log-container .collapsible-body.information-container {
+  padding: 39px 15px;
+}
+
+#close-editor-log {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  z-index: 3;
+  font-size: 26px;
+  cursor: pointer;
+  color: #616161;
+}
+
+#close-editor-log:hover {
+  color: #ef5350;
+}
+
+#editor-log-container .collapsible .collapsible-body {
+  overflow-y: scroll;
+}
+
+#keyboard-tab-container {
+  position: relative;
+  top: -5px;
+}
+
+#keyboard-tab-container .keyboard-tabs {
+  height: 32px;
+  border-radius: 3px;
+  width: 110px;
+  border-radius: 0px 3px 3px 0px;
+  background-color: #f5f5f5;
+  color: #424242;
+  margin-bottom: 3px;
+  text-transform: none;
+  cursor: pointer !important;
+}
+
+#keyboard-tab-container .keyboard-tabs span {
+  cursor: pointer !important;
+}
+
+#keyboard-tab-container .keyboard-tabs.active {
+  background-color: #80deea !important;
+}
+
+#keyboard-tab-container .keyboard-tabs:hover {
+  background-color: #e0f7fa;
+}
+
+#keyboard-tab-container .keyboard-tabs .keyboard-latex {
+  position: relative;
+  top: -3px;
+}
+
+#my-keyboard-container .keyboard-latex {
+  text-transform: none;
+}
+
+#my-keyboard-container .keyboard-latex .mq-sqrt-prefix {
+  transform: scale(1, 1.2) !important;
+}
+
+#my-keyboard-container .btn {
+  width: 100%;
+  background-color: #f5f5f5;
+  color: #424242;
+  cursor: pointer;
+}
+
+#my-keyboard-container .btn * {
+  cursor: pointer;
+}
+
+#my-keyboard-container .row {
+  margin-bottom: 5px !important;
+}
+
+#my-keyboard-container .col {
+  padding-right: 5px !important;
+  padding-left: 0px !important;
+}
+
+#my-keyboard-container #greek-letters-uppercase {
+  display: none;
+}
+
+#my-keyboard-container .mq-empty {
+  display: none;
+}
+
+#btn-greek-letter-uppercase, #btn-greek-letter-lowercase {
+  font-size: 12px;
+}
+
+#greek-letters-keyboard {
+  display: block;
+}
+
+#operators-keyboard, #functions-keyboard, #advanced-keyboard {
+  display: none;
+}
+
+#relevant-physics-equations-total-count {
+  margin-bottom: -48px;
+  float: right;
+  margin-right: 5px;
+  visibility: hidden;
+}
+
+#relevant-physics-equations-total-count.active {
+  visibility: visible !important;
+}
+
+#relevant-physics-equations-total-count > span {
+  padding: 3px;
+  background-color: #f0f4c3;
+  border-radius: 5px;
+  color: #424242;
+}
+
+.mq-math-mode .mq-text-mode {
+  font-family: arial !important;
+  color: #9e9e9e !important;
+}
+
+.mq-math-mode .mq-text-mode.mq-hasCursor {
+  box-shadow: none !important;
+  text-decoration: underline;
+  text-decoration-color: #4fc3f7;
+}
+
+.undefined-variable-badge {
+  padding: 5px;
+  background-color: #f5f5f5;
+  border-radius: 3px;
+  cursor: pointer !important;
+  color: #424242;
+}
+
+.undefined-variable-badge .mq-overline{
+  border-color: #424242;
+}
+
+.undefined-variable-badge:hover .mq-overline{
+  border-color: #0097a7;
+}
+.undefined-variable-badge:hover {
+  color: #0097a7;
+}
+
+#warning-box-undefined-vars .mq-overline {
+  border-color: white !important;
+}
+
+#units-dropdown-menu {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: none;
+  min-width: 300px;
+  height: 300px;
+  background-image: linear-gradient(to bottom right, #f5f5f5, #fafafa);
+}
+
+#units-dropdown-menu .menu-container{
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#input-user-units-search {
+  font-size: 14px;
+}
+
+#units-dropdown-menu .si-unit-row .col {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+#units-dropdown-menu .si-unit-row:hover {
+  background-color: #e0f2f1;
+  cursor: pointer;
+}
+
+#units-dropdown-menu .si-unit-row.active {
+  background-color: #b2dfdb !important;
+  cursor: pointer;
+}

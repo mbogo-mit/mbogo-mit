@@ -1,0 +1,14 @@
+-Line by line Questions, Warnings, and Errors
+  Questions:
+    [type = 1]: Is this variable (some physics constant)
+              Description: asking the user if a specific undefined variable that has the same notation as an unused physics constant is referencing that physics constant (yes or no)
+
+  Warnings:
+    [type = 1]: Undefined Variable
+    [type = 3]: Improperly defined equation
+              Description: user writes an equation that doesn't make sense like 2++2 or 2*=1 where there are two operator beside each other or some other small typo
+
+  Error:
+    [type = 1]: d is a differential and can't be used as a variable
+    [type = 2]: Adding vector and scalar together
+    
