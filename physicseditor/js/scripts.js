@@ -4,6 +4,14 @@ $(document).ready(function(){
 
   ListOfPhysicsConstants = JSON.parse($("#main-screen").attr("lopc"));
 
+  setTimeout(function(){
+    $("#loading-screen").animate({
+      opacity: 0.0
+    },500,function(){
+      $(this).css("display","none");
+    });
+  },2100);
+
 
   $(".static-physics-equation").each(function(i){
     MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
