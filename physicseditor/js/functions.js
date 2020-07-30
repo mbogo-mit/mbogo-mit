@@ -276,8 +276,6 @@ function UpdateDefinedVariables(opts){
     EL.GenerateEditorErrorMessages();
   }
 
-  //after editing the defined variables and or predfined variables we need to check what are the relevant equations for the defined variables
-  CheckForAndDisplayRelevantEquations();
 }
 
 function IsVariableLatexStringVector(ls){
@@ -364,11 +362,23 @@ function TrimUnitInputValue(str){
 }
 
 function AddNewEditorLineToEnd(){
-  MathFieldKeyPressEnter($("#math_field_editor_container .editor_line:last-child"));
+  MathFieldKeyPressEnter($("#math_field_editor_container .editor_line:last-child"),false);
 }
 
 
-function MathFieldKeyPressEnter(el){
+function MathFieldKeyPressEnter(el, enterClicked = false){
+  //first we need to copy everything after the cursor so that when we go to the next line that information goes to the next line and is removed from the current line
+  let lsForNextLine = "";
+  if(enterClicked){
+    EditingMathFields = true
+    let lsBeforeBackspace = MathFields[FocusedMathFieldId].mf.latex();
+    MathFields[FocusedMathFieldId].mf.keystroke("Shift-Down");
+    MathFields[FocusedMathFieldId].mf.keystroke("Backspace");
+    let lsAfterBackspace = MathFields[FocusedMathFieldId].mf.latex();
+    //removes the first instance of the information that came before the cursor. it only removes the first because we are passing in a string and not a regex expression
+    lsForNextLine = lsBeforeBackspace.replace(lsAfterBackspace, "");
+    EditingMathFields = false;
+  }
   //create a new div element then initialize a math field in it
   let rid = RID();
   $(`
@@ -405,6 +415,13 @@ function MathFieldKeyPressEnter(el){
   AdjustLineLabelNumber();//make sure that the line is label with the correct number
 
   CreateNewMathField(rid);
+
+  if(enterClicked){
+    //after we create the new mathfield we need to give it the information that was entered down into the next line
+    MathFields[FocusedMathFieldId].mf.latex(lsForNextLine);
+    MathFields[FocusedMathFieldId].mf.moveToLeftEnd();
+  }
+
 }
 
 function MoveCursor1Line(id, move = "down", direction = "right"){
@@ -414,7 +431,7 @@ function MoveCursor1Line(id, move = "down", direction = "right"){
     nextLineId = $(`#${id}`).parents(".editor_line").next().find(".my_math_field").attr("id");
 
     if(nextLineId == undefined){//there is no line below so we must create one
-      MathFieldKeyPressEnter($(`#${id}`).parents(".editor_line"));
+      MathFieldKeyPressEnter($(`#${id}`).parents(".editor_line"), false);
     }
     else{
       FocusedMathFieldId = nextLineId;
@@ -519,6 +536,7 @@ function DeleteCurrentMathFieldAndCopyContentIntoPreviousMathField(id){
     EditingMathFields = true;
     MathFields[FocusedMathFieldId].mf.latex(addedLs);
     MathFields[FocusedMathFieldId].mf.moveToLeftEnd();
+    UpdateLineLabelHeight(FocusedMathFieldId);
     EditingMathFields = false;
     MathFields[FocusedMathFieldId].mf.write(existingLs);
     MathFields[FocusedMathFieldId].mf.focus();
@@ -978,7 +996,7 @@ function GetLineNumberFromMathFieldId(mfId){
 }
 
 function CheckForAndDisplayRelevantEquations(){
-  let usedQuantities = GetAllUsedQuantities();//an object that has the quanitity as the key and true if it is known or and false if it is unknown
+  let usedQuantities = GetAllUsedQuantities();//an object that has the quantity as the key and true if it is known or and false if it is unknown
   //this function goes through the dom of physics equations and checks the quanities they relate and sees if the equation is relevant for the defined quanities in the editor
   //an equation is relevant when there are no quanitites that the user is not using  and when it has one quantity that the user is using and has set as known.
   //additionally the user has to have the same number of each quantity or more for an equation to be relevant
@@ -1070,8 +1088,18 @@ function GetAllUsedQuantities(){
     }
   }
 
-  return usedQuantities;
+  for (const [key, value] of Object.entries(EL.undefinedVars.defined)) {
+    if(value.quantity != undefined){
+      if(usedQuantities[value.quantity] == undefined){
+        usedQuantities[value.quantity] = {number: 1, state: value.state};
+      }
+      else{
+        usedQuantities[value.quantity].number += 1;
+      }
+    }
+  }
 
+  return usedQuantities;
 }
 
 function DisablePhysicsConstantCheckboxesThatAreBeingUsed(){

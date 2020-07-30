@@ -64,6 +64,9 @@ function EditorLogger(){
       }
     }
 
+    //after parsing through everything and building up the list of defined undefined variables we need to check if there are any relevant equations for the set of variables we have in DefinedVariables and this.undefinedVars.defined
+    CheckForAndDisplayRelevantEquations();
+
     this.display();
   }
 
@@ -127,6 +130,7 @@ function EditorLogger(){
       units: (fullUnitsString.custom) ? fullUnitsString.str : TrimUnitInputValue(fullUnitsString.str),
       unitsMathjs: GetUnitsFromMathJsVectorString(unitsMathjs),//if it is not a vector it won't effect the string
       rid: RID(),
+      quantity: (fullUnitsString.custom) ? undefined : UnitReference[fullUnitsString.str].quantity,
       dynamicUnits: true,
     };
     //then after giving this variable a definiton we need to remove it from the undefined object of this.undefinedVars

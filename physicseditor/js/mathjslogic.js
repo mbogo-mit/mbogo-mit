@@ -39,6 +39,18 @@ math.import({
     let expr = `[${v1[1]} * ${v2[2]} - ${v1[2]} * ${v2[1]}, ${v1[2]} * ${v2[0]} - ${v1[0]} * ${v2[2]}, ${v1[0]} * ${v2[1]} - ${v1[1]} * ${v2[0]}]/ 1 vector`;
     return math.evaluate(expr);
 
+  },
+  absoluteValue: function(v){
+    if(v == undefined){
+      return "";
+    }
+    //we need to check that this is a vector before we square root the dot product of it self
+    if(v._data == undefined){//a high level check to check if v is a vector based on looking at what vectors returned when they are evaluated
+      v = v.toString();
+      return math.evaluate(`sqrt((${v})(${v}))`);
+    }
+    v = v.toString();
+    return math.evaluate(`sqrt(myDotProduct(${v},${v}))`);
   }
 });
 
@@ -93,6 +105,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
       if(trulyUndefinedVars.length == 0){//there must be 0 truly undefined variables for the string to be parsed
 
         let str = ReplaceVariablesWithMathjsUnits(exprs[i][j].str);
+        str = CleanLatexString(str,["absolute-value"]);
         str = CleanLatexString(str, ["fractions","addition","parentheses","brackets", "white-space"]);
         str = FindAndWrapVectorsThatAreBeingMultiplied(str);
         str = CleanLatexString(str,["multiplication"]);
@@ -108,7 +121,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
     }
   }
 
-  //console.log(exprs);
+  console.log(exprs);
 
 
   let results = [];
@@ -153,7 +166,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
 
   }
 
-  //console.log(results);
+  console.log(results);
   ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID);
 
 }
@@ -431,6 +444,9 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
       ls = ls.replace(r, value);
     }
     //console.log(ls);
+  }
+  if(types.includes("absolute-value")){
+    ls = ls.replace(/\\left\|/g,"absoluteValue(").replace(/\\right\|/g, ")");
   }
 
   return ls;

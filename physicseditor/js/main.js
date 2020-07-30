@@ -25,7 +25,7 @@ function CreateNewMathField(id){
 
       },
       enter: function(){
-        MathFieldKeyPressEnter($(`#${id}`).parents(".editor_line"));
+        MathFieldKeyPressEnter($(`#${id}`).parents(".editor_line"), true);
       },
       moveOutOf: function(dir, mathField) {
         //tagging variables may cause this event to fire by accident so we need to make sure that the event was not fire because of the processes that occur while tagging a variable
