@@ -10,6 +10,7 @@ function RID(){
   return rid;
 }
 
+let EditingMathFields = false;
 let UnitsDropdownMenuOpen = false
 let ListOfPhysicsConstants;
 

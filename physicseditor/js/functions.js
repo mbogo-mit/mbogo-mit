@@ -427,8 +427,6 @@ function MoveCursor1Line(id, move = "down", direction = "right"){
         MathFields[FocusedMathFieldId].mf.moveToLeftEnd();
       }
 
-
-
     }
 
   }
@@ -444,6 +442,9 @@ function MoveCursor1Line(id, move = "down", direction = "right"){
       else{
         MathFields[FocusedMathFieldId].mf.moveToLeftEnd();
       }
+    }
+    else{
+      MathFields[FocusedMathFieldId].mf.focus();
     }
   }
 
@@ -502,19 +503,27 @@ function SetMathFieldsUI(){
   $(`#${FocusedMathFieldId}`).parent(".my_math_field_col").addClass("active");
 }
 
-function DeleteCurrentMathField(id){
+function DeleteCurrentMathFieldAndCopyContentIntoPreviousMathField(id){
   //the id of the mathfield that needs to be focused because this one is getting deleted
   let newId = $(`#${id}`).parents(".editor_line").prev().find(".my_math_field").attr("id");
   if(newId != undefined){
+    //setting new mathfield
+    FocusedMathFieldId = newId;
+    //copying latex string from the line that will be deleted
+    let addedLs =  MathFields[id].mf.latex();
+    let existingLs = MathFields[FocusedMathFieldId].mf.latex();
     //deleting mathfield
     delete MathFields[id];
     $(`#${id}`).parents(".editor_line").remove();
-    //setting new mathfield
-    FocusedMathFieldId = newId;
+
+    EditingMathFields = true;
+    MathFields[FocusedMathFieldId].mf.latex(addedLs);
+    MathFields[FocusedMathFieldId].mf.moveToLeftEnd();
+    EditingMathFields = false;
+    MathFields[FocusedMathFieldId].mf.write(existingLs);
+    MathFields[FocusedMathFieldId].mf.focus();
     SetMathFieldsUI();
     AdjustLineLabelNumber();
-    MathFields[FocusedMathFieldId].mf.focus();
-    MathFields[FocusedMathFieldId].mf.moveToRightEnd();
 
   }
 }
