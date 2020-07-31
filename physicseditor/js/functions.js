@@ -370,10 +370,10 @@ function MathFieldKeyPressEnter(el, enterClicked = false){
   //first we need to copy everything after the cursor so that when we go to the next line that information goes to the next line and is removed from the current line
   let lsForNextLine = "";
   if(enterClicked){
-    EditingMathFields = true
+    EditingMathFields = true;
     let lsBeforeBackspace = MathFields[FocusedMathFieldId].mf.latex();
     MathFields[FocusedMathFieldId].mf.keystroke("Shift-Down");
-    MathFields[FocusedMathFieldId].mf.keystroke("Backspace");
+    MathFields[FocusedMathFieldId].mf.write("");
     let lsAfterBackspace = MathFields[FocusedMathFieldId].mf.latex();
     //removes the first instance of the information that came before the cursor. it only removes the first because we are passing in a string and not a regex expression
     lsForNextLine = lsBeforeBackspace.replace(lsAfterBackspace, "");
@@ -381,36 +381,11 @@ function MathFieldKeyPressEnter(el, enterClicked = false){
   }
   //create a new div element then initialize a math field in it
   let rid = RID();
-  $(`
-    <div class="editor_line row">
-      <div class="line_label col m1">
-        <span class="active line-number">1</span>
-        <span onclick="OpenEditorLog('warning')" class="line-warning" mf="${rid}">
-          <svg width="1em" height="1em" viewBox="0 0 16 16" class="amber-text text-lighten-2 bi bi-exclamation-triangle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 5zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-          </svg>
-        </span>
-        <span onclick="OpenEditorLog('error')" class="line-error" mf="${rid}">
-          <svg width="1em" height="1em" viewBox="0 0 16 16" class="red-text text-lighten-2 bi bi-bug-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M4.978.855a.5.5 0 1 0-.956.29l.41 1.352A4.985 4.985 0 0 0 3 6h10a4.985 4.985 0 0 0-1.432-3.503l.41-1.352a.5.5 0 1 0-.956-.29l-.291.956A4.978 4.978 0 0 0 8 1a4.979 4.979 0 0 0-2.731.811l-.29-.956zM13 6v1H8.5v8.975A5 5 0 0 0 13 11h.5a.5.5 0 0 1 .5.5v.5a.5.5 0 1 0 1 0v-.5a1.5 1.5 0 0 0-1.5-1.5H13V9h1.5a.5.5 0 0 0 0-1H13V7h.5A1.5 1.5 0 0 0 15 5.5V5a.5.5 0 0 0-1 0v.5a.5.5 0 0 1-.5.5H13zm-5.5 9.975V7H3V6h-.5a.5.5 0 0 1-.5-.5V5a.5.5 0 0 0-1 0v.5A1.5 1.5 0 0 0 2.5 7H3v1H1.5a.5.5 0 0 0 0 1H3v1h-.5A1.5 1.5 0 0 0 1 11.5v.5a.5.5 0 1 0 1 0v-.5a.5.5 0 0 1 .5-.5H3a5 5 0 0 0 4.5 4.975z"/>
-          </svg>
-        </span>
-        <span class="line-question" mf="${rid}"><i class="fas fa-question-circle"></i></span>
-      </div>
-      <div class="col m11 my_math_field_col">
-        <div id="${rid}" class="my_math_field"></div>
-      </div>
-    </div>
-    `).insertAfter(el);
+  let html = ejs.render(Templates["editor-line"], {rid: rid});
+  $(html).insertAfter(el);
 
   FocusedMathFieldId = rid;
   SetMathFieldsUI();
-
-  //adding keypress event for the new mathfield element
-  $(`#${rid}`).click(function(){
-    FocusedMathFieldId = $(this).attr("id");
-    SetMathFieldsUI();
-  });
 
   AdjustLineLabelNumber();//make sure that the line is label with the correct number
 
@@ -422,6 +397,11 @@ function MathFieldKeyPressEnter(el, enterClicked = false){
     MathFields[FocusedMathFieldId].mf.moveToLeftEnd();
   }
 
+}
+
+function FocusOnThisMathField(rid){
+  FocusedMathFieldId = rid;
+  SetMathFieldsUI();
 }
 
 function MoveCursor1Line(id, move = "down", direction = "right"){
@@ -1378,5 +1358,64 @@ function MainScreenClicked(e){
     if($("#units-dropdown-menu").find(e.target).length == 0){
       CloseUnitDropdownSearchMenu();
     };
+  }
+}
+
+function KeyLogger(e){
+  e = e || event; // to deal with IE
+  EditorKeyPresses[e.keyCode] = (e.type == 'keydown');
+  CheckHotKeys();
+}
+
+function CheckHotKeys(){
+  if(HotKeySequenceReset){
+    if(EditorKeyPresses[91] && EditorKeyPresses[66]){//ctrl+b
+      //there are two scenerios why a user may be clicking control be. (1) they are trying to generate the vector sign
+      EditingMathFields = true;//we need to edit the latex but we dont want these edits to be parsed because they are just intermeditate steps for us to get the information we want
+      let currentLs = MathFields[FocusedMathFieldId].mf.latex();
+      MathFields[FocusedMathFieldId].mf.write("$#!$");
+      let changedLs = MathFields[FocusedMathFieldId].mf.latex().split("\\$#!\\$");//using this as the delimeter because latex puts backslashs infront of dollar signs
+      let startIndex = currentLs.indexOf(changedLs[0]) + changedLs[0].length;
+      let endIndex = currentLs.lastIndexOf(changedLs[1]);
+      let selectedString = currentLs.substring(startIndex, endIndex);
+      //selecting the delimiter that we injected into the string
+      MathFields[FocusedMathFieldId].mf.keystroke("Shift-Left");//selects $
+      MathFields[FocusedMathFieldId].mf.keystroke("Shift-Left");//selects !$
+      MathFields[FocusedMathFieldId].mf.keystroke("Shift-Left");//selects #!$
+      MathFields[FocusedMathFieldId].mf.keystroke("Shift-Left");//selects $#!$
+      EditingMathFields = false;//we want to parse the next change because we are finished doing the intermediate steps to get the selectedString
+      MathFields[FocusedMathFieldId].mf.write(`\\vec{${selectedString}}`);
+      if(selectedString.length == 0){//this means the user wanted to generate a vector sign so we need to place the cursor in the right position once they generate the vector sign
+        MathFields[FocusedMathFieldId].mf.keystroke("Left");
+      }
+
+
+      /*
+      let changedLs = MathFields[FocusedMathFieldId].mf.latex().split("\\$#!\\$");//using this as the delimeter because latex puts backslashs infront of dollar signs
+      if(currentLs.length == changedLs[0].length + changeLs[1].length){
+        //this means the user didn't select anything and they just want to generate a vector sign
+        MathFields[FocusedMathFieldId].mf.latex(`${changedLs[0]}\\vec{}${changedLs[1]}`);
+      }
+      let startIndex = currentLs.indexOf(changedLs[0]) + changedLs[0].length;
+      if(startIndex == 0){
+        startIndex += 1;//this is for the edge case where the thing the person is selecting is at the beginning of the string
+      }
+      let endIndex = currentLs.substring(startIndex).indexOf(changedLs[1]) + startIndex;
+      let selectedString = currentLs.substring(startIndex, endIndex);
+      EditingMathFields = false;
+      MathFields[FocusedMathFieldId].mf.latex(`${changedLs[0]}\\vec{${selectedString}}${changedLs[1]}`);
+      console.log(selectedString);
+      if(selectedString.length == 0){//this means the user wanted to generate a vector sign so we need to place the cursor in the right position once they generate the vector sign
+        MathFields[FocusedMathFieldId].mf.keystroke("Left");
+      }
+      */
+      HotKeySequenceReset = false;
+    }
+  }
+  else{
+    HotKeySequenceReset = !EditorKeyPresses[91];
+    if(HotKeySequenceReset){
+      EditorKeyPresses = {};
+    }
   }
 }

@@ -14,6 +14,9 @@ let EditingMathFields = false;
 let UnitsDropdownMenuOpen = false
 let ListOfPhysicsConstants;
 
+let EditorKeyPresses = {};
+let HotKeySequenceReset = true;
+
 let ImportVariableDefinitions = {
   //the key is the variable, unit is the latex string the describes the units for that variable, and key is the quantity name and key for ListOfSIUnits for the specific variable
   mechanics: {

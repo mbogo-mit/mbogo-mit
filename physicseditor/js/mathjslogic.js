@@ -121,7 +121,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
     }
   }
 
-  console.log(exprs);
+  //console.log(exprs);
 
 
   let results = [];
@@ -166,7 +166,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
 
   }
 
-  console.log(results);
+  //console.log(results);
   ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID);
 
 }
