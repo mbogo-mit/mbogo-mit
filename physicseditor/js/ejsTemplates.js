@@ -118,7 +118,7 @@ let Templates = {
   "VariableCollection": {
     "physics-constant":
     `
-    <li class="collection-item">
+    <li class="collection-item <%= (opts.unused) ? "unused-variable" : "" %>">
       <span class="static-physics-equation" latex="<%= opts.ls %>" rid="<%= opts.variable.rid %>"></span>
       <span class="right delete-var" onclick="UpdateMyVariablesCollection({ls: '<%= opts.ls %>', rid: '<%= opts.variable.rid %>',remove: true, uncheckbox: true, editable: false})"><i class="material-icons">close</i></span>
       <span class="new badge physics-constant" data-badge-caption="<%= opts.variable.quantityDescription %>"></span>
@@ -128,10 +128,10 @@ let Templates = {
     `,
     "defined-variable":
     `
-    <li class="collection-item">
+    <li class="collection-item <%= (opts.unused) ? "unused-variable" : "" %>">
       <span class="static-physics-equation editable-variable" latex="<%= opts.ls %>" rid="<%= opts.variable.rid %>"></span>
       <span class="right delete-var" onclick="UpdateMyVariablesCollection({rid: '<%= opts.variable.rid %>',remove: true, editable: true})"><i class="material-icons">close</i></span>
-      <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="new badge <%= opts.variable.state %>" data-badge-caption="<%= opts.variable.state %>"></span>
+      <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="new badge <%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>" data-badge-caption="<%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>"></span>
       <% if(opts.variable.dynamicUnits){%>
         <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="new badge info units dynamic-units tooltipped" data-position="bottom" data-tooltip="This unit was dynamically created by the editor" data-badge-caption="<%= opts.variable.units %>"></span>
       <%}else{%>
@@ -150,10 +150,10 @@ let Templates = {
     `,
     "undefined-variable":
     `
-    <li class="collection-item undefined-variable">
+    <li class="collection-item undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>">
       <span class="static-physics-equation editable-variable" latex="<%= opts.ls %>" rid="<%= opts.variable.rid %>"></span>
       <span class="right delete-var" onclick="UpdateMyVariablesCollection({remove: true, cantRemove: true})"><i class="material-icons">close</i></span>
-      <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="new badge <%= opts.variable.state %>" data-badge-caption="<%= opts.variable.state %>"></span>
+      <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="new badge <%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>" data-badge-caption="<%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>"></span>
       <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="new badge info undefined-units units" data-badge-caption="<%= opts.variable.units %>"></span>
       <span class="new badge info uneditable" data-badge-caption="<%= opts.variable.type %>"></span>
     </li>
@@ -220,5 +220,9 @@ let Templates = {
       </tbody>
     </table>
   </div>
+  `,
+  "no-variables-defined":
+  `
+  <div id="no-variables-defined" class="center">The physics constants you import and variables you use in the editor will appear in this tab</div>
   `,
 };

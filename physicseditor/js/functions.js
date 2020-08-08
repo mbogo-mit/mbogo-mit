@@ -347,6 +347,9 @@ function ToggleVariableState(rid){
     }
   }
 
+  //because we changed the state of a variable we need to update the known and unknown status of all the other variables based on the change
+  EL.UpdateKnownUnknownVariables();
+
   //then after we have edited either DefinedVariables or EL.undefinedVars.defined then we need to update the collection with the new information
   UpdateMyVariablesCollection({update: true});
 }
@@ -370,14 +373,13 @@ function MathFieldKeyPressEnter(el, enterClicked = false){
   //first we need to copy everything after the cursor so that when we go to the next line that information goes to the next line and is removed from the current line
   let lsForNextLine = "";
   if(enterClicked){
-    EditingMathFields = true;
     let lsBeforeBackspace = MathFields[FocusedMathFieldId].mf.latex();
     MathFields[FocusedMathFieldId].mf.keystroke("Shift-Down");
     MathFields[FocusedMathFieldId].mf.write("");
+    UpdateLineLabelHeight(FocusedMathFieldId);//adjusting the line label height because this math field has changed
     let lsAfterBackspace = MathFields[FocusedMathFieldId].mf.latex();
     //removes the first instance of the information that came before the cursor. it only removes the first because we are passing in a string and not a regex expression
     lsForNextLine = lsBeforeBackspace.replace(lsAfterBackspace, "");
-    EditingMathFields = false;
   }
   //create a new div element then initialize a math field in it
   let rid = RID();
@@ -470,7 +472,9 @@ function AdjustLineLabelNumber(){
 }
 
 function RecalculateHeightOfLineEmptySpace(){
-  $("#editor_empty_space_container").css("height",`${$("#math_field_editor_container").height() - $("#editor_lines_container").height() - 5}px`);
+  let h = $("#math_field_editor_container").height() - $("#editor_lines_container").height() - 5;
+  h = (h < 36) ? 36 : h;
+  $("#editor_empty_space_container").css("height",`${h}px`);
 }
 
 function CreateFullUnitsString(quantity, name, symbol){
@@ -527,7 +531,6 @@ function DeleteCurrentMathFieldAndCopyContentIntoPreviousMathField(id){
 }
 
 function ToggleKeyboard(){
-  console.log("Toggle Keyboard");
   if($("#toggle-dir").hasClass("fa-caret-down")){
     $("#toggle-dir").removeClass("fa-caret-down");
     $("#toggle-dir").addClass("fa-caret-up");
@@ -653,8 +656,8 @@ function PutBracketsAroundAllSubsSupsAndRemoveEmptySubsSups(ls){
     i++;
   }
 
-  ls = ls.replace(/_\{(\s|\\)*}/g,"");//remnoving all empty subscripts from latex string
-  ls = ls.replace(/\^\{(\s|\\)*}/g,"");//remnoving all empty superscripts from latex string
+  ls = ls.replace(/_\{(\s|\\)*}/g," ");//remnoving all empty subscripts from latex string
+  ls = ls.replace(/\^\{(\s|\\)*}/g," ");//remnoving all empty superscripts from latex string
   return ls;
 }
 
@@ -766,7 +769,9 @@ function OrderCompileAndRenderMyVariablesCollection(){
 
   //if there is anything left in the unorded arrays then just append it to the ordered lists
   orderedTrulyUndefinedVars = orderedTrulyUndefinedVars.concat(trulyUndefinedVars);
+  let unusedUndefinedVars = [].concat(trulyUndefinedVars);
   orderedDefinedVars = orderedDefinedVars.concat(definedVars);
+  let unusedDefinedVars = [].concat(definedVars);
 
   //COMPILE
   html = "";
@@ -774,6 +779,7 @@ function OrderCompileAndRenderMyVariablesCollection(){
     let opts = {
       ls: orderedTrulyUndefinedVars[i],
       variable: Object.assign({}, EL.undefinedVars.undefined[orderedTrulyUndefinedVars[i]]),
+      unused: unusedUndefinedVars.includes(orderedTrulyUndefinedVars[i]),
     }
     html += ejs.render(Templates["VariableCollection"]["undefined-variable"], {opts: opts});
   }
@@ -781,6 +787,7 @@ function OrderCompileAndRenderMyVariablesCollection(){
   for(var i = 0; i < orderedDefinedVars.length; i++){
     let opts = {
       ls: orderedDefinedVars[i],
+      unused: unusedDefinedVars.includes(orderedDefinedVars[i]),
     };
 
     if(Object.keys(DefinedVariables).includes(orderedDefinedVars[i])){
@@ -799,6 +806,9 @@ function OrderCompileAndRenderMyVariablesCollection(){
   }
 
   //RENDER
+  if(html == ""){//if there are no variables defined we will just show a nice message to the user so they know whats up
+    html = ejs.render(Templates["no-variables-defined"]);
+  }
   $("#my_variables-collection-container .collection").html(html);//rendering new collection
   //Add event listeners and initialize static math fields
   $("#my_variables .collection span").each(function(){
@@ -980,7 +990,7 @@ function CheckForAndDisplayRelevantEquations(){
   //this function goes through the dom of physics equations and checks the quanities they relate and sees if the equation is relevant for the defined quanities in the editor
   //an equation is relevant when there are no quanitites that the user is not using  and when it has one quantity that the user is using and has set as known.
   //additionally the user has to have the same number of each quantity or more for an equation to be relevant
-
+  //console.log(usedQuantities);
   let sections = ["mechanics-equations","thermal-equations","waves-optics-equations","electricity-magnetism-equations","modern-physics-equations"];
 
   let totalNumberOfRelevantEquationsInSection = 0;
@@ -1049,7 +1059,7 @@ function GetAllUsedQuantities(){
   for (const [key, value] of Object.entries(PreDefinedVariables)) {
     if(value.quantity != undefined){
       if(usedQuantities[value.quantity] == undefined){
-        usedQuantities[value.quantity] = {number: 1, state: value.state};
+        usedQuantities[value.quantity] = {number: 1, state: value.state, quantityDescription: value.quantityDescription};
       }
       else{
         usedQuantities[value.quantity].number += 1;
@@ -1240,6 +1250,9 @@ function ToggleVariableBadgeUnitsSize(el = null, rid = "", expand = false){
   if(expand){
     //we need to calculate how large to expand it
     let w = el.parent(".collection-item").width() - $(`.static-physics-equation[rid='${rid}']`).width() - 185;
+    if(el.prev().hasClass("known-unknown")){
+      w -= 50;//this is because this tag takes more space up so we need to make the expand not as big
+    }
     el.css("width",`${w}px`);
   }
   else{
@@ -1258,6 +1271,8 @@ function DisplayUnitDropdownSearchMenu(el, rid){
 
   //setting value so that the menu knowns what to update once the user has chosen the unit they want
   $("#units-search-results").attr("rid",rid);
+  //focusing the input field so the user doesn't have to click they can just start typing
+  $("#input-user-units-search").focus();
 
   RenderSIUnitsSearch();//start a search to bring up all the variables
 
@@ -1388,27 +1403,6 @@ function CheckHotKeys(){
       if(selectedString.length == 0){//this means the user wanted to generate a vector sign so we need to place the cursor in the right position once they generate the vector sign
         MathFields[FocusedMathFieldId].mf.keystroke("Left");
       }
-
-
-      /*
-      let changedLs = MathFields[FocusedMathFieldId].mf.latex().split("\\$#!\\$");//using this as the delimeter because latex puts backslashs infront of dollar signs
-      if(currentLs.length == changedLs[0].length + changeLs[1].length){
-        //this means the user didn't select anything and they just want to generate a vector sign
-        MathFields[FocusedMathFieldId].mf.latex(`${changedLs[0]}\\vec{}${changedLs[1]}`);
-      }
-      let startIndex = currentLs.indexOf(changedLs[0]) + changedLs[0].length;
-      if(startIndex == 0){
-        startIndex += 1;//this is for the edge case where the thing the person is selecting is at the beginning of the string
-      }
-      let endIndex = currentLs.substring(startIndex).indexOf(changedLs[1]) + startIndex;
-      let selectedString = currentLs.substring(startIndex, endIndex);
-      EditingMathFields = false;
-      MathFields[FocusedMathFieldId].mf.latex(`${changedLs[0]}\\vec{${selectedString}}${changedLs[1]}`);
-      console.log(selectedString);
-      if(selectedString.length == 0){//this means the user wanted to generate a vector sign so we need to place the cursor in the right position once they generate the vector sign
-        MathFields[FocusedMathFieldId].mf.keystroke("Left");
-      }
-      */
       HotKeySequenceReset = false;
     }
   }

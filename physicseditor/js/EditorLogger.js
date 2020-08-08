@@ -1,5 +1,8 @@
 function EditorLogger(){
 
+  this.rawExpressionData = {};
+  this.linesToCheckForSelfConsistency = [];
+
   this.undefinedVars = {
     undefined: {},
     defined: {},
@@ -19,12 +22,28 @@ function EditorLogger(){
       description: "An equation on this line is ending in an operation",
       example: "",
     },
+    "Unexpected type of argument in function cross": {
+      description: "You are crossing a vector with a scalar",
+      example: "",
+    },
     "Units do not match": {
-      description: "You are adding or substracting expressions that don't have the same units, or you are adding to expressions with the same units but one is a vector and the other is a scalar",
+      description: "You are adding or substracting expressions that don't have the same units, or you are adding two expressions with the same units but one is a vector and the other is a scalar",
       example: "",
     },
     "Units do not equal each other": {
       description: "You have expressions that are set equal to each other that don't have the same units, or they have the same units but one is a vector and the other is a scalar.",
+      example: "",
+    },
+    "Expressions are not equivalent": {
+      description: "You have expressions on this line that are set equal to each other but are not equivalent",
+      example: "",
+    },
+    "Expressions found inside integral without differential variable": {
+      description: "All expressions inside the parentheses of an integral must be multiplied by a differential variable, for exmaple: dx,dy,dt,etc",
+      example: "",
+    },
+    "Integral bounds not formatted properly": {
+      description: "There is an integral on this line that has a lower bound defined but not an upper bound defined or vise versa",
       example: "",
     },
     "Value expected": {
@@ -50,19 +69,25 @@ function EditorLogger(){
     this.clearLog();//clearing log befor adding to it
     this.saveUndefinedVariablesData();
     this.clearUndefinedVariables();
+    this.clearRawExpressionData();
+    this.clearLinesToCheckForSelfConsistency();
 
     for(const [lineNumber, id] of Object.entries(orderedIds)){
-      //console.log(lineNumber);
       //before we do anything there are some edge case we need to take care of specifically \nabla^2 need to be formatted as \nabla \cdot \nabla
       let ls = FormatNablaSquared(MathFields[id].mf.latex());
       ls = PutBracketsAroundAllSubsSupsAndRemoveEmptySubsSups(ls);
-      ls = RemoveDifferentialOperatorDFromLatexString(ls);
       if(ls.length > 0){//there is something to evaluate
-        let undefinedVars = GetUndefinedVariables(ls);
+        let undefinedVars = GetUndefinedVariables(RemoveDifferentialOperatorDFromLatexString(ls));
         this.recordUndefinedVariables(undefinedVars);
         CheckForErrorsInExpression(ls, lineNumber, id);
       }
     }
+
+    //after we have gone through all the lines and parsed everything we will have a list of lines that we can check for selfConsistency so lets do that
+
+    this.CheckLinesForSelfConsistency();
+
+    this.UpdateKnownUnknownVariables();
 
     //after parsing through everything and building up the list of defined undefined variables we need to check if there are any relevant equations for the set of variables we have in DefinedVariables and this.undefinedVars.defined
     CheckForAndDisplayRelevantEquations();
@@ -70,7 +95,20 @@ function EditorLogger(){
     this.display();
   }
 
-  this.ParsePreviousLinesAgainWithNewInfo = function(endingLineNumber){
+  this.ParsePreviousLinesAgainWithNewInfoAboutUnknownVariables = function(endingLineNumber){
+    for(const [lineNumber, expressions] of Object.entries(this.rawExpressionData)){
+      if(lineNumber > endingLineNumber){
+        break;//we break the job of this function was only to parse previous lines and the current line we were on when we called this function
+      }
+      else{
+        IdentifyAllKnownUnknownVariables(expressions);
+      }
+
+    }
+
+  }
+
+  this.ParsePreviousLinesAgainWithNewInfoAboutUndefinedVariables = function(endingLineNumber){
     let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
     this.clearLog();//clearing log befor adding to it
     this.clearUndefinedVariables(true, false);//clearing undefined variables but not defined undefined variables
@@ -80,18 +118,77 @@ function EditorLogger(){
         break;//we break the job of this function was only to parse previous lines and the current line we were on when we called this function
       }
       else{
-        //console.log("Repeat: " + lineNumber);
         //before we do anything there are some edge case we need to take care of specifically \nabla^2 need to be formatted as \nabla \cdot \nabla
         let ls = FormatNablaSquared(MathFields[id].mf.latex());
         ls = PutBracketsAroundAllSubsSupsAndRemoveEmptySubsSups(ls);
-        ls = RemoveDifferentialOperatorDFromLatexString(ls);
         if(ls.length > 0){//there is something to evaluate
-          let undefinedVars = GetUndefinedVariables(ls);
+          let undefinedVars = GetUndefinedVariables(RemoveDifferentialOperatorDFromLatexString(ls));
           this.recordUndefinedVariables(undefinedVars);
           CheckForErrorsInExpression(ls, lineNumber, id);
         }
       }
 
+    }
+  }
+
+  this.CheckLinesForSelfConsistency = function(){
+    let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
+    let lineNumber;
+    let mfID;
+    //this function will go through the "this.linesToCheckForSelfConsistency" array and do a high level check for self consistency
+    //this makes sures that there are no duplicate values in the array
+    this.linesToCheckForSelfConsistency = this.linesToCheckForSelfConsistency.filter((value, index, self)=>{
+      return self.indexOf(value) === index
+    });
+    for(let i = 0; i < this.linesToCheckForSelfConsistency.length; i++){
+      lineNumber = this.linesToCheckForSelfConsistency[i];
+      mfID = orderedIds[this.linesToCheckForSelfConsistency[i]];
+      for(let j = 0; j < this.rawExpressionData[this.linesToCheckForSelfConsistency[i]].length; j++){
+        let expressionsThatDontEqualEachOtherOnThisLine = [];
+        let a = [];
+        let c = 0;
+        if(this.rawExpressionData[this.linesToCheckForSelfConsistency[i]][j].length >= 2){//you can only do a self consistency check if there at least two expressions set equal to each other
+          //before we do a high level self consistency check we need to make sure that integrals are formatted properly and have the correct information. specifically if a lower bound is defined then an upperbound should also be defined and vise versa
+          if(AreIntegralBoundsFormattedProperly(this.rawExpressionData[this.linesToCheckForSelfConsistency[i]][j])){
+            a = DoHighLevelSelfConsistencyCheck(this.rawExpressionData[this.linesToCheckForSelfConsistency[i]][j], lineNumber, mfID);
+            while(c < a.length){
+              expressionsThatDontEqualEachOtherOnThisLine.push(a[c]);
+              c++;
+            }
+          }
+          else{
+            this.addLog({error: [{
+              error: this.createLoggerErrorFromMathJsError("Integral bounds not formatted properly"),
+              info: "",
+              lineNumber: lineNumber,
+              mfID: mfID,
+            }]});
+          }
+
+        }
+
+        //console.log("expressionsThatDontEqualEachOtherOnThisLine", expressionsThatDontEqualEachOtherOnThisLine);
+        if(expressionsThatDontEqualEachOtherOnThisLine.length > 0){
+          this.addLog({error: [{
+            error: this.createLoggerErrorFromMathJsError("Expressions are not equivalent"),
+            info: "",
+            lineNumber: lineNumber,
+            mfID: mfID,
+          }]});
+        }
+      }
+    }
+
+  }
+
+  this.UpdateKnownUnknownVariables = function(reset = true){
+    //we need to first reset all unknown variables current state to "unknown" so that they have to prove that they are known every time the user makes an edit in the editor
+    if(reset){
+      this.ResetAllUnknownVariblesToCurrentStateUnknown();
+    }
+    //after we have identified all of the undefined and variables and defined undefined variables and have created logs for everything we need to evaluate which variables are unknown and which variables where initil unknown but are defined by all known variables
+    for(const [lineNumber, expressions] of Object.entries(this.rawExpressionData)){
+      IdentifyAllKnownUnknownVariables(expressions);
     }
   }
 
@@ -164,6 +261,15 @@ function EditorLogger(){
     };
   }
 
+  this.clearRawExpressionData = function(){
+    this.rawExpressionData = {};
+  }
+
+
+  this.clearLinesToCheckForSelfConsistency = function(){
+    this.linesToCheckForSelfConsistency = [];
+  }
+
   this.clearUndefinedVariables = function(clearUndefined = true, clearDefined = true){
     if(clearUndefined){
       this.undefinedVars.undefined = {};
@@ -175,6 +281,32 @@ function EditorLogger(){
       //the process described above can be found in this.recordDefinitionForUndefinedVariable() function
       RemoveAllDynamicUnitsVariablesFromVectorMagnitudeVariables();
       //all defined undefined variables have an attribute dynamicUnits that is set to true which allows use to figure out which vector magnitudes were set by defined undefined variables
+    }
+
+  }
+
+  this.ResetAllUnknownVariblesToCurrentStateUnknown = function(){
+    //definedVariables needs to be set because it persists between edits so every time an edit is made every unknown
+    //variable needs to prove that they are set equal to all known variables in the editor
+    for(const [key, value] of Object.entries(DefinedVariables)){
+      if(value.state == "unknown"){
+        DefinedVariables[key].currentState = "unknown";
+      }
+    }
+
+    //these variables are dynamically created eveyr time the editor is changed so you would think we wouldn't have to reset
+    //these if they were just created. but in the use case where the user changes the state of another variable we wanted to
+    //be able to update the state of all the other variables without having to parse everything and regenerate everything.
+    //This can be seen in the function "ToggleVariableState"
+    for(const [key, value] of Object.entries(this.undefinedVars.undefined)){
+      if(value.state == "unknown"){
+        this.undefinedVars.undefined[key].currentState = "unknown";
+      }
+    }
+    for(const [key, value] of Object.entries(this.undefinedVars.defined)){
+      if(value.state == "unknown"){
+        this.undefinedVars.defined[key].currentState = "unknown";
+      }
     }
 
   }
@@ -207,6 +339,7 @@ function EditorLogger(){
     let error = undefined;
     keys.map(function(key, index){
       if(err.indexOf(key) != -1){
+
         error = {
           type: key,
           description: et[key].description,

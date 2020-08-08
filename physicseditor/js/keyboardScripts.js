@@ -1,58 +1,3 @@
-let KeyboardLayouts = {
-  greek: {
-    default: [
-      "ς ε ρ τ υ θ ι ο π",
-      "α σ δ φ γ η ξ κ λ",
-      "ABC ζ χ ψ ω β ν μ",
-    ],
-    shift: [
-      "{tab} : ΅ Ε Ρ Τ Υ Θ Ι Ο Π { } |",
-      '{lock} Α Σ Δ Φ Γ Η Ξ Κ Λ ¨ " {enter}',
-      "{shift} > Ζ Χ Ψ Ω Β Ν Μ < > ? {shift}",
-      "ABC {space}"
-    ]
-  },
-  operators: {
-    default: [
-      "\\times \\pm ρ τ υ θ ι ο π",
-      "α σ δ φ γ η ξ κ λ",
-      "ABC ζ χ ψ ω β ν μ",
-    ],
-    shift: [
-      "{tab} : ΅ Ε Ρ Τ Υ Θ Ι Ο Π { } |",
-      '{lock} Α Σ Δ Φ Γ Η Ξ Κ Λ ¨ " {enter}',
-      "{shift} > Ζ Χ Ψ Ω Β Ν Μ < > ? {shift}",
-      "ABC {space}"
-    ]
-  },
-  functions: {
-    default: [
-      "ς ε ρ τ υ θ ι ο π",
-      "α σ δ φ γ η ξ κ λ",
-      "ABC ζ χ ψ ω β ν μ",
-    ],
-    shift: [
-      "{tab} : ΅ Ε Ρ Τ Υ Θ Ι Ο Π { } |",
-      '{lock} Α Σ Δ Φ Γ Η Ξ Κ Λ ¨ " {enter}',
-      "{shift} > Ζ Χ Ψ Ω Β Ν Μ < > ? {shift}",
-      "ABC {space}"
-    ]
-  },
-  advanced: {
-    default: [
-      "ς ε ρ τ υ θ ι ο π",
-      "α σ δ φ γ η ξ κ λ",
-      "ABC ζ χ ψ ω β ν μ",
-    ],
-    shift: [
-      "{tab} : ΅ Ε Ρ Τ Υ Θ Ι Ο Π { } |",
-      '{lock} Α Σ Δ Φ Γ Η Ξ Κ Λ ¨ " {enter}',
-      "{shift} > Ζ Χ Ψ Ω Β Ν Μ < > ? {shift}",
-      "ABC {space}"
-    ]
-  },
-};
-
 function ToggleGreekKeyboard(lowercase){
   console.log(lowercase);
   if(lowercase){
@@ -81,7 +26,6 @@ function InsertComment(){
 }
 
 function SetKeyboardKeys(key){
-  //MyKeyboard.setOptions({layout: KeyboardLayouts[key]});
 
   $("#greek-letters-tab, #operators-tab, #functions-tab, #advanced-operators-tab").removeClass("active");
   //clear keyboards

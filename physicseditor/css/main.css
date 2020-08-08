@@ -35,7 +35,7 @@ body {
 }
 
 .static-physics-equation .mq-sqrt-prefix {
-  transform: scale(1, 2.7) !important;
+  transform: scale(1, 1.7) !important;
 }
 
 .static-physics-equation-header {
@@ -227,6 +227,10 @@ body {
   color: #ef5350;
 }
 
+.collection-item.unused-variable .unknown, .collection-item.unused-variable .known, .collection-item.unused-variable .info, .collection-item.unused-variable .constant-info, .collection-item.unused-variable .physics-constant, .collection-item.unused-variable .static-physics-equation {
+  color: #9e9e9e !important;
+}
+
 #my_variables .collection-item.active {
   background-color: #fafafa !important;
   color: #212121;
@@ -240,6 +244,13 @@ body {
 #my_variables .collection .unknown {
   /*background-color: #ffcdd2;*/
   background-image: linear-gradient(to bottom right, #ffcdd2, #ffebee);
+  color: #424242;
+  cursor: pointer;
+}
+
+#my_variables .collection .known-unknown {
+  /*background-color: #ffcdd2;*/
+  background-image: linear-gradient(to bottom right, #ffcdd2, #b2dfdb);
   color: #424242;
   cursor: pointer;
 }
