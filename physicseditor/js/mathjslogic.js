@@ -352,7 +352,6 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
         if(possiblySolvableExpressions[c].expression.indexOf("\\left[") == -1 && possiblySolvableExpressions[c].expression.indexOf("\\right]") == -1){
           let expression = `${SimpleConvertLatexStringToNerdamerReadableString(possiblySolvableExpressions[c].expression, uniqueRIDStringArray)} = ${knownUnitStringConstant}`;
           let undefinedVariable = SimpleConvertLatexStringToNerdamerReadableString(possiblySolvableExpressions[c].undefinedVariable, uniqueRIDStringArray);//this just gets the undefined variable interms of its random id string
-          console.log(`${expression}, ${undefinedVariable}`);
 
           try{
             SqrtLoop = 0;//resetting this global variable to 0 which makes sure that nerdamer doesn't go into a loop trying to solve for a variable
@@ -374,7 +373,7 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
             }
           }
           catch(err){
-            console.log(err);
+            //console.log(err);
           }
         }
 
@@ -546,7 +545,7 @@ function FindAndFormatUnitsOfMathjsVector(ls){
         }
         catch(err){
           console.log("Error occured trying to parse vector into MathJs Vector");
-          console.log(err);
+          //console.log(err);
         }
       }
       else{
@@ -726,7 +725,7 @@ function SimpleConvertLatexStringToNerdamerReadableString(ls, uniqueRIDStringArr
   return nerdamer.convertFromLaTeX(ls).toString();
 }
 
-function ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, recognizeNerdamerFunctions = false, lookForDifferentials = false){
+function ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, recognizeNerdamerFunctions = false){
   //now we have to go character by character and replace variables with their unitsMathjs string
   let i = 0;
   let delta = 0;
@@ -741,7 +740,7 @@ function ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, recognize
     //if this is true then we have converted things to nerdamer functions before we passed it to this function so
     //we need to make sure that we dont recognize a letter in a nerdamer function as a variable
     if(recognizeNerdamerFunctions){
-      let nerdamerFunctions = ["integrate(",];
+      let nerdamerFunctions = ["integrate(","abs(","vector(","dot(","cross("];
       for(var c = 0; c < nerdamerFunctions.length; c++){
         if(s.indexOf(nerdamerFunctions[c]) == 0){
           foundMatch = true;
@@ -1274,7 +1273,7 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
     //console.log(uniqueRIDStringArray);
     let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID);
     let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID)
-    console.log(expression1 + " ?= " +  expression2);
+    //console.log(expression1 + " ?= " +  expression2);
     if(expression1 != null && expression2 != null){
       //because this is a high level check we need to make sure that both expressions use the same variables and if not we cannot be sure that the equations don't equal each other so we will not actaully do any check
       let expression1Variables = GetRidStringVariablesFromString(expression1, uniqueRIDStringArray);
@@ -1301,7 +1300,7 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
                 }
               }
               if(!isEqual){
-                console.log("not equal");
+                //console.log("not equal");
                 expressionThatAreNotCorrect.push({
                   expression1: expressionArray[i].rawStr,
                   expression2: expressionArray[i+1].rawStr,
@@ -1312,7 +1311,7 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
           }
           else if(expressionArray[i].operator == "<"){
             if(!nerdamer(expression1).lt(expression2)){//nerdamer less than function
-              console.log("not less than");
+              //console.log("not less than");
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
@@ -1322,7 +1321,7 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
           }
           else if(expressionArray[i].operator == ">"){
             if(!nerdamer(expression1).gt(expression2)){//nerdamer greater than function
-              console.log("not greater than");
+              //console.log("not greater than");
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
@@ -1332,7 +1331,7 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
           }
           else if(expressionArray[i].operator == "\\le"){
             if(!nerdamer(expression1).lte(expression2)){//nerdamer less than or equal to function
-              console.log("not less than or equal");
+              //console.log("not less than or equal");
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
@@ -1342,7 +1341,7 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
           }
           else if(expressionArray[i].operator == "\\ge"){
             if(!nerdamer(expression1).gte(expression2)){//nerdamer greater than or equal to function
-              console.log("not greater than or equal");
+              //console.log("not greater than or equal");
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
@@ -1659,7 +1658,7 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   ls = FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID);
   //this line is temporary. We will soon be able to support parsing and using these operators and notations
   if(ls.indexOf("\\int") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1){
-    ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray);
+    ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, true);//passing true as the last parameter tells this function that there are nerdamer functions in this string so don't try to replace the letters in the function names
     return nerdamer.convertFromLaTeX(ls).expand().toString();//this is just a place holder for the actual value we will return
   }
   else{
@@ -1668,7 +1667,7 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
 }
 
 function FormatVectorsIntoNerdamerVectors(ls){
-  return ls.replace(/\(\[/g, "(vector(").replace(/\]\)/g, "))");
+  return ls.replace(/\(\[/g, "vector(").replace(/\]\)/g, ")");
 }
 
 function ReturnIntegralExpressionAndOtherExpression(dividedString, differentialVariableRidString, variableRidString){

@@ -167,9 +167,8 @@ function EditorLogger(){
 
         }
 
-        //console.log("expressionsThatDontEqualEachOtherOnThisLine", expressionsThatDontEqualEachOtherOnThisLine);
         if(expressionsThatDontEqualEachOtherOnThisLine.length > 0){
-          console.log("expressionsThatDontEqualEachOtherOnThisLine", expressionsThatDontEqualEachOtherOnThisLine);
+          //console.log("expressionsThatDontEqualEachOtherOnThisLine", expressionsThatDontEqualEachOtherOnThisLine);
           let latexExpressions = expressionsThatDontEqualEachOtherOnThisLine.map((value)=>{
             let oppositeOperator = {
               "<": "\\nless",
@@ -180,7 +179,7 @@ function EditorLogger(){
             };
             return `${value.expression1} ${oppositeOperator[value.operator]} ${value.expression2}`;
           });
-          console.log(latexExpressions);
+          //console.log(latexExpressions);
           this.addLog({error: [{
             error: this.createLoggerErrorFromMathJsError("Incorrect equations"),
             info: "",
