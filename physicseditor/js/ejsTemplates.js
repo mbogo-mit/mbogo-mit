@@ -14,7 +14,7 @@ let Templates = {
             <span class="badge" data-badge-caption="<%= log.success.length %>"></span>
           </div>
           <div class="collapsible-body information-container">
-            <ul class="collapsible popout">
+            <ul class="collapsible">
               <% for(let i = 0; i < log.success.length; i++){%>
               <li>
                 <div class="collapsible-header"><%= log.success[i].error.type %><span class="badge">Line: <%= log.success[i].lineNumber %></span></div>
@@ -33,7 +33,7 @@ let Templates = {
             <span class="badge" data-badge-caption="<%= log.info.length %>"></span>
           </div>
           <div class="collapsible-body information-container">
-            <ul class="collapsible popout">
+            <ul class="collapsible">
               <% for(let i = 0; i < log.info.length; i++){%>
               <li>
                 <div class="collapsible-header"><%= log.info[i].error.type %><span class="badge">Line: <%= log.info[i].lineNumber %></span></div>
@@ -52,7 +52,7 @@ let Templates = {
             <span class="badge" data-badge-caption="<%= log.warning.length %>"></span>
           </div>
           <div class="collapsible-body information-container">
-            <ul class="collapsible popout">
+            <ul class="collapsible">
               <% for(let i = 0; i < log.warning.length; i++){%>
               <li>
                 <div class="collapsible-header"><%= log.warning[i].warning %><span class="badge">Line: <%= log.warning[i].lineNumber %></span></div>
@@ -79,7 +79,7 @@ let Templates = {
             <span class="badge" data-badge-caption="<%= log.error.length %>"></span>
           </div>
           <div class="collapsible-body information-container">
-            <ul class="collapsible popout">
+            <ul class="collapsible">
               <% for(let i = 0; i < log.error.length; i++){%>
               <li>
                 <div class="collapsible-header"><%= log.error[i].error.type %><span class="badge">Line: <%= log.error[i].lineNumber %></span></div>

@@ -1,5 +1,199 @@
 let ListOfFunctions = ["\\sum", "\\prod","\\sqrt","\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\arcsin", "\\arccos", "\\arctan", "\\exp", "\\lg", "\\ln", "\\log",];
 
+let ListOfOperators = [
+  "\\frac", "\\sqrt", "\\int", "\\oint", "\\sum", "\\prod", "\\triangledown","\\cdot","\\ast","\\bigcup","\\coprod","\\pm", "-", "+", "\\times","\\circ",
+  "<", ">", "=","*", "\\doteq", "\\geq", "\\leq", "\\leqslant", "\\geqslant", "\\equiv", "\\neq", "\\ngtr", "\\nless", "\\nleqslant", "\\ngeqslant", "\\approx", "\\simeq", "\\cong", "\\propto",
+  "\\leftarrow", "\\rightarrow", "\\Leftarrow", "\\Rightarrow", "\\leftrightarrow", "\\Leftrightarrow", "\\leftrightharpoons", "\\rightleftharpoons",
+  "\\left(", "\\right)","\\left|", "\\right|", "\\left \\|", "\\right \\|", "\\left[", "\\right]", "\\left [", "\\right ]", "\\left \\langle", "\\right \\rangle", "\\left \\{", "\\right \\}", "\\left |", "\\right |",
+  "\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\arcsin", "\\arccos", "\\arctan", "\\exp", "\\lg", "\\ln", "\\log",
+];
+
+let LatexGreekLetters = [
+  "\\nabla","\\alpha","\\beta", "\\gamma", "\\delta", "\\epsilon", "\\varepsilon", "\\zeta", "\\eta", "\\theta", "\\vartheta", "\\iota", "\\kappa", "\\lambda", "\\mu", "\\nu", "\\xi", "\\pi", "\\varpi", "\\rho", "\\varrho", "\\sigma", "\\varsigma", "\\tau", "\\upsilon", "\\phi", "\\varphi", "\\chi", "\\psi", "\\omega", "\\Gamma", "\\Delta", "\\Lambda", "\\Theta", "\\Xi", "\\Pi", "\\Upsilon", "\\Sigma", "\\Phi", "\\Psi", "\\Omega",
+];
+
+
+function GetVariablesFromLatexString(ls){
+  ls = PutBracketsAroundAllSubsSupsAndRemoveEmptySubsSups(ls);
+  ls = RemoveDifferentialOperatorDFromLatexString(ls);
+  let vars = [];
+  let str = "";
+  let answer;
+  let state = {
+    index: 0,
+    ls: ls,
+    currentlyParsingVariable: false,
+    numberOfRightBracketsNeeded: 0,
+  };
+  while(state.index < ls.length){
+    answer = ThisIsTheBeginningOfAVariable(state);
+    if(answer.yes){
+      str = answer.substring;
+    }
+    else{
+      answer = ThisIsTheContinuationOfAVariable(state);
+      if(answer.yes){
+        str += answer.substring;
+      }
+      else{
+        answer = ThisIsTheEndOfAVariable(state)
+        if(answer.yes){
+          vars.push(str);//Adding
+          str = "";
+        }
+        else{
+          answer = ThisIsFormattingText(state);
+        }
+      }
+    }
+
+    state = Object.assign({}, answer.newState);
+
+  }
+
+  if(state.currentlyParsingVariable){
+    vars.push(str);
+  }
+
+  //we need to filter the array for only unique values
+  let uniqueVars = vars.filter((value, index, self)=>{
+    return self.indexOf(value) === index
+  });
+
+  return uniqueVars;
+}
+
+function ThisIsTheBeginningOfAVariable(state){
+  let subLs = state.ls.substring(state.index);
+  let alpha = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+  let answer = {
+    yes: false,
+    newState: Object.assign({}, state),
+    substring: "",
+  }
+  if(!state.currentlyParsingVariable){
+    //we need to see if the current character could be the start of a variable
+    if(subLs[0] == "\\"){
+      //it could equal a blackslash because it is the start of a vector variable '\vec{}'
+      if(subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0 || subLs.indexOf("\\overline{") == 0){
+        let size = (subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0) ? "\\bar{".length : "\\overline{".length;
+        answer.yes = true;
+        answer.substring = subLs.substring(0,size);
+        answer.newState.currentlyParsingVariable = true;
+        answer.newState.numberOfRightBracketsNeeded = 1;//because the vec has a left bracket
+        answer.newState.index += size;
+      }
+      else{
+        //this checks if the variable is like a greek letter which be formatted in a latex keyword
+        for(var i = 0; i < LatexGreekLetters.length; i++){
+          if(subLs.indexOf(LatexGreekLetters[i]) == 0){
+            //this is a variable
+            answer.yes = true;
+            answer.substring = subLs.substring(0,LatexGreekLetters[i].length);
+            answer.newState.currentlyParsingVariable = true;
+            answer.newState.index += LatexGreekLetters[i].length;
+            break;//we found a match so no need to parse any more
+          }
+        }
+      }
+    }
+    else if(alpha.includes(subLs[0])){
+      answer.yes = true;
+      answer.substring = subLs[0];
+      answer.newState.currentlyParsingVariable = true;
+      answer.newState.index++;
+    }
+  }
+
+  return answer;
+}
+
+function ThisIsTheContinuationOfAVariable(state){
+  let subLs = state.ls.substring(state.index);
+  let answer = {
+    yes: false,
+    newState: Object.assign({}, state),
+    substring: "",
+  }
+
+  if(state.currentlyParsingVariable){
+    if(subLs.indexOf("_{") == 0){//this is the only that is an acceptable continuation of a variable without the need of brackets
+      answer.yes = true;
+      answer.substring = subLs.substring(0,2);
+      answer.newState.numberOfRightBracketsNeeded += 1;//because the "_" needs an opening and closing bracket
+      answer.newState.index += 2;
+    }
+    else{
+      //the only other way we are still parsing a variable is if there are open left brackets that are in the string that need right brackets
+      if(state.numberOfRightBracketsNeeded > 0){
+        if(subLs[0] == "}"){
+          answer.newState.numberOfRightBracketsNeeded -= 1
+        }
+        else if(subLs[0] == "{"){
+          answer.newState.numberOfRightBracketsNeeded += 1
+        }
+        //regardless of what the character is we are still continuing to make a variable because we haven't closed off all of the brackets yet
+        answer.yes = true;
+        answer.substring = subLs[0];
+        answer.newState.index ++;
+
+      }
+    }
+  }
+
+  return answer
+}
+
+function ThisIsTheEndOfAVariable(state){
+  let subLs = state.ls.substring(state.index);
+  let answer = {
+    yes: false,
+    newState: Object.assign({}, state),
+    substring: "",
+  }
+  //the only way that this character is not a continuation but the next character after the end of another one is that it is not an "_" and numberOfRightBracketsNeeded = 0
+  if(state.currentlyParsingVariable && subLs[0] != "_" && state.numberOfRightBracketsNeeded == 0){
+    answer.yes = true;
+    answer.newState.currentlyParsingVariable = false;
+    //ther is no substring and there is not index to change because all we are saying is that this character is not a continuation of the varaible that we were creating
+  }
+
+  return answer;
+}
+
+function ThisIsFormattingText(state){//if something is formating text than we don't really need to parse it we can just skip it
+  let subLs = state.ls.substring(state.index);
+  let answer = {
+    yes: false,
+    newState: Object.assign({}, state),
+    substring: "",
+  }
+
+  if(!state.currentlyParsingVariable){//the only way something can just be formatting text is if you are first not parsing a variable
+    if(subLs[0] == "\\"){
+      let foundMatch = false;
+      for(var i = 0; i < ListOfOperators.length; i++){
+        if(subLs.indexOf(ListOfOperators[i]) == 0){
+          foundMatch = true;
+          answer.newState.index += ListOfOperators[i].length;//so we skip all of the irrelevant opperator text
+          break;//found a match
+        }
+      }
+      if(!foundMatch){
+        answer.newState.index ++;
+      }
+    }
+    else{
+      answer.newState.index ++;
+    }
+
+  }
+
+  return answer;
+}
+
+
+
 function TakeOutFractionLatexFormatting(ls){
   let index = 0;
   while(ls.indexOf("\\frac") != -1){
@@ -48,73 +242,4 @@ function FindIndexOfClosingBracket(ls){
 
   }
   return null;
-}
-
-/*
-function ParseLatexStringIntoAlgebraJsExpression(ls){
-
-  let exprs = [];
-  exprs.push(new Expression());
-
-  let index = 0;
-  let delta = 0;
-  let operation = null;
-  let currentExpression = null;
-  let foundMatch = false;
-
-  while(index < ls.length){
-    foundMatch = false;
-    currentExpression = null;
-    let s = ls.substring(index);
-    if(operation == ""){
-      //we are checking if the current index we are at is an operation
-      let sequentialOperators = SequentialOperators.multiply.concat(SequentialOperators.add).concat(SequentialOperators.subtract);
-      for(var c = 0; c < sequentialOperators.length; c++){
-        if(s.indexOf(sequentialOperators[c]) == 0){
-          operation = sequentialOperators[c];
-          delta = sequentialOperators[c].length;
-          foundMatch = true;
-        }
-      }
-    }
-
-    if(!foundMatch){//if we still haven't figured out what is at this index we need to check if it is a variable
-      let i = AlegbraJsUnitVariables.indexOf(s[0]);
-      if(i != -1){
-        currentExpression = new Expression(AlegbraJsUnitVariables[i]);
-        foundMatch = true;
-        delta = 1;
-      }
-    }
-
-    //if this thing is not a plus, minus, multiply or variable it is either a \frac,\left(,^, or function like sqrt, or cos
-
-    if(!foundMatch){
-      //checking to see if this is a fraction
-      if(s.indexOf("\\frac") == 0){
-        let frac = GetNumeratorAndDenominatorSubstringFromLatexString(s);
-        currentExpression = ParseLatexStringIntoAlgebraJsExpression(frac.numerator).divide(ParseLatexStringIntoAlgebraJsExpression(frac.denominator));
-        foundMatch = true;
-        delta = ("\\frac{" + frac.numerator + "}{" + frac.denominator + "}").length;
-      }
-    }
-
-    if(!foundMatch){
-      //checking if this is a \left(
-      if(s.indexOf("\\left(") == 0){
-        let parenthesesExpressionSubstring = GetParenthesesExpressionSubstringFromLatexString(s);
-        currentExpression = ParseLatexStringIntoAlgebraJsExpression(parenthesesExpressionSubstring);
-        delta = ("\\left(" + parenthesesExpressionSubstring + "\\right)").length;
-      }
-    }
-
-    index += delta;
-  }
-
-
-
-}
-*/
-function RecursivePLSIAJE(){//P.L.S.I.A.J.E stands for ParseLatexStringIntoAlgebraJsExpression
-
 }

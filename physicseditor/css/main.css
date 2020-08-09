@@ -480,7 +480,7 @@ body {
   background-color: white;
 }
 
-#editor-log-container .collapsible {
+#editor-log-container .collapsible.log-container {
   margin: 0px;
   box-shadow: none;
 }
@@ -492,7 +492,11 @@ body {
 }
 
 #editor-log-container .collapsible-body.information-container {
-  padding: 39px 15px;
+  padding: 20px;
+}
+
+#editor-log-container .collapsible-body.information-container .collapsible {
+  margin: 0px;
 }
 
 #close-editor-log {

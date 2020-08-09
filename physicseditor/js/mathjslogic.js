@@ -197,7 +197,8 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
         let str = ReplaceVariablesWithMathjsUnits(exprs[i][j].str);
 
         str = CleanLatexString(str,["absolute-value"]);
-        str = CleanLatexString(str, ["fractions","addition","parentheses","brackets", "white-space"]);
+        str = CleanLatexString(str, ["fractions","addition","parentheses","brackets", "white-space", "square-brackets"]);
+        str = FindAndFormatUnitsOfMathjsVector(str);//we have to do this step after all the square brackets have been formatted
         str = FindAndWrapVectorsThatAreBeingMultiplied(str);
         str = CleanLatexString(str,["multiplication"]);
         str = CleanLatexString(str,["latexFunctions"]);//this takes functions in latex and converts them to something mathjs can understand. for example converting \sqrt into sqrt so math js understands
@@ -347,25 +348,37 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
           ridString: knownUnitStringConstant,
           unitsMathjs: equationUnits,
         });
-        let expression = `${SimpleConvertLatexStringToNerdamerReadableString(possiblySolvableExpressions[c].expression, uniqueRIDStringArray)} = ${knownUnitStringConstant}`;
-        let undefinedVariable = SimpleConvertLatexStringToNerdamerReadableString(possiblySolvableExpressions[c].undefinedVariable, uniqueRIDStringArray);//this just gets the undefined variable interms of its random id string
-        SqrtLoop = 0;//resetting this global variable to 0 which makes sure that nerdamer doesn't go into a loop trying to solve for a variable
-        let solution = nerdamer(expression).solveFor(undefinedVariable).toString();
-        //console.log(solution);
-        if(solution.length != 0){
-          //we need to convert the solution into math js units
-          let mathjsString = ReplaceUniqueRIDStringWithMathjsUnits(solution, uniqueRIDStringArray);
-          try{//we are going to try to evaluate the math js string to get the units of this unknown variable. if it works we will added it to defined undefined vars if it doesn't work then we just catch the error
-            let mathjsUnits = math.evaluate(mathjsString).toString();
-            //if the above line doesn't through an error then we have found a unit definition for this undefined variable so we need to record it
-            EL.recordDefinitionForUndefinedVariable(possiblySolvableExpressions[c].undefinedVariable, mathjsUnits);
-            recordedDefinitionForUndefinedVariable = true;
+        //we dont have support for figuring out the units of a vector's components quite yet
+        if(possiblySolvableExpressions[c].expression.indexOf("\\left[") == -1 && possiblySolvableExpressions[c].expression.indexOf("\\right]") == -1){
+          let expression = `${SimpleConvertLatexStringToNerdamerReadableString(possiblySolvableExpressions[c].expression, uniqueRIDStringArray)} = ${knownUnitStringConstant}`;
+          let undefinedVariable = SimpleConvertLatexStringToNerdamerReadableString(possiblySolvableExpressions[c].undefinedVariable, uniqueRIDStringArray);//this just gets the undefined variable interms of its random id string
+          console.log(`${expression}, ${undefinedVariable}`);
+
+          try{
+            SqrtLoop = 0;//resetting this global variable to 0 which makes sure that nerdamer doesn't go into a loop trying to solve for a variable
+            let solution = nerdamer(expression).solveFor(undefinedVariable).toString();
+            //console.log(solution);
+            if(solution.length != 0){
+              //we need to convert the solution into math js units
+              let mathjsString = ReplaceUniqueRIDStringWithMathjsUnits(solution, uniqueRIDStringArray);
+              try{//we are going to try to evaluate the math js string to get the units of this unknown variable. if it works we will added it to defined undefined vars if it doesn't work then we just catch the error
+                let mathjsUnits = math.evaluate(mathjsString).toString();
+                //if the above line doesn't through an error then we have found a unit definition for this undefined variable so we need to record it
+                EL.recordDefinitionForUndefinedVariable(possiblySolvableExpressions[c].undefinedVariable, mathjsUnits);
+                recordedDefinitionForUndefinedVariable = true;
+              }
+              catch(err){
+                //do nothing
+                //console.log(err);
+              }
+            }
           }
           catch(err){
-            //do nothing
-            //console.log(err);
+            console.log(err);
           }
         }
+
+
       }
     }
 
@@ -464,7 +477,7 @@ function ReplaceVariablesWithMathjsUnits(ls){
         //we need to check if this variable is a vector and if so then we have to format unitsMathjs variable differently
         let unitsMathjs = variable.unitsMathjs;
         if(variable.type == "vector"){
-          unitsMathjs = `[(${unitsMathjs}) vector, (${unitsMathjs}) vector, (${unitsMathjs}) vector]`;//making math js representation of a vector
+          unitsMathjs = `[(${unitsMathjs}), (${unitsMathjs}), (${unitsMathjs})]`;//making math js representation of a vector
         }
         foundMatch = true;
         delta = vars[c].length;
@@ -510,6 +523,44 @@ function ReplaceVariablesWithMathjsUnits(ls){
 
   return newLs;
 
+}
+
+function FindAndFormatUnitsOfMathjsVector(ls){
+  //this function goes through latex string and multiplies
+  let i = 0;
+  let i2 = 0;
+  let delta = 1;
+  let s;
+  let newLs = "";
+  while(i < ls.length){
+    delta = 1;
+    s = ls.substring(i);
+    if(s.indexOf("([") == 0){
+      i2 = FindIndexOfClosingParenthesis(s.substring(1));
+      if(i2 != null){
+        i2 += 1;//accounts for the shift that occured because we used a substring of "s"
+        delta = i2 + 1;
+        try{
+          let formattedVector = math.evaluate(`${s.substring(0,i2 + 1)} (1 vector)`).toString();
+          newLs += `(${formattedVector})`;
+        }
+        catch(err){
+          console.log("Error occured trying to parse vector into MathJs Vector");
+          console.log(err);
+        }
+      }
+      else{
+        console.log("couldn't find closing parentheses");
+        return ls;
+      }
+    }
+    else{
+      newLs += s[0];
+    }
+    i += delta;
+  }
+
+  return newLs;
 }
 
 function ReplaceUniqueRIDStringWithMathjsUnits(ls, uniqueRIDStringArray){//this function works exactly like ReplaceVariablesWithMathjsUnits() except it doesn't care about the distincition between vectors and scalars only units
@@ -836,6 +887,9 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
   }
   if(types.includes("brackets")){
     ls = ls.replace(/\{/g,"(").replace(/\}/g,")");//replacing brackets for parentheses
+  }
+  if(types.includes("square-brackets")){
+    ls = ls.replace(/\\left\[/g,"([").replace(/\\right\]/g,"])");//replacing brackets for parentheses
   }
   if(types.includes("white-space")){
     ls = ls.replace(/\\\s/g, '');//removing "\ " blackslash with space after
@@ -1211,11 +1265,9 @@ function GetRidStringVariablesFromString(str, uniqueRIDStringArray){
 }
 
 function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
-  console.log("expressionArray", expressionArray);
   let expressionThatAreNotCorrect = [];
   //so now we need to check if there is even a possiblity that we can do a high level check between these expressions
   for(let i = 0; i + 1 < expressionArray.length; i++){
-    console.log("i", i);
     //we need to do an exact conversion from latex to a string that nerdamer can understand. they have a convertFromLatex function but it is very limited so we will use it sparingly
     //this line of code converts the two expressions we were analyzing into nerdeamer readable string then we use nerdamers .eq() function to check if they are equal. if they arent then we add these two expression to the "expressionThatDontEqualEachOther" array
     let uniqueRIDStringArray = GenerateUniqueRIDStringForVariables(`${expressionArray[i].rawStr} + ${expressionArray[i+1].rawStr}`);//passing both string and putting a plus inbetween them so that we generate a uniqueRIDStringArray that accounts for all the variables and differential variables used in both expressions
@@ -1234,12 +1286,28 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
           //using all of nerdamer's equality functions to figure out if the expression is correct
           if(expressionArray[i].operator == "="){
             if(!nerdamer(expression1).eq(expression2)){//nerdamer equal to function
-              console.log("not equal");
-              expressionThatAreNotCorrect.push({
-                expression1: expressionArray[i].rawStr,
-                expression2: expressionArray[i+1].rawStr,
-                operator: expressionArray[i].operator,
-              });
+              let isEqual = false;
+              //before we can be sure that these two expression are not equal we need to check if both are vectors because for some reason nerdamer returns false even if the expressions are both "[x,y,z]"
+              let resultingVector = nerdamer(expression1).subtract(expression2);
+              if(resultingVector.symbol.elements){//if this doens't equal undefined we know our result "r" is a vector so we can do an extra check before we assume the expressions don't equal
+                isEqual = true;
+                let count = 0;
+                while(count < resultingVector.symbol.elements.length){
+                  if(nerdamer.vecget(resultingVector, count).toString() != "0"){//checking if each component of this vector is equal to 0
+                    isEqual = false;
+                    break;
+                  }
+                  count++;
+                }
+              }
+              if(!isEqual){
+                console.log("not equal");
+                expressionThatAreNotCorrect.push({
+                  expression1: expressionArray[i].rawStr,
+                  expression2: expressionArray[i+1].rawStr,
+                  operator: expressionArray[i].operator,
+                });
+              }
             }
           }
           else if(expressionArray[i].operator == "<"){
@@ -1286,8 +1354,6 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
       }
     }
   }
-
-  console.log("expressionThatAreNotCorrect", expressionThatAreNotCorrect);
   return expressionThatAreNotCorrect;
 }
 
@@ -1584,10 +1650,11 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
 }
 
 function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStringArray, lineNumber, mfID){
-  if(ls.indexOf("\\times") != -1){
-    return null;//right now we don't support cross product calculations because we don't know the difference between a scalar and a vector so if someone wrote \vec{v} \times \vec{v} = 0, we know this is true but my program right now would just multiply v*v and say it should equal v^2
-  }
-  ls = ls.replace(/\\left\|/g,"abs(").replace(/\\right\|/g,")");//this converts all absolute value signs into nerdamer function "abs(......)"
+  //I'm wrapping the absolute value function in parentheses "(abs(....))" so that it doesn't through off the wrap vector
+  ls = ls.replace(/\\left\|/g,"(abs(").replace(/\\right\|/g,"))");//this converts all absolute value signs into nerdamer function "abs(......)"
+  ls = CleanLatexString(ls, ["square-brackets"]);//we need to make sure that brackets formatted in latex are cleaned and
+  ls = FindAndWrapVectorsThatAreBeingMultiplied(ls).replace(/(myCrossProduct)/g,"cross").replace(/(myDotProduct)/g,"dot");//the replacing what i call cross and dot product with what nerdamer recognizes as a cross or dot product
+  ls = FormatVectorsIntoNerdamerVectors(ls);
   //we need to see if we can parse \int into a nerdamer string like integrate(x,x). and if we can't convert all of them then the if statement below will not allow us to check if the strings are equal
   ls = FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID);
   //this line is temporary. We will soon be able to support parsing and using these operators and notations
@@ -1598,6 +1665,10 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   else{
     return null;
   }
+}
+
+function FormatVectorsIntoNerdamerVectors(ls){
+  return ls.replace(/\(\[/g, "(vector(").replace(/\]\)/g, "))");
 }
 
 function ReturnIntegralExpressionAndOtherExpression(dividedString, differentialVariableRidString, variableRidString){
