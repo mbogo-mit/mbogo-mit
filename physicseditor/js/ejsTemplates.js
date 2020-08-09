@@ -83,7 +83,13 @@ let Templates = {
               <% for(let i = 0; i < log.error.length; i++){%>
               <li>
                 <div class="collapsible-header"><%= log.error[i].error.type %><span class="badge">Line: <%= log.error[i].lineNumber %></span></div>
-                <div class="collapsible-body"><span><%= log.error[i].error.description %></span></div>
+                <div class="collapsible-body">
+                  <div><%= log.error[i].error.description %></div>
+                  <% if(log.error[i].latexExpressions != undefined){%>
+                  <%for(let latexExpression of log.error[i].latexExpressions){%>
+                    <div style="display:block;" class="log-static-latex" latex="<%= latexExpression %>"><%= latexExpression %></div>
+                  <%}}%>
+                </div>
               </li>
               <% } %>
             </ul>

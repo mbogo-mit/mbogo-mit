@@ -73,7 +73,7 @@ function IdentifyAllKnownUnknownVariables(exprs){
   for(var i = 0; i < exprs.length; i++){
     if(exprs[i].length >= 2){//if there aren't at least two expressions set equal to each other there is no way that a variable that was previously unknown could be equal to all known variables
       listOfUnknownVariables = exprs[i].map(function(value, index){
-        let vars = GetVariablesFromLatexString(value.str);
+        let vars = GetVariablesFromLatexString(value.rawStr);
         let unknownVars = [];
         vars.map(function(v){
           if(DefinedVariables[v] != undefined){
@@ -145,29 +145,49 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
   ls = SimplifyFunctionDefinitionToJustFunctionVariable(ls);//converts "f(x,y)=xy" to f=xy
 
   let expressions = ls.split(";");
-  let exprs = [];
-  let rawData = [];
-  expressions.map(function(value, i){
-    let v = value.split("=");//getting all the latex string split by = sign
-    let a = [];
-    let rd = [];
-    for(var c = 0; c < v.length; c++){
-      //making an array that holds all the latex strings that are set to each other which will keep track if the string was parsed on not based on whether it had undefined variables in it
-      if(v[c].length > 0){
-        a.push({
-          parsed: false,
-          str: RemoveDifferentialOperatorDFromLatexString(v[c]),
-        });
-        rd.push({
-          str: v[c],
-        });
+  let rawData = expressions.map((str) => {
+    let i = 0;
+    let startIndex = 0;
+    let splittedExpressions = [];
+    let foundMatch = false;
+    while(i < str.length){
+      foundMatch = false;
+      for(let delimiter of EqualityOperators){
+        if(delimiter.indexOf("\\") == 0){
+          foundMatch = (str.substring(i).indexOf(`${delimiter} `) == 0 || str.substring(i).indexOf(`${delimiter}\\`) == 0);
+        }
+        else{
+          foundMatch = (str.substring(i).indexOf(delimiter) == 0);
+        }
+        if(foundMatch){
+          splittedExpressions.push({
+            parsed: false,
+            str: RemoveDifferentialOperatorDFromLatexString(str.substring(startIndex, i)),
+            rawStr: str.substring(startIndex, i),
+            operator: delimiter,
+          });
+          startIndex = i + delimiter.length;
+          i += delimiter.length -1;
+          break;
+        }
       }
+
+      i++;
     }
-    exprs.push(a);
-    rawData.push(rd.slice());
+    //then when we are done with the while loop we have to add the rest of the expression into the "splittedExpressions" array because there is no operator at the end of the string
+    splittedExpressions.push({
+      parsed: false,
+      str: RemoveDifferentialOperatorDFromLatexString(str.substring(startIndex, i)),
+      rawStr: str.substring(startIndex, i),
+      operation: null,
+    });
+
+    return splittedExpressions;
   });
 
-  EL.rawExpressionData[lineNumber] = rawData.slice();//copying information
+  let exprs = JSON.parse(JSON.stringify(rawData));//making a deep copy of the raw data
+
+  EL.rawExpressionData[lineNumber] = JSON.parse(JSON.stringify(rawData));//making a deep copy of the raw data
 
 
   for(var i = 0; i < exprs.length; i++){
@@ -1131,7 +1151,7 @@ function AreIntegralBoundsFormattedProperly(expressionArray){
   let c = 0;
   let ls;
   while(c < expressionArray.length){
-    ls = expressionArray[c].str;//checking each latex string to see if there is badly formatted integrals
+    ls = expressionArray[c].rawStr;//checking each latex string to see if there is badly formatted integrals
     //this function takes in an expression array of latex strings and checks if the "\int" latex string and its bounds are formatted properly.
     //when no bounds are explicitly defined by the user the integral will have a latex string of "\\int" becayse earlier the Editor Logger "EL" takes out all empty Subscripts and superscripts so "\\int_{ }^{ }" would turn into this "\\int"
     //if an upperbound is explicitly defined but a lower bound is not the integral will look like this "\\int^{...}"
@@ -1191,42 +1211,84 @@ function GetRidStringVariablesFromString(str, uniqueRIDStringArray){
 }
 
 function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
-  let expressionThatDontEqualEachOther = [];
-  //first we need to get a list of all the variables used in each expression and pair up all the expressions that use the same variables
-  let expressionVariablesArray = expressionArray.map(function(value){
-    return GetVariablesFromLatexString(value.str).filter((v) => { return (v != "\\pi" && v != "i" && v != "e")});
-    //this removes "\\pi" and "i" from the variable list because nerdamer see thoses as values and not variables.
-    //This allows us to check if sin(\\pi) = 0. if we didn't do this line than we would say that the left side has the
-    //variable \\pi which the right side doesn't but in reality nerdamer can handle this case
-  });
+  console.log("expressionArray", expressionArray);
+  let expressionThatAreNotCorrect = [];
   //so now we need to check if there is even a possiblity that we can do a high level check between these expressions
-  for(let i = 0; i < expressionArray.length; i++){
-    for(let j = i + 1; j < expressionArray.length; j++){
-          //we need to do an exact conversion from latex to a string that nerdamer can understand. they have a convertFromLatex function but it is very limited so we will use it sparingly
-          //this line of code converts the two expressions we were analyzing into nerdeamer readable string then we use nerdamers .eq() function to check if they are equal. if they arent then we add these two expression to the "expressionThatDontEqualEachOther" array
-          let uniqueRIDStringArray = GenerateUniqueRIDStringForVariables(`${expressionArray[i].str} + ${expressionArray[j].str}`);//passing both string and putting a plus inbetween them so that we generate a uniqueRIDStringArray that accounts for all the variables and differential variables used in both expressions
-          //console.log(uniqueRIDStringArray);
-          let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].str, uniqueRIDStringArray, lineNumber, mfID);
-          let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[j].str, uniqueRIDStringArray, lineNumber, mfID)
-          //console.log(expression1 + " ?= " +  expression2);
-          if(expression1 != null && expression2 != null){
-            //because this is a high level check we need to make sure that both expressions use the same variables and if not we cannot be sure that the equations don't equal each other so we will not actaully do any check
-            let expression1Variables = GetRidStringVariablesFromString(expression1, uniqueRIDStringArray);
-            let expression2Variables = GetRidStringVariablesFromString(expression2, uniqueRIDStringArray);
-            //console.log(expression1Variables, expression2Variables);
-            if(expression1Variables.length == expression2Variables.length){//the arrays have to bee the same length
-              //we are now going to filter expression1Variables array using values from expression2Variables array and if there are any variables left in expression1Variable array we know that these two arrays don't hold the exact same variables as each other and therefore we can't do a high level check
-              if(expression1Variables.filter((v) => {return !expression2Variables.includes(v)}).length == 0){
-                if(!nerdamer(expression1).eq(expression2)){
-                  //console.log("not equal");
-                  expressionThatDontEqualEachOther.push([expressionArray[i].str, expressionArray[j].str]);
-                }
-              }
+  for(let i = 0; i + 1 < expressionArray.length; i++){
+    console.log("i", i);
+    //we need to do an exact conversion from latex to a string that nerdamer can understand. they have a convertFromLatex function but it is very limited so we will use it sparingly
+    //this line of code converts the two expressions we were analyzing into nerdeamer readable string then we use nerdamers .eq() function to check if they are equal. if they arent then we add these two expression to the "expressionThatDontEqualEachOther" array
+    let uniqueRIDStringArray = GenerateUniqueRIDStringForVariables(`${expressionArray[i].rawStr} + ${expressionArray[i+1].rawStr}`);//passing both string and putting a plus inbetween them so that we generate a uniqueRIDStringArray that accounts for all the variables and differential variables used in both expressions
+    //console.log(uniqueRIDStringArray);
+    let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID);
+    let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID)
+    console.log(expression1 + " ?= " +  expression2);
+    if(expression1 != null && expression2 != null){
+      //because this is a high level check we need to make sure that both expressions use the same variables and if not we cannot be sure that the equations don't equal each other so we will not actaully do any check
+      let expression1Variables = GetRidStringVariablesFromString(expression1, uniqueRIDStringArray);
+      let expression2Variables = GetRidStringVariablesFromString(expression2, uniqueRIDStringArray);
+      //console.log(expression1Variables, expression2Variables);
+      if(expression1Variables.length == expression2Variables.length){//the arrays have to bee the same length
+        //we are now going to filter expression1Variables array using values from expression2Variables array and if there are any variables left in expression1Variable array we know that these two arrays don't hold the exact same variables as each other and therefore we can't do a high level check
+        if(expression1Variables.filter((v) => {return !expression2Variables.includes(v)}).length == 0){
+          //using all of nerdamer's equality functions to figure out if the expression is correct
+          if(expressionArray[i].operator == "="){
+            if(!nerdamer(expression1).eq(expression2)){//nerdamer equal to function
+              console.log("not equal");
+              expressionThatAreNotCorrect.push({
+                expression1: expressionArray[i].rawStr,
+                expression2: expressionArray[i+1].rawStr,
+                operator: expressionArray[i].operator,
+              });
             }
           }
+          else if(expressionArray[i].operator == "<"){
+            if(!nerdamer(expression1).lt(expression2)){//nerdamer less than function
+              console.log("not less than");
+              expressionThatAreNotCorrect.push({
+                expression1: expressionArray[i].rawStr,
+                expression2: expressionArray[i+1].rawStr,
+                operator: expressionArray[i].operator,
+              });
+            }
+          }
+          else if(expressionArray[i].operator == ">"){
+            if(!nerdamer(expression1).gt(expression2)){//nerdamer greater than function
+              console.log("not greater than");
+              expressionThatAreNotCorrect.push({
+                expression1: expressionArray[i].rawStr,
+                expression2: expressionArray[i+1].rawStr,
+                operator: expressionArray[i].operator,
+              });
+            }
+          }
+          else if(expressionArray[i].operator == "\\le"){
+            if(!nerdamer(expression1).lte(expression2)){//nerdamer less than or equal to function
+              console.log("not less than or equal");
+              expressionThatAreNotCorrect.push({
+                expression1: expressionArray[i].rawStr,
+                expression2: expressionArray[i+1].rawStr,
+                operator: expressionArray[i].operator,
+              });
+            }
+          }
+          else if(expressionArray[i].operator == "\\ge"){
+            if(!nerdamer(expression1).gte(expression2)){//nerdamer greater than or equal to function
+              console.log("not greater than or equal");
+              expressionThatAreNotCorrect.push({
+                expression1: expressionArray[i].rawStr,
+                expression2: expressionArray[i+1].rawStr,
+                operator: expressionArray[i].operator,
+              });
+            }
+          }
+        }
+      }
     }
   }
-  return expressionThatDontEqualEachOther;
+
+  console.log("expressionThatAreNotCorrect", expressionThatAreNotCorrect);
+  return expressionThatAreNotCorrect;
 }
 
 function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID){

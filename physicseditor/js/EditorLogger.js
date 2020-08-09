@@ -34,8 +34,8 @@ function EditorLogger(){
       description: "You have expressions that are set equal to each other that don't have the same units, or they have the same units but one is a vector and the other is a scalar.",
       example: "",
     },
-    "Expressions are not equivalent": {
-      description: "You have expressions on this line that are set equal to each other but are not equivalent",
+    "Incorrect equations": {
+      description: "You have incorrect equations on this line",
       example: "",
     },
     "Expressions found inside integral without differential variable": {
@@ -169,9 +169,22 @@ function EditorLogger(){
 
         //console.log("expressionsThatDontEqualEachOtherOnThisLine", expressionsThatDontEqualEachOtherOnThisLine);
         if(expressionsThatDontEqualEachOtherOnThisLine.length > 0){
+          console.log("expressionsThatDontEqualEachOtherOnThisLine", expressionsThatDontEqualEachOtherOnThisLine);
+          let latexExpressions = expressionsThatDontEqualEachOtherOnThisLine.map((value)=>{
+            let oppositeOperator = {
+              "<": "\\nless",
+              ">": "\\ngtr",
+              "=": "\\ne",
+              "\\le": ">",
+              "\\ge": "<",
+            };
+            return `${value.expression1} ${oppositeOperator[value.operator]} ${value.expression2}`;
+          });
+          console.log(latexExpressions);
           this.addLog({error: [{
-            error: this.createLoggerErrorFromMathJsError("Expressions are not equivalent"),
+            error: this.createLoggerErrorFromMathJsError("Incorrect equations"),
             info: "",
+            latexExpressions: latexExpressions,
             lineNumber: lineNumber,
             mfID: mfID,
           }]});
