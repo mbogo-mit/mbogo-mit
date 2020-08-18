@@ -1,5 +1,6 @@
 #determinate-loader {
   transition: width 2s;
+  background-color: #8860d0;
 }
 #loading-screen {
   width: 100%;
@@ -12,8 +13,17 @@
   padding-right: 10%;
 }
 
+#loading-screen .progress {
+  background-color: rgba(135, 96, 208, 0.2);
+}
+
 [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
   visibility: hidden !important;
+}
+
+[type="checkbox"]:checked+span:not(.lever):before {
+  border-right: 2px solid #8860d0 !important;
+  border-bottom: 2px solid #8860d0 !important;
 }
 
 body {
@@ -21,12 +31,20 @@ body {
   overflow-x: hidden;
 }
 
+#my-navbar {
+  padding: 12px 0px;
+  font-size: 16px;
+  font-weight: bold;
+  background-image: linear-gradient(to bottom right, #5680e9, #8860d0);
+  color: white;
+}
+
 .static-physics-equation.tooltipped {
   cursor: pointer;
 }
 
-.static-physics-equation.tooltipped:hover {
-  color: #0097a7;
+.static-physics-equation.tooltipped:hover, .physics-equation-headers:hover, .static-physics-equation-header:hover {
+  color: #5680e9;
 }
 
 
@@ -45,10 +63,6 @@ body {
 
 .static-physics-equation-header i {
   visibility: hidden;
-}
-
-.static-physics-equation-header:hover {
-  color: #0097a7;
 }
 
 .static-physics-equation-header:hover i {
@@ -92,14 +106,14 @@ body {
   padding: 5px 0px 5px 5px !important;
   width: calc(100% - 26px) !important;
   border: 1px solid transparent;
-  border-bottom: 1px solid #e1f5fe;
+  border-bottom: 1px solid #f5f5f5;
 }
 
 .my_math_field_col.active {
-  -webkit-box-shadow: 0px 0px 8px 0px rgba(132,225,235,0.5);
-  -moz-box-shadow: 0px 0px 8px 0px rgba(132,225,235,0.5);
-  box-shadow: 0px 0px 8px 0px rgba(132,225,235,0.5);
-  border: 1px rgba(132,225,235,0.5) solid;
+  -webkit-box-shadow: 0px 0px 8px 0px #84ceeb;
+  -moz-box-shadow: 0px 0px 8px 0px #84ceeb;
+  box-shadow: 0px 0px 8px 0px #84ceeb;
+  border: 1px rgba(132, 206, 235,0.5) solid;
 }
 
 .line-error svg, .line-warning svg {
@@ -115,11 +129,12 @@ body {
   display: inline-block !important;
   height: 23.64px;
   width: 25px !important;
-  background-color: #eeeeee;
+  background-color: #fafafa;
 }
 
 .line_label.active {
-  background-color: rgba(132,225,235,1);
+  background-image: linear-gradient(to bottom right, #5680e9, #84ceeb);
+  color: white;
 }
 .line_label span {
   display: none;
@@ -150,21 +165,20 @@ body {
   background-color: #ec407a;
 }
 
-
 #equations_container .tabs .tab a:focus, #equations_container .tabs .tab a:focus.active {
-  background-color: rgba(48, 79, 254, 0.2);
+  background-color: #5680e9;
 }
 
 #equations_container .tabs .tab a:hover, #equations_container .tabs .tab a.active {
-  color: rgba(48, 79, 254, 1.0);
+  color: rgba(132, 206, 235, 1.0);
 }
 
 #equations_container .tabs .indicator {
-  background-color: rgba(48, 79, 254, 1.0) !important;
+  background-color: #5680e9 !important;
 }
 
 #equations_container .tabs .tab a {
-  color: rgba(48, 79, 254, 0.7);
+  color: rgba(132, 206, 235, 0.7);
 }
 
 #physics-equation-a-tag {
@@ -176,7 +190,7 @@ body {
 }
 
 .relevant-equations-badge {
-  background-color: #f0f4c3 !important;
+  background-color: #c1c8e4 !important;
   color: #424242 !important;
   visibility: hidden;
 }
@@ -186,99 +200,141 @@ body {
 }
 
 .relevant-equation {
-  background-color: #f0f4c3 !important;
+  background-color: #c1c8e4 !important;
 }
 
-#my_variables .collection.no-variables-defined {
+#my_variables .my-collection.no-variables-defined {
   border: none !important;
 }
 
-#my_variables .collection #no-variables-defined {
+#my_variables .my-collection #no-variables-defined {
   display: none;
   color: #616161;
   padding: 10px 20px;
 }
 
-#my_variables .collection.no-variables-defined #no-variables-defined {
+#my_variables .my-collection.no-variables-defined #no-variables-defined {
   display: inline-block;
 }
 
-#my_variables .collection-item{
-  padding-right: 5px !important;
-  padding-top: 15px;
-  padding-bottom: 15px;
+#my_variables .variable-row{
+  padding: 5px !important;
 }
 
-#my_variables .collection-item.undefined-variable{
+#my_variables .variable-row  .variable-value{
+  text-align: right !important;
+  font-size: 19px;
+  max-width: 45%;
+  background-color: #f5f5f5;
+  border: 1px solid #757575;
+  margin-right: 5px;
+  min-width: 10%;
+  border-radius: 2px;
+}
+
+#my_variables .variable-row  .variable-value.static-mathfield{
+  border: 1px solid #f5f5f5;
+}
+
+#my_variables .variable-row  .variable-value.error {
+  border: 1px solid #e57373;
+}
+
+#my_variables .variable-row  .variable-value.mq-focused.error{
+  -webkit-box-shadow: #e57373 0 0 1px 2px, inset #e57373 0 0 2px 0 !important;
+  -moz-box-shadow: #e57373 0 0 1px 2px, inset #e57373 0 0 2px 0 !important;
+  box-shadow: #e57373 0 0 1px 2px, inset #e57373 0 0 2px 0 !important;
+  border-color: #e57373 !important;
+  border-radius: 2px !important;
+}
+
+
+#my_variables .variable-row  .variable-value.mq-focused{
+  -webkit-box-shadow: #8bd 0 0 1px 2px, inset #6ae 0 0 2px 0;
+  -moz-box-shadow: #8bd 0 0 1px 2px, inset #6ae 0 0 2px 0;
+  box-shadow: #8bd 0 0 1px 2px, inset #6ae 0 0 2px 0;
+  border-color: #709AC0;
+  border-radius: 2px !important;
+}
+
+#my_variables .variable-row  .variable-tag{
+  padding: 2px 4px;
+  border-radius: 2px;
+  margin-right: 5px;
+}
+
+#my_variables .variable-row.undefined-variable{
   background-color: rgba(255, 235, 238, 0.4);
 }
 
-#my_variables .collection-item .delete-var {
+#my_variables .variable-row .delete-var {
   margin-left: 5px;
+  position: relative;
+  top: 2px;
   visibility: hidden;
 }
 
-#my_variables .collection-item.active .delete-var {
+#my_variables .variable-row.active .delete-var {
   visibility: visible;
 }
 
-#my_variables .collection-item.active .delete-var:hover {
+#my_variables .variable-row.active .delete-var:hover {
   cursor: pointer;
   color: #ef5350;
 }
 
-.collection-item.unused-variable .unknown, .collection-item.unused-variable .known, .collection-item.unused-variable .info, .collection-item.unused-variable .constant-info, .collection-item.unused-variable .physics-constant, .collection-item.unused-variable .static-physics-equation {
+.variable-row.unused-variable .unknown, .variable-row.unused-variable .given, .variable-row.unused-variable .info, .variable-row.unused-variable .constant-info, .variable-row.unused-variable .physics-constant, .variable-row.unused-variable .static-physics-equation {
   color: #9e9e9e !important;
 }
 
-#my_variables .collection-item.active {
+#my_variables .variable-row.active {
   background-color: #fafafa !important;
   color: #212121;
 }
 
-#my_variables .collection-item.undefined-variable.active {
+#my_variables .variable-row.undefined-variable.active {
   background-color: rgba(255, 235, 238, 0.8) !important;
   color: #212121;
 }
 
-#my_variables .collection .unknown {
+#my_variables .my-collection .unknown {
   /*background-color: #ffcdd2;*/
   background-image: linear-gradient(to bottom right, #ffcdd2, #ffebee);
   color: #424242;
   cursor: pointer;
 }
 
-#my_variables .collection .known-unknown {
+#my_variables .my-collection .known {
   /*background-color: #ffcdd2;*/
   background-image: linear-gradient(to bottom right, #ffcdd2, #b2dfdb);
   color: #424242;
   cursor: pointer;
 }
 
-#my_variables .collection .info.undefined-units {
+#my_variables .my-collection .info.undefined-units {
   background-image: linear-gradient(to bottom right, #ffcdd2, #ffebee) !important;
   color: #424242;
   cursor: pointer;
 }
 
-#my_variables .collection .known {
+#my_variables .my-collection .given {
   /*background-color: #b2dfdb;*/
   background-image: linear-gradient(to bottom right, #b2dfdb, #e0f2f1);
   color: #424242;
   cursor: pointer;
 }
 
-#my_variables .collection .info {
+#my_variables .my-collection .info {
   background-color: #f5f5f5;
   color: #424242;
   cursor: pointer;
 }
 
-#my_variables .collection .info.units.dynamic-units {
+#my_variables .my-collection .info.units.dynamic-units {
   background-image: linear-gradient(to bottom right, #c5cae9, #e8eaf6)  !important;;
 }
 
-#my_variables .collection .info.units {
+#my_variables .my-collection .info.units {
   background-image: linear-gradient(to bottom right, #b2ebf2, #e0f7fa)
 }
 
@@ -299,34 +355,38 @@ body {
 }
 
 
-#my_variables .collection .info.uneditable {
+#my_variables .my-collection .info.uneditable {
   color: #424242;
   cursor: default;
 }
-#my_variables .collection .info.cantBeVector {
+#my_variables .my-collection .info.cantBeVector {
   color: #424242;
   background-color: #ef9a9a !important;
   width: auto !important;
   cursor: default;
+  line-height: 26px !important;
+  height: 26px !important;
+  padding: 0px 5px !important;
+  border-radius: 3px !important;
 }
 
-#my_variables .collection .info.cantBeVector svg {
+#my_variables .my-collection .info.cantBeVector svg {
   position: relative;
   top: 2px;
 }
 
-#my_variables .collection .constant-info {
+#my_variables .my-collection .constant-info {
   background-color: transparent;
   color: #424242;
 }
 
-#my_variables .collection .physics-constant {
+#my_variables .my-collection .physics-constant {
   /*background-color: #e1bee7;*/
   background-image: linear-gradient(to bottom right, #e1bee7, #ede7f6);
   color: #424242;
 }
 
-#my_variables .collection {
+#my_variables .my-collection {
   margin: 10px;
 }
 
@@ -345,12 +405,12 @@ body {
 }
 
 #physics_equations .collapsible-header:hover{
-  background-color: #e1f5fe;
-  transition: background-color 0.5s;
+  background-image: linear-gradient(to bottom right, #84ceeb, #ffffff);
+  /*transition: background-color 0.5s;*/
 }
 
 #physics_equations li.active .collapsible-header{
-  background-color: #80deea;
+  background-image: linear-gradient(to bottom right, #84ceeb, #ffffff);
   transition: background-color 0.5s;
 }
 
@@ -398,9 +458,8 @@ body {
   -webkit-box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
   -moz-box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
   box-shadow: 24px -17px 49px -32px rgba(156,156,156,1);
+  background-image: linear-gradient(to bottom right, #84ceeb, #c1c8e4);
 }
-
-
 
 #keyboard-button .fa-keyboard {
   font-size: 1.6rem !important;
@@ -431,7 +490,7 @@ body {
   overflow-y: scroll;
 }
 
-#my_variables-collection-container .collection {
+#my_variables-collection-container .my-collection {
   border: none;
 }
 
@@ -527,7 +586,7 @@ body {
   border-radius: 3px;
   width: 110px;
   border-radius: 0px 3px 3px 0px;
-  background-color: #f5f5f5;
+  background-color: white;
   color: #424242;
   margin-bottom: 3px;
   text-transform: none;
@@ -539,7 +598,8 @@ body {
 }
 
 #keyboard-tab-container .keyboard-tabs.active {
-  background-color: #80deea !important;
+  background-image: linear-gradient(to bottom right, #5680e9, #84ceeb);
+  color: white;
 }
 
 #keyboard-tab-container .keyboard-tabs:hover {
@@ -612,7 +672,7 @@ body {
 
 #relevant-physics-equations-total-count > span {
   padding: 3px;
-  background-color: #f0f4c3;
+  background-color: #c1c8e4;
   border-radius: 5px;
   color: #424242;
 }
@@ -683,4 +743,20 @@ body {
 #units-dropdown-menu .si-unit-row.active {
   background-color: #b2dfdb !important;
   cursor: pointer;
+}
+
+.error-log .log-static-latex .mq-scaled.mq-paren {
+  transform: scale(0.8, 1.3) !important;/*this fixes brackets for static math fields in the editor logger*/
+}
+
+.warning-header {
+  color: #ffd54f;
+}
+
+.error-header {
+  color: #E57373;
+}
+
+#btn-update-imported-variables:not(.disabled), #btn-cancel-imported-variables {
+  background-color: #5680e9 !important;
 }

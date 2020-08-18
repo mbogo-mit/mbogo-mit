@@ -19,7 +19,7 @@ function KeyboardClicked(write, typedText = ""){
 
 function InsertComment(){
   //check if the user is already in a comment section, and if they are not then do something otherwise don't do anything
-  console.log($(`#${FocusedMathFieldId} .mq-text-mode.mq-hasCursor`));
+  //console.log($(`#${FocusedMathFieldId} .mq-text-mode.mq-hasCursor`));
   if($(`#${FocusedMathFieldId} .mq-text-mode.mq-hasCursor`).length == 0){
     KeyboardClicked('','\\text ');
   }

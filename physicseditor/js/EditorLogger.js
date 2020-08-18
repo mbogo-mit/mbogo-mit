@@ -26,12 +26,24 @@ function EditorLogger(){
       description: "You are crossing a vector with a scalar",
       example: "",
     },
+    "Cannot read property 'toString' of undefined": {
+      description: "You have an empty expression or no expression on this line",
+      example: "",
+    },
     "Units do not match": {
-      description: "You are adding or substracting expressions that don't have the same units, or you are adding two expressions with the same units but one is a vector and the other is a scalar",
+      description: "You are adding or substracting expressions that don't have the same units",
+      example: "",
+    },
+    "Adding a scalar with a vector": {
+      description: "Units match, but your adding a scalar with a vector",
+      example: "",
+    },
+    "Setting a vector equal to scalar": {
+      description: "Units match, but you are setting a vector quantity equal to a scalar quantity",
       example: "",
     },
     "Units do not equal each other": {
-      description: "You have expressions that are set equal to each other that don't have the same units, or they have the same units but one is a vector and the other is a scalar.",
+      description: "You have expressions that are set equal to each other that don't have the same units",
       example: "",
     },
     "Incorrect equations": {
@@ -64,7 +76,7 @@ function EditorLogger(){
     }
   }
 
-  this.GenerateEditorErrorMessages = function(){
+  this.GenerateEditorErrorMessages = function(opts = {}){
     let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
     this.clearLog();//clearing log befor adding to it
     this.saveUndefinedVariablesData();
@@ -92,7 +104,7 @@ function EditorLogger(){
     //after parsing through everything and building up the list of defined undefined variables we need to check if there are any relevant equations for the set of variables we have in DefinedVariables and this.undefinedVars.defined
     CheckForAndDisplayRelevantEquations();
 
-    this.display();
+    this.display({dontRenderMyVariablesCollection: opts.dontRenderMyVariablesCollection});
   }
 
   this.ParsePreviousLinesAgainWithNewInfoAboutUnknownVariables = function(endingLineNumber){
@@ -101,7 +113,7 @@ function EditorLogger(){
         break;//we break the job of this function was only to parse previous lines and the current line we were on when we called this function
       }
       else{
-        IdentifyAllKnownUnknownVariables(expressions);
+        IdentifyAllKnownVariablesAndTheirValues(expressions);
       }
 
     }
@@ -163,6 +175,11 @@ function EditorLogger(){
               lineNumber: lineNumber,
               mfID: mfID,
             }]});
+
+            //we are going to add this information to the correct mathfield that has this error
+            MathFields[mfID].log.error.push({
+              error: this.createLoggerErrorFromMathJsError("Integral bounds not formatted properly"),
+            });
           }
 
         }
@@ -187,6 +204,12 @@ function EditorLogger(){
             lineNumber: lineNumber,
             mfID: mfID,
           }]});
+
+          //we are going to add this information to the correct mathfield that has this error
+          MathFields[mfID].log.error.push({
+            error: this.createLoggerErrorFromMathJsError("Incorrect equations"),
+            latexExpressions: latexExpressions,
+          });
         }
       }
     }
@@ -200,7 +223,7 @@ function EditorLogger(){
     }
     //after we have identified all of the undefined and variables and defined undefined variables and have created logs for everything we need to evaluate which variables are unknown and which variables where initil unknown but are defined by all known variables
     for(const [lineNumber, expressions] of Object.entries(this.rawExpressionData)){
-      IdentifyAllKnownUnknownVariables(expressions);
+      IdentifyAllKnownVariablesAndTheirValues(expressions);
     }
   }
 
@@ -212,13 +235,15 @@ function EditorLogger(){
         //so we check that this undefined variable is not a key in this.undefinedVars.defined because that would mean it is defined
         if(!definedUndefinedVariables.includes(undefinedVars[i])){
           //we are going to add this new undefined variable to the list of undefined variables
+          let savedVariable = this.retrieveSavedUndefinedVariablesData(undefinedVars[i]);
           this.undefinedVars.undefined[undefinedVars[i]] = {
-            state: this.retrieveSavedUndefinedVariablesData(undefinedVars[i]).state,
+            state: (savedVariable.state) ? savedVariable.state : "unknown",
             type: (IsVariableLatexStringVector(undefinedVars[i])) ? "vector" : "scalar",
             units: "undefined (none)",
-            value: undefined,
+            value: (savedVariable.value) ? savedVariable.value: undefined,
+            valueFormattingError: (savedVariable.valueFormattingError) ? savedVariable.valueFormattingError: undefined,
             unitsMathjs: "1 undefinedunit",
-            rid: RID(),
+            rid: (savedVariable.rid) ? savedVariable.rid : RID(),
           };
         }
 
@@ -230,15 +255,18 @@ function EditorLogger(){
     let fullUnitsString = GetFullUnitsStringFromUnitsMathJs(unitsMathjs);
     let isVariableVector = IsVariableLatexStringVector(definedUndefinedVariable);
 
+    let savedVariable = this.retrieveSavedUndefinedVariablesData(definedUndefinedVariable);
+
     this.undefinedVars.defined[definedUndefinedVariable] = {
-      state: this.retrieveSavedUndefinedVariablesData(definedUndefinedVariable).state,
+      state: (savedVariable.state) ? savedVariable.state : "unknown",
       type: (isVariableVector) ? "vector" : "scalar",
-      value: undefined,
+      value: (savedVariable.value) ? savedVariable.value: undefined,
+      valueFormattingError: (savedVariable.valueFormattingError) ? savedVariable.valueFormattingError: undefined,
       canBeVector: fullUnitsString.canBeVector,
       fullUnitsString: fullUnitsString.str,
       units: (fullUnitsString.custom) ? fullUnitsString.str : TrimUnitInputValue(fullUnitsString.str),
       unitsMathjs: GetUnitsFromMathJsVectorString(unitsMathjs),//if it is not a vector it won't effect the string
-      rid: RID(),
+      rid: (savedVariable.rid) ? savedVariable.rid : RID(),
       quantity: (fullUnitsString.custom) ? undefined : UnitReference[fullUnitsString.str].quantity,
       dynamicUnits: true,
     };
@@ -264,6 +292,10 @@ function EditorLogger(){
     this.log.error = this.log.error.concat((log.error) ? log.error : []);
   }
 
+  this.addToMathFieldsLog = function(log){
+
+  }
+
   this.clearLog = function(){
     this.log = {
       success: [],
@@ -271,6 +303,12 @@ function EditorLogger(){
       warning: [],
       error: [],
     };
+    for (const [key, value] of Object.entries(MathFields)) {
+      MathFields[key].log = {
+        warning: [],//variable undefined,
+        error: [], //units don't match
+      };
+    }
   }
 
   this.clearRawExpressionData = function(){
@@ -303,6 +341,8 @@ function EditorLogger(){
     for(const [key, value] of Object.entries(DefinedVariables)){
       if(value.state == "unknown"){
         DefinedVariables[key].currentState = "unknown";
+        //if the value is unknown by definition then the value of the variable must be "undefined"
+        DefinedVariables[key].value = undefined;
       }
     }
 
@@ -313,11 +353,15 @@ function EditorLogger(){
     for(const [key, value] of Object.entries(this.undefinedVars.undefined)){
       if(value.state == "unknown"){
         this.undefinedVars.undefined[key].currentState = "unknown";
+        //if the value is unknown by definition then the value of the variable must be "undefined"
+        this.undefinedVars.undefined[key].value = undefined;
       }
     }
     for(const [key, value] of Object.entries(this.undefinedVars.defined)){
       if(value.state == "unknown"){
         this.undefinedVars.defined[key].currentState = "unknown";
+        //if the value is unknown by definition then the value of the variable must be "undefined"
+        this.undefinedVars.defined[key].value = undefined;
       }
     }
 
@@ -372,8 +416,8 @@ function EditorLogger(){
 
   }
 
-  this.display = function(){
-    let log = Object.assign({}, this.log);//copying so we don't accidentally change the real log
+  this.display = function(opts = {}){
+    let log = JSON.parse(JSON.stringify(this.log));//copying so we don't accidentally change the real log
     //changing html of logger
     let html = ejs.render(Templates["editorLogger"],{log: log});
     $("#editor-log-container").html(html);
@@ -386,11 +430,14 @@ function EditorLogger(){
     $("#btn-log-warning-indicator .indicator-count").html(log.warning.length);
     $("#btn-log-error-indicator .indicator-count").html(log.error.length);
 
+    RenderAllMathFieldLogs();
+
     //initialize static math fields that are used in the log
     $(".log-static-latex").each(function(){
-      MQ.StaticMath($(this)[0]);
+      MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
     });
 
+    /*
     //we need to first clear all the messages from every mathfield and set them to the default state before we populate them with information and render
     for (const [key, value] of Object.entries(MathFields)) {
       MathFields[key].message = {
@@ -414,10 +461,13 @@ function EditorLogger(){
         vars: log.warning[i].variables,
       }
       RenderMessageUI(log.warning[i].mfID);//takes the messages for a specific math field and renders it
-    }
+    }*/
 
-    //after generating errors and defined undefined and defined undefined variables we need to rerender my variable collection
-    OrderCompileAndRenderMyVariablesCollection();
+    if(!opts.dontRenderMyVariablesCollection){
+      //after generating errors and defined undefined and defined undefined variables we need to rerender my variable collection
+      OrderCompileAndRenderMyVariablesCollection();
+    }
+    
   }
 
 }

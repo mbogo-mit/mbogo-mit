@@ -56,10 +56,11 @@ function RenderImportedVariablesTable(key){
     MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
   });
   //add event listeners for checkboxes
-  $("#import-all-mechanics-variables").change(function(){
+  $("#import-all-variables").change(function(){
     $("#btn-update-imported-variables").removeClass("disabled");
     if($(this).prop("checked")){
-      $(".variable-checkbox").prop("checked",true);
+      //making sure to only check variables that are not disabled
+      $(".variable-checkbox:not([disabled='disabled']").prop("checked",true);
     }
     else{
       $(".variable-checkbox").prop("checked",false);
@@ -71,6 +72,8 @@ function RenderImportedVariablesTable(key){
   });
   //now open the modal
   $("#modal_import_variable_definition").modal("open");
+
+  $(".already-imported-variable.tooltipped").tooltip();
 }
 
 function UpdateImportedVariables(){
@@ -114,17 +117,20 @@ function UpdateImportedVariables(){
       }
     }
     else{
-      //if it is not checked we need to remove it
-      UpdateSimilarDefinedVariables({
-        type: "remove",
-        ls: ls,
-      });
-      //if the variable is a vector we need to try to remove its magnitude as well
-      if(IsVariableLatexStringVector(ls)){
+      //if it wasn't checked it could have been disabled because it is already imported so we need to make sure that it wasn't disabled and if it was don't do anything don't remove anything
+      if($(this).attr("disabled") != "disabled"){
+        //if it is not checked we need to remove it
         UpdateSimilarDefinedVariables({
           type: "remove",
-          ls: RemoveVectorLatexString(ls),
+          ls: ls,
         });
+        //if the variable is a vector we need to try to remove its magnitude as well
+        if(IsVariableLatexStringVector(ls)){
+          UpdateSimilarDefinedVariables({
+            type: "remove",
+            ls: RemoveVectorLatexString(ls),
+          });
+        }
       }
     }
   });
@@ -249,6 +255,15 @@ function UpdateDefinedVariables(opts){
     else{
       PreDefinedVariables[opts.ls] = opts.props;
       PreDefinedVariables[opts.ls].rid = opts.rid;
+      //after we add a new variable as a predefined variable we need to make sure to remove any defined variable that uses that same ls
+      if(DefinedVariables[opts.ls] != undefined){
+        UpdateDefinedVariables({
+          type: "remove",
+          rid: DefinedVariables[opts.ls].rid,
+          editable: true,
+        });
+      }
+      
     }
   }
   else if(opts.type == "remove"){
@@ -304,16 +319,20 @@ function GetFullUnitsStringFromUnitsMathJs(unitsMathjs){
 function ToggleVariableState(rid){
   let foundVariable = false;
 
+  LastVariableRIDChangedToGiven = null;
+
   for(const [key, value] of Object.entries(DefinedVariables)){
     if(value.rid == rid){
       let ls = key;
       let props = Object.assign({},value);
       //changing the state
-      if(props.state == "known"){
+      if(props.state == "given"){
         props.state = "unknown";
       }
       else{
-        props.state = "known";
+        props.state = "given";
+        //if the state is set to given then we need to focus the variable value tag
+        LastVariableRIDChangedToGiven = rid;
       }
       UpdateDefinedVariables({
         type: "update",
@@ -330,7 +349,13 @@ function ToggleVariableState(rid){
       if(value.rid == rid){
         //changing the state
         foundVariable = true;
-        EL.undefinedVars.undefined[key].state = (EL.undefinedVars.undefined[key].state == "known") ? "unknown" : "known";
+        if(EL.undefinedVars.undefined[key].state == "given"){
+          EL.undefinedVars.undefined[key].state = "unknown";
+        }
+        else{
+          EL.undefinedVars.undefined[key].state = "given";
+          LastVariableRIDChangedToGiven = rid;
+        }
         break;
       }
     }
@@ -341,7 +366,13 @@ function ToggleVariableState(rid){
       if(value.rid == rid){
         //changing the state
         foundVariable = true;
-        EL.undefinedVars.defined[key].state = (EL.undefinedVars.defined[key].state == "known") ? "unknown" : "known";
+        if(EL.undefinedVars.defined[key].state == "given"){
+          EL.undefinedVars.defined[key].state = "unknown";
+        }
+        else{
+          LastVariableRIDChangedToGiven = rid;
+          EL.undefinedVars.defined[key].state = "given";
+        }
         break;
       }
     }
@@ -401,9 +432,16 @@ function MathFieldKeyPressEnter(el, enterClicked = false){
 
 }
 
-function FocusOnThisMathField(rid){
-  FocusedMathFieldId = rid;
+function UnfocusOnThisMathField(){
+  FocusedMathFieldId = "none";
   SetMathFieldsUI();
+}
+
+function FocusOnThisMathField(rid){
+  setTimeout(function(r){
+    FocusedMathFieldId = r;
+    SetMathFieldsUI();
+  },100, rid);
 }
 
 function MoveCursor1Line(id, move = "down", direction = "right"){
@@ -531,14 +569,16 @@ function DeleteCurrentMathFieldAndCopyContentIntoPreviousMathField(id){
 }
 
 function ToggleKeyboard(){
-  if($("#toggle-dir").hasClass("fa-caret-down")){
-    $("#toggle-dir").removeClass("fa-caret-down");
-    $("#toggle-dir").addClass("fa-caret-up");
+  if($("#toggle-dir").hasClass("down-arrow")){
+    $("#toggle-dir").removeClass("down-arrow");
+    $("#toggle-dir").addClass("up-arrow");
+    $("#toggle-dir").html("keyboard_arrow_up");
     $("#keyboard-container").css("bottom","-150px");
   }
   else{
-    $("#toggle-dir").removeClass("fa-caret-up");
-    $("#toggle-dir").addClass("fa-caret-down");
+    $("#toggle-dir").removeClass("up-arrow");
+    $("#toggle-dir").addClass("down-arrow");
+    $("#toggle-dir").html("keyboard_arrow_down");
     $("#keyboard-container").css("bottom","0px");
   }
 }
@@ -560,6 +600,45 @@ function RenderMessageUI(id){
   else{
     elmnt.find(".line_label span.line-number").addClass('active');
   }
+}
+
+function RenderAllMathFieldLogs(){
+  for(const [key, value] of Object.entries(MathFields)){
+    $(`.line_label > [mf='${key}']`).removeClass('active');
+    //removing old tooltips if they exist
+    try{
+      $(`.line_label > .line-warning[mf='${key}']`).tooltip("destroy");
+    }catch(err){
+      //they didn't have this specific line and warning tooltipped yet
+    }
+    try{
+      $(`.line_label > .line-error[mf='${key}']`).tooltip("destroy");
+    }catch(err){
+      //they didn't have this specific line and error tooltipped yet
+    }
+
+    if(MathFields[key].log.warning.length > 0){
+      $(`.line_label > .line-warning[mf='${key}']`).addClass('active');
+      //after we figure what meassage to send we need tooltip the icon with information
+      $(`.line_label > .line-warning[mf='${key}']`).tooltip({html: ejs.render(Templates["mathfield-warning"], {warnings: MathFields[key].log.warning})});
+    }
+    else if(MathFields[key].log.error.length > 0){
+      $(`.line_label > .line-error[mf='${key}']`).addClass('active');
+      //after we figure what meassage to send we need tooltip the icon with information
+      $(`.line_label > .line-error[mf='${key}']`).tooltip({html: ejs.render(Templates["mathfield-error"], {errors: MathFields[key].log.error})});
+      $(`.line_label > .line-error[mf='${key}']`).hover(function(){
+        $(this).tooltip("open");
+        $(".log-static-latex").each(function(){
+          MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+        });
+      });
+    }
+    else{
+      $(`.line_label > .line-number[mf='${key}']`).addClass('active');
+    }
+  }
+
+  
 }
 
 function GetUndefinedVariables(ls){
@@ -809,33 +888,151 @@ function OrderCompileAndRenderMyVariablesCollection(){
   if(html == ""){//if there are no variables defined we will just show a nice message to the user so they know whats up
     html = ejs.render(Templates["no-variables-defined"]);
   }
-  $("#my_variables-collection-container .collection").html(html);//rendering new collection
+  //we need to remove all tooltips in the collection before we create new ones
+  try{
+    $('#my_variables-collection-container .tooltipped').tooltip("destroy");
+  }catch(err){console.log(err);}
+  $("#my_variables-collection-container .my-collection").html(html);//rendering new collection
   //Add event listeners and initialize static math fields
-  $("#my_variables .collection span").each(function(){
+  $("#my_variables .my-collection span").each(function(){
     if($(this).attr("rid") != undefined && $(this).attr("latex") != undefined){
       MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
     }
   });
 
+  $(".variable-value").each(function(){
+    let opts = {
+      spaceBehavesLikeTab: false,
+      restrictMismatchedBrackets: true,
+      sumStartsWithNEquals: true,
+      supSubsRequireOperand: true,
+      autoCommands: `sqrt pi`,
+      autoOperatorNames: 'sin cos csc sec tan arcsin arccos cot sinh cosh tanh log ln',
+      charsThatBreakOutOfSupSub: '+-=<>',
+      handlers: {
+        edit: function(mathField) {
+          let valueFormattingError = FindFormattingErrorInVariableValueMathField(mathField.latex());
+          $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).removeClass("error");
+          try{//the input field may not have a tooltip connected to it so this line may not work
+            $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("destroy");
+          }catch(err){}
+          if(valueFormattingError != undefined){
+            //we found an error so we need to display it as a tooltip
+            $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).addClass("error");
+            $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip({html: valueFormattingError});
+            $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("open");
+          }
+          FindAndUpateVariableByRID($(mathField.el()).attr("rid"),{value: mathField.latex(), valueFormattingError: valueFormattingError});
+        },
+        enter: function(){
+          EL.GenerateEditorErrorMessages();
+        },
+      }
+    };
+    
+    if($(this).hasClass("static-mathfield")){
+      //this means we are displaying a variable value for a known variable meaning the value shouldn't be able to be edited because the value was generated by the program
+      MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+    }
+    else{
+      if(LastVariableRIDChangedToGiven == $(this).attr("rid")){
+        MQ.MathField($(this)[0], opts).latex($(this).attr("latex")).focus();
+      }
+      else{
+        MQ.MathField($(this)[0], opts).latex($(this).attr("latex"));
+      }
+    }
+    
+    
+  });
   //tooltipping everything that was just created and needs a tooltip
   $("#my_variables .tooltipped").tooltip();
 
   //updating hover event
-  $("#my_variables .collection-item").unbind("mouseout mouseover");
-  $("#my_variables .collection-item").hover(function(){
-    $("#my_variables .collection-item").removeClass('active');
+  $("#my_variables .variable-row").unbind("mouseout mouseover");
+  $("#my_variables .variable-row").hover(function(){
+    $("#my_variables .variable-row").removeClass('active');
     $(this).addClass('active');
   },function(){
     $(this).removeClass('active');
   });
   //checking how many variables are defined and if there are none adding the no-variables-defined class to the collection
   //this helps with ui look and feel
-  if($("#my_variables .collection-item").length == 0){
-    $("#my_variables .collection").addClass("no-variables-defined");
+  if($("#my_variables .variable-row").length == 0){
+    $("#my_variables .my-collection").addClass("no-variables-defined");
   }
   else{
-    $("#my_variables .collection").removeClass("no-variables-defined");
+    $("#my_variables .my-collection").removeClass("no-variables-defined");
   }
+
+}
+
+function FindFormattingErrorInVariableValueMathField(ls){
+  //this function needs to check that there are no variables in the string and or vectors and that the string is formatted properly
+  if(GetVariablesFromLatexString(ls).filter((variable) => {return !(["\\pi","e","i"].includes(variable))}).length > 0){
+    //this if statement gets all the variables in the latex string and removes constants that nederamer can understand
+    //and if there are any variables left over than the user is using variables and that is not allowed becauase the variable
+    //value mathfield should only be taking in numbers and simple operations like multiplication, division, substraction and addition
+    return "No variables allowed in input box! Only numbers";
+  }
+  
+  //the next check is checking if there are any unallowed operations in the box like integral or summation or nabla stuff like that
+  let notAllowedOperators = ["\\int", "\\oint", "\\sum", "\\prod", "\\triangledown","\\bigcup","\\coprod","\\circ","<", ">", "=", "\\doteq", "\\geq", "\\leq", "\\leqslant", "\\geqslant", "\\equiv", "\\neq", "\\ngtr", "\\nless", "\\nleqslant", "\\ngeqslant", "\\approx", "\\simeq", "\\cong", "\\propto", "\\left\\langle", "\\right\\rangle", "\\left \\{", "\\right \\}", "\\exp"];
+  for(let i = 0; i < notAllowedOperators.length; i++){
+    if(ls.indexOf(notAllowedOperators[i]) != -1){
+      return "Found disallowed operator in input box"
+    }
+  }
+
+  //last check is to run it through nerdamer and see if it throws up errors meaning the string is not formatted properly
+  ls = CleanLatexString(ls, ["fractions","addition","parentheses","brackets", "white-space"]);
+  ls = CleanLatexString(ls,["multiplication"]);
+  ls = CleanLatexString(ls,["latexFunctions"]);
+  try{
+    let str = nerdamer.convertFromLaTeX(ls).toString();
+    return undefined;//no error was found
+  }
+  catch(err){
+    return "Formatting error detected";
+  }
+  
+}
+
+function FindAndUpateVariableByRID(rid,opts = {}){
+  let foundVariable = false;
+  
+  for(const [key, value] of Object.entries(DefinedVariables)){
+    if(value.rid == rid){
+      foundVariable = true;
+      DefinedVariables[key].value = opts.value;
+      DefinedVariables[key].valueFormattingError = opts.valueFormattingError;
+      break;
+    }
+  }
+
+  if(!foundVariable){
+    for(const [key, value] of Object.entries(EL.undefinedVars.undefined)){
+      if(value.rid == rid){
+        foundVariable = true;
+        EL.undefinedVars.undefined[key].value = opts.value;
+        EL.undefinedVars.undefined[key].valueFormattingError = opts.valueFormattingError;
+        break;
+      }
+    }
+  }
+
+  if(!foundVariable){
+    for(const [key, value] of Object.entries(EL.undefinedVars.defined)){
+      if(value.rid == rid){
+        foundVariable = true;
+        EL.undefinedVars.defined[key].value = opts.value;
+        EL.undefinedVars.defined[key].valueFormattingError = opts.valueFormattingError;
+        break;
+      }
+    }
+  }
+
+  EL.GenerateEditorErrorMessages({dontRenderMyVariablesCollection: true});
 
 }
 
@@ -849,7 +1046,7 @@ function UpdateMyVariablesCollection(opts = {ls: "", rid: "", update: true, add:
       rid: opts.rid,
       editable: opts.editable,
       props: {
-        state: "known",
+        state: "given",
         type: 'physics constant',
         unitString: opts.pc.unitString,
         unit: opts.pc.unit,
@@ -955,6 +1152,7 @@ function CloseEditorLog(){
 }
 
 function OpenEditorLog(type){
+  /*
   $('#editor-log-container .collapsible.log-container').collapsible('close', 0);
   $('#editor-log-container .collapsible.log-container').collapsible('close', 1);
   $('#editor-log-container .collapsible.log-container').collapsible('close', 2);
@@ -979,6 +1177,7 @@ function OpenEditorLog(type){
   $("#editor-log-container").animate({
     right: 0,
   },250);
+  */
 }
 
 function GetLineNumberFromMathFieldId(mfId){
@@ -1005,7 +1204,7 @@ function CheckForAndDisplayRelevantEquations(){
       for (const [key, value] of Object.entries(quantities)) {
         if(usedQuantities[key] != undefined){//checking if user has defined the quantity that this equation uses
           if(usedQuantities[key].number >= value){//the user has defined this variable at least the same number of times this equation needs or more
-            if(usedQuantities[key].state == "known"){
+            if(usedQuantities[key].state == "given"){
               isRelevantEquation = true;
             }
           }
@@ -1249,14 +1448,14 @@ function DefineVariableUnits(el, rid){
 function ToggleVariableBadgeUnitsSize(el = null, rid = "", expand = false){
   if(expand){
     //we need to calculate how large to expand it
-    let w = el.parent(".collection-item").width() - $(`.static-physics-equation[rid='${rid}']`).width() - 185;
-    if(el.prev().hasClass("known-unknown")){
+    let w = el.parent(".variable-row").width() - $(`.static-physics-equation[rid='${rid}']`).width() - 185;
+    if(el.prev().hasClass("known")){
       w -= 50;//this is because this tag takes more space up so we need to make the expand not as big
     }
     el.css("width",`${w}px`);
   }
   else{
-    $("#my_variables-collection-container .badge.units").css("width","auto");
+    $("#my_variables-collection-container .variable-row .units").css("width","auto");
   }
 }
 
@@ -1310,56 +1509,77 @@ function UpdateVariableUnits(el){
     let rid = $("#units-search-results").attr("rid");
     let fullUnitsString = el.attr("fullUnitssString");
 
-    let foundVariable = false;
-    let ls = "";
-    let props = {};
-
-    for(const [key, value] of Object.entries(DefinedVariables)){
-      if(value.rid == rid){
-        foundVariable = true;
-        ls = key;
-        props.type = value.type;
-        props.state = value.state;
-        break;
-      }
+    if(fullUnitsString.indexOf("undefined") != -1){//the user is setting the variable back to undefined
+      UpdateDefinedVariables({
+        type: "remove",
+        rid: rid,
+        editable: true,
+      });
     }
+    else{
 
-    if(!foundVariable){
-      for(const [key, value] of Object.entries(EL.undefinedVars.undefined)){
+      let foundVariable = false;
+      let ls = "";
+      let props = {};
+
+      for(const [key, value] of Object.entries(DefinedVariables)){
         if(value.rid == rid){
           foundVariable = true;
           ls = key;
+          //copying over data
           props.type = value.type;
           props.state = value.state;
+          props.value = value.value;
+          props.valueFormattingError = value.valueFormattingError;
+          
           break;
         }
       }
-    }
 
-    if(!foundVariable){
-      for(const [key, value] of Object.entries(EL.undefinedVars.defined)){
-        if(value.rid == rid){
-          foundVariable = true;
-          ls = key;
-          props.type = value.type;
-          props.state = value.state;
-          break;
+      if(!foundVariable){
+        for(const [key, value] of Object.entries(EL.undefinedVars.undefined)){
+          if(value.rid == rid){
+            foundVariable = true;
+            ls = key;
+            //copying over data
+            props.type = value.type;
+            props.state = value.state;
+            props.value = value.value;
+            props.valueFormattingError = value.valueFormattingError;
+            break;
+          }
         }
       }
+
+      if(!foundVariable){
+        for(const [key, value] of Object.entries(EL.undefinedVars.defined)){
+          if(value.rid == rid){
+            foundVariable = true;
+            ls = key;
+            //copying over data
+            props.type = value.type;
+            props.state = value.state;
+            props.value = value.value;
+            props.valueFormattingError = value.valueFormattingError;
+            break;
+          }
+        }
+      }
+
+      props.fullUnitsString = fullUnitsString;
+      props.units = TrimUnitInputValue(fullUnitsString);
+      props.unitsMathjs = UnitReference[fullUnitsString].unitsMathjs;
+      props.quantity = UnitReference[fullUnitsString].quantity;
+      props.canBeVector = UnitReference[fullUnitsString].canBeVector;
+
+      UpdateDefinedVariables({
+        type: "update",
+        ls: ls,
+        editable: true,
+        props: props,
+      });
+
     }
-
-    props.fullUnitsString = fullUnitsString;
-    props.units = TrimUnitInputValue(fullUnitsString);
-    props.unitsMathjs = UnitReference[fullUnitsString].unitsMathjs;
-    props.quantity = UnitReference[fullUnitsString].quantity;
-    props.canBeVector = UnitReference[fullUnitsString].canBeVector;
-
-    UpdateDefinedVariables({
-      type: "update",
-      ls: ls,
-      editable: true,
-      props: props,
-    });
 
     CloseUnitDropdownSearchMenu();
 

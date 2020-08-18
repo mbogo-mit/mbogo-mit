@@ -36,8 +36,8 @@ $(document).ready(function(){
   $("#physics_equations .collapsible").collapsible({
     onOpenEnd: function(){
       //there are some equations that are too long to fit into the space alotted so I am finding them and making their font size a bit smaller so they don't overlap into other equations
-      $("#physics_equations .static-physics-equation").each(function(){
-        //console.log($(this)[0].getBoundingClientRect(), $(this).parent(".col")[0].getBoundingClientRect());
+      $("#physics_equations .collapsible li.active .static-physics-equation").each(function(){
+        console.log($(this).width(), $(this).parent(".col").width());
         if($(this).width() > $(this).parent(".col").width()){
           $(this).css("font-size","13px");
         }
@@ -100,16 +100,6 @@ $(document).ready(function(){
 
   $("#main-screen").click(function(e){
     MainScreenClicked(e);
-  })
-
-  $("#import-all-mechanics-variables").change(function(){
-    $("#btn-update-imported-variables").removeClass("disabled");
-    if($(this).prop("checked")){
-      $(".variable-checkbox").prop("checked",true);
-    }
-    else{
-      $(".variable-checkbox").prop("checked",false);
-    }
   });
 
   $(".variable-checkbox").change(function(){

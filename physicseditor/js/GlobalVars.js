@@ -11,7 +11,7 @@ function RID(){
 }
 
 let SqrtLoop = 0;
-
+let LastVariableRIDChangedToGiven = null;
 let EditingMathFields = false;
 let UnitsDropdownMenuOpen = false
 let ListOfPhysicsConstants;
@@ -59,7 +59,33 @@ let ImportVariableDefinitions = {
     "k": {units: "N/m", quantityDescription: "spring constant", quantity: "spring constant", vector: false, unitsMathjs: "1 N/m", rid: RID(),},
     "\\rho": {units: "kg/m^3", quantityDescription: "mass density", quantity: "mass density", vector: false, unitsMathjs: "1 kg/m^3", rid: RID(),},
   },
-  thermal: {},
+  thermal: {
+    "t": {units: "s", quantityDescription: "time", quantity: "time", vector: false, unitsMathjs: "1 s", rid: RID(),},
+    "T": {units: "K", quantityDescription: "Temperature", quantity: "thermodynamic temperature", vector: false, unitsMathjs: "1 K", rid: RID(),},
+    "m": {units: "kg", quantityDescription: "mass", quantity: "mass", vector: false, unitsMathjs: "1 kg",rid: RID(),},
+    "l": {units: "m", quantityDescription: "length", quantity: "length", vector: false, unitsMathjs: "1 m",rid: RID(),},
+    "\\lambda": {units: "m", quantityDescription: "wave length", quantity: "length", vector: false, unitsMathjs: "1 m",rid: RID(),},
+    "\\vec{x}": {units: "m", quantityDescription: "length", quantity: "length", vector: true, unitsMathjs: "1 m",rid: RID(),},
+    "\\vec{y}": {units: "m", quantityDescription: "length", quantity: "length", vector: true, unitsMathjs: "1 m",rid: RID(),},
+    "\\vec{z}": {units: "m", quantityDescription: "length", quantity: "length", vector: true, unitsMathjs: "1 m",rid: RID(),},
+    "\\vec{r}": {units: "m", quantityDescription: "radius", quantity: "length", vector: true, unitsMathjs: "1 m",rid: RID(),},
+    "v": {units: "m/s", quantityDescription: "velocity", quantity: "velocity", vector: true, unitsMathjs: "1 m/s",rid: RID(),},
+    "A": {units: "m^2", quantityDescription: "area", quantity: "area", vector: false, unitsMathjs: "1 m^2",rid: RID(),},
+    "V": {units: "m^3", quantityDescription: "volume", quantity: "volume", vector: false, unitsMathjs: "1 m^3",rid: RID(),},
+    "U": {units: "J", quantityDescription: "potential energy", quantity: "energy/work", vector: false, unitsMathjs: "1 J", rid: RID(),},
+    "P": {units: "Pa", quantityDescription: "pressure", quantity: "pressure", vector: false, unitsMathjs: "1 Pa", rid: RID(),},
+    "c": {units: "J/(kg K)", quantityDescription: "specific heat capacity", quantity: "specific heat capacity", vector: false, unitsMathjs: "1 J/(kg K)", rid: RID(),},
+    "\\alpha": {units: "K^-1", quantityDescription: "coefficient of thermal expansion", quantity: "coefficient of thermal expansion", vector: false, unitsMathjs: "1 / K", rid: RID(),},
+    "\\beta": {units: "K^-1", quantityDescription: "coefficient of thermal expansion", quantity: "coefficient of thermal expansion", vector: false, unitsMathjs: "1 / K", rid: RID(),},
+    "Q": {units: "J", quantityDescription: "heat", quantity: "energy/work", vector: false, unitsMathjs: "1 J", rid: RID(),},
+    "W": {units: "J", quantityDescription: "work", quantity: "energy/work", vector: false, unitsMathjs: "1 J", rid: RID(),},
+    "L": {units: "J/kg", quantityDescription: "specific latent heat", quantity: "specific latent heat", vector: false, unitsMathjs: "1 J / kg", rid: RID(),},
+    "n": {units: "mol", quantityDescription: "amount of substance", quantity: "amount of substance", vector: false, unitsMathjs: "1 mol", rid: RID(),},
+    "N": {units: "unitless", quantityDescription: "number of molecules", quantity: "unitless", vector: false, unitsMathjs: "1", rid: RID(),},
+    "S": {units: "J/K", quantityDescription: "entropy", quantity: "entropy", vector: false, unitsMathjs: "1 J/K", rid: RID(),},
+    "\\eta": {units: "unitless", quantityDescription: "energy efficiency", quantity: "energy efficiency", vector: false, unitsMathjs: "1", rid: RID(),},
+    "k": {units: "W/(m*K)", quantityDescription: "thermal conductivity", quantity: "thermal conductivity", vector: false, unitsMathjs: "1 W/(m*K)", rid: RID(),},
+  },
   waveOptics: {},
   em: {},
   modern: {},
@@ -71,70 +97,70 @@ let SimilarVectorMagnitudeVariables = {};
 
 let PreDefinedVariables = {
   "\\hat{x}": {
-    state: "knonwn",
+    state: "given",
     type: "vector",
     units: "unitless",
     value: undefined,
     unitsMathjs: "1",
   },
   "\\hat{y}": {
-    state: "knonwn",
+    state: "given",
     type: "vector",
     units: "unitless",
     value: undefined,
     unitsMathjs: "1",
   },
   "\\hat{z}": {
-    state: "knonwn",
+    state: "given",
     type: "vector",
     units: "unitless",
     value: undefined,
     unitsMathjs: "1",
   },
   "\\hat{r}": {
-    state: "knonwn",
+    state: "given",
     type: "vector",
     units: "unitless",
     value: undefined,
     unitsMathjs: "1",
   },
   "\\hat{\\theta}": {
-    state: "knonwn",
+    state: "given",
     type: "vector",
     units: "unitless",
     value: undefined,
     unitsMathjs: "1",
   },
   "\\hat{\\phi}": {
-    state: "knonwn",
+    state: "given",
     type: "vector",
     units: "unitless",
     value: undefined,
     unitsMathjs: "1",
   },
   "\\nabla": {
-    state: "knonwn",
+    state: "given",
     type: "vector",
     units: "wave number (m^(-1))",
     value: undefined,
     unitsMathjs: "1/m",
   },
   "\\pi": {
-    state: "knonwn",
+    state: "given",
     type: "constant",
     units: "unitless",
     value: Math.PI.toFixed(5),
     unitsMathjs: "1",
   },
   "e": {
-    state: "known",
+    state: "given",
     type: "constant",
     units: "unitless",
     value: Math.exp(1).toFixed(5),
     unitsMathjs: "1",
   },
   "i": {
-    state: "known",
+    state: "given",
     type: "constant",
     units: "unitless",
     value: "i",
@@ -163,9 +189,9 @@ let MessageBoxMathFields = {
 let ParsedHoverRequest = false;
 let MOUSEDOWN = false;
 let VariableRightClicked = false;
-
 let MathFields = {};
 let FocusedMathFieldId = "first_math_field";
+let VariableValueMathFields = {};
 
 let HoveredOutOfTaggedVariable = true;
 let HoveringOverVariableDescriptionMenu = false;
@@ -178,6 +204,7 @@ let UnitReference = {};
 
 
 let ListOfSIUnits = {
+  "unitless" : {name: "unitless variable", symbol: "none", unitsMathjs: "1", canBeVector: true,},
   "length" : {name: "meter", symbol: "m", unitsMathjs: "1 m", canBeVector: true,},
   "mass" : {name: "kilogram", symbol: "kg", unitsMathjs: "1 kg", canBeVector: false, },//kilogram will be represented with a g
   "time" : {name: "second", symbol: "s", unitsMathjs: "1 s", canBeVector: false,},
@@ -236,7 +263,9 @@ let ListOfSIUnits = {
   "angular impulse" : {name: "kilogram meter squared per second", symbol: "kg*m^2/s",   unitsMathjs: "1 kg m^2/s", canBeVector: true, },
   "heat flux density" : {name: "watt per square meter", symbol: "W/m^2",   unitsMathjs: "1 W/m^2", canBeVector: false,   },
   "heat capacity" : {name: "joule per kelvin", symbol: "J/K",   unitsMathjs: "1 J/K", canBeVector: false,   },
+  "entropy" : {name: "joule per kelvin", symbol: "J/K",   unitsMathjs: "1 J/K", canBeVector: false,   },
   "specific heat capacity" : {name: "joule per kilogram kelvin", symbol: "J/(kg*K)",   unitsMathjs: "1 J/(kg K)", canBeVector: false,   },
+  "specific latent heat" : {name: "joule per kilogram", symbol: "J / kg",   unitsMathjs: "1 J / kg", canBeVector: false,   },
   "specific energy" : {name: "joule per kilogram", symbol: "J/kg",   unitsMathjs: "1 J/kg", canBeVector: false,  },
   "thermal conductivity" : {name: "watt per meter kelvin", symbol: "W/(m*K)",   unitsMathjs: "1 W/(m K)", canBeVector: false,   },
   "energy density" : {name: "joule per cubic meter", symbol: "J/m^3",   unitsMathjs: "1 J/m^3", canBeVector: false, },
@@ -252,8 +281,8 @@ let ListOfSIUnits = {
   "radiance" : {name: "watt per square meter steradian", symbol: "W/(m^2*sr)",   unitsMathjs: "1 W/(m^2 sr)", canBeVector: false, },
   "catalytic concentration" : {name: "katal per cubic meter", symbol: "kat/m^3",   unitsMathjs: "1 kat/m^3", canBeVector: false, },
   "unknown" : {name: "unknown units", symbol: "?", unitsMathjs: "1", canBeVector: true,},
-  "unitless" : {name: "unitless variable", symbol: "none", unitsMathjs: "1", canBeVector: true,},
   "coefficient of friction" : {name: "unitless variable", symbol: "none", unitsMathjs: "1", canBeVector: false,},
   "energy efficiency" : {name: "unitless variable", symbol: "none", unitsMathjs: "1", canBeVector: false,},
+  "coefficient of thermal expansion" : {name: "inverse kelvin", symbol: "1/K", unitsMathjs: "1 / K", canBeVector: false,},
   "undefined": {name: "undefined variable", symbol: "none", unitsMathjs: "1 undefinedunit", canBeVector: true,},
 };

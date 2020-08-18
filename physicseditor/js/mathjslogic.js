@@ -68,75 +68,195 @@ function IsSignleUndefinedVariable(ls){
   return false;
 }
 
-function IdentifyAllKnownUnknownVariables(exprs){
-  let listOfKnownVariables = [];
+
+function IdentifyAllKnownVariablesAndTheirValues(exprs){
   for(var i = 0; i < exprs.length; i++){
+    let exprsCopy;
     if(exprs[i].length >= 2){//if there aren't at least two expressions set equal to each other there is no way that a variable that was previously unknown could be equal to all known variables
-      listOfUnknownVariables = exprs[i].map(function(value, index){
-        let vars = GetVariablesFromLatexString(value.rawStr);
+      exprsCopy = JSON.parse(JSON.stringify(exprs[i]));//copying exprs data to be used later and information added
+      for(var j = 0; j < exprsCopy.length; j++){
+        let vars = GetVariablesFromLatexString(exprsCopy[j].rawStr);
         let unknownVars = [];
+        let variableValues = {
+          unknown: {},//this holds an object of all the variables in this expression with unknown values
+          known: {},//this holds an object of all the variables in this expression with known values
+        };
         vars.map(function(v){
           if(DefinedVariables[v] != undefined){
-            if(DefinedVariables[v].state != "known" && DefinedVariables[v].currentState != "known"){
+            //trying to figure out if this variable is unknown
+            if(DefinedVariables[v].state != "given" && DefinedVariables[v].currentState != "known"){
               unknownVars.push(v);
+            }
+            //trying to figure out if this variables values is undefined or defined
+            if(DefinedVariables[v].value != undefined){
+              variableValues.known[v] = DefinedVariables[v].value;
+            }
+            else{
+              variableValues.unknown[v] = undefined;
+            }
+          }
+          else if(PreDefinedVariables[v] != undefined){
+            //because this is a predefined variable we known that it is known so all we want to do is pass its value as a into the set of known values for this expression
+            //trying to figure out if this variables values is undefined or defined
+            if(PreDefinedVariables[v].value != undefined){
+              variableValues.known[v] = PreDefinedVariables[v].value;
+            }
+            else{
+              variableValues.unknown[v] = undefined;
             }
           }
           else if(EL.undefinedVars.undefined[v] != undefined){
-            if(EL.undefinedVars.undefined[v].state != "known" && EL.undefinedVars.undefined[v].currentState != "known"){
+            //trying to figure out if this variable is unknown
+            if(EL.undefinedVars.undefined[v].state != "given" && EL.undefinedVars.undefined[v].currentState != "known"){
               unknownVars.push(v);
+            }
+            //trying to figure out if this variables values is undefined or defined
+            if(EL.undefinedVars.undefined[v].value != undefined){
+              variableValues.known[v] = EL.undefinedVars.undefined[v].value;
+            }
+            else{
+              variableValues.unknown[v] = undefined;
             }
           }
           else if(EL.undefinedVars.defined[v] != undefined){
-            if(EL.undefinedVars.defined[v].state != "known" && EL.undefinedVars.defined[v].currentState != "known"){
+            //trying to figure out if this variable is unknown
+            if(EL.undefinedVars.defined[v].state != "given" && EL.undefinedVars.defined[v].currentState != "known"){
               unknownVars.push(v);
+            }
+            //trying to figure out if this variables values is undefined or defined
+            if(EL.undefinedVars.defined[v].value != undefined){
+              variableValues.known[v] = EL.undefinedVars.defined[v].value;
+            }
+            else{
+              variableValues.unknown[v] = undefined;
             }
           }
         });
-        return unknownVars;
-      });
 
-      //you need at least on of the arrays inside of this array to have a length of zero meaning that it has all known variables for us to think that that any other expression with only one unknown variable
-      let atLeastOneCompletelyKnownExpression = false;
-      let listOfKnownUnknownVariables = [];
-      listOfUnknownVariables.map(function(value, index){
-        if(value.length == 0){
-          atLeastOneCompletelyKnownExpression = true;
-        }
-        else if(value.length == 1){
-          listOfKnownUnknownVariables.push(value[0]);
-        }
-      });
+        exprsCopy[j].unknownVars = unknownVars;
+        exprsCopy[j].variableValues = variableValues;
 
-      if(atLeastOneCompletelyKnownExpression){
-        let changedStateOfAtLeastOneVariable = false;
-        //we need to make all of these variables currentState property equal to "known"
-        listOfKnownUnknownVariables.map(function(v){
-          if(DefinedVariables[v] != undefined){
-            DefinedVariables[v].currentState = "known";
-            changedStateOfAtLeastOneVariable = true;
+      }
+
+      //now that we have gathered the necessary information to check if a unknown variable can become known and to check if a now known variable could have its actual value calculated we need to actaully do these checks and calculations
+      let index = 0;
+      while(index < exprsCopy.length){
+        //first we need to see if the expression are related using an equal sign '=' if not there is no way we could say this value is known and therefore actauly calcualte this "known value"
+        if(exprsCopy[index].operator == "="){
+          if(exprsCopy[index].unknownVars.length + exprsCopy[index + 1].unknownVars.length == 1){//this means that out of these two expression one is completely known and the other only has one unknown variable which we can say is known because it is apart of an equation where it is the only unknown
+            let uniqueRIDStringArray = GenerateUniqueRIDStringForVariables(`${exprsCopy[index].rawStr} + ${exprsCopy[index + 1].rawStr}`);
+            let unknownVariable;
+            if(exprsCopy[index].unknownVars.length == 0){//if this current expression is completely known then the unknown variable is in the other expression
+              unknownVariable = exprsCopy[index + 1].unknownVars[0];
+            }
+            else{
+              unknownVariable = exprsCopy[index].unknownVars[0];
+            }
+            //we are now going to try to solve for the one variable that is unknown in the other expression
+            let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(exprsCopy[index].rawStr, uniqueRIDStringArray);
+            let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(exprsCopy[index + 1].rawStr, uniqueRIDStringArray);
+            if(expression1 != null && expression2 != null){//the conversion from latex to nerdamer readable string was successful
+              SqrtLoop = 0;//resetting this global variable to 0 which makes sure that nerdamer doesn't go into a loop trying to solve for a variable
+              let unknownVariableRIDString = ReplaceVariablesWithUniqueRIDString(unknownVariable, uniqueRIDStringArray).replace(/(\(|\)|\s)/g,"");//removing parentheses on the ends and white space because if the rid variable is "_ertyuio" this function will return " (_ertyuio) "
+              //console.log(`${expression1} = ${expression2}, solved for: ${unknownVariableRIDString}`);
+              let solution = nerdamer(`${expression1} = ${expression2}`).solveFor(unknownVariableRIDString);
+              //console.log("solution",solution.toString());
+              if(solution.length > 0){//that means we found a solution
+                //we are going to gather every non-zero solution but if all solution are zero then we will send the zerio as the solution
+                let allNonZeroSolutions = solution.filter((s) => {return s.toString() != "0"});
+                //console.log("allNonZeroSolutions", allNonZeroSolutions);
+                let knownVariableValue;
+                if(allNonZeroSolutions.length == 0){
+                  knownVariableValue = solution[0].toString();
+                }
+                else{
+                  knownVariableValue = allNonZeroSolutions[0].toString();//grab the first non zero solution
+                }
+                //now that we have solved for this variable, we need to see if we can calculate its actual value
+                if(Object.keys(exprsCopy[index].variableValues.unknown).length + Object.keys(exprsCopy[index + 1].variableValues.unknown).length == 1){
+                  //this means that the only unknown variable value in these two expression set equal to each other is the variable we are trying to calculate its value
+                  //we now need to replace every UniqueRIDString with the value of the latex variable 
+                  let count = 0;
+                  let r;
+                  let allKnownVariableValues = Object.assign(exprsCopy[index].variableValues.known, exprsCopy[index + 1].variableValues.known);
+                  //console.log("allKnownVariableValues", allKnownVariableValues);
+                  //console.log("uniqueRIDStringArray",uniqueRIDStringArray);
+                  while(count < uniqueRIDStringArray.length){
+                    if(allKnownVariableValues[uniqueRIDStringArray[count].variable] != undefined){
+                      //console.log("uniqueRIDStringArray[count].ridString",uniqueRIDStringArray[count].ridString);
+                      r = new RegExp(uniqueRIDStringArray[count].ridString, 'g');
+                      knownVariableValue = knownVariableValue.replace(r, `(${allKnownVariableValues[uniqueRIDStringArray[count].variable]})`);
+                    }
+                    count++;
+                  }
+                  try{
+                    //making sure that anything we replaced this string with is 
+                    knownVariableValue = CleanLatexString(knownVariableValue,["multiplication"]);
+                    knownVariableValue = nerdamer.convertFromLaTeX(knownVariableValue).toString();
+                    //console.log("knownVariableValue", knownVariableValue);
+                    //once we have replaced all unique rid strings with there variable values we need to try to evaluate this string using mathjs because it only allows for simple numbers and arrays so if it throws an error then we don't have a simple number or array (vector)
+                    try{
+                      knownVariableValue = math.evaluate(knownVariableValue).toString();
+                    }catch(err2){
+                      knownVariableValue = undefined;
+                      //console.log(err2);
+                    }
+                  }
+                  catch(err){
+                    knownVariableValue = undefined;
+                    //console.log(err);
+
+                  }
+                  
+                }
+                else{
+                  knownVariableValue = undefined;
+                }
+
+                //now that we have tried to calcuate this known value regardless if we were succesful or failed we were able to solve for a unknown variable using all known values so we need to set the variable's "currenState" equal to "knonwn"
+                let foundMatchAndChangedVariableValueOrState = false
+                if(DefinedVariables[unknownVariable] != undefined){
+                  DefinedVariables[unknownVariable].currentState = "known";
+                  DefinedVariables[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
+                  foundMatchAndChangedVariableValueOrState = true;
+                }
+                else if(EL.undefinedVars.undefined[unknownVariable] != undefined){
+                  EL.undefinedVars.undefined[unknownVariable].currentState = "known";
+                  EL.undefinedVars.undefined[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
+                  foundMatchAndChangedVariableValueOrState = true;
+                }
+                else if(EL.undefinedVars.defined[unknownVariable] != undefined){
+                  EL.undefinedVars.defined[unknownVariable].currentState = "known";
+                  EL.undefinedVars.defined[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
+                  foundMatchAndChangedVariableValueOrState = true;
+                }
+
+                if(foundMatchAndChangedVariableValueOrState){
+                  //because we changed values and were able to identify new known variables we need
+                  //call "UpdateKnownUnknownVariables" function which will parse the rawExpressionData from the first line with the new information we have put into the known unknown variables.
+                  //By passing in "false" this function wont reset the variables currentState values which is what we want because we want the information we have just found to persist. Otherwise we would get a loop
+                  EL.UpdateKnownUnknownVariables(false);
+                  return;//after this function is done running it means it has already parsed all the lines starting from the top  so we just end right here
+                }
+              }
+            }
           }
-          else if(EL.undefinedVars.undefined[v] != undefined){
-            EL.undefinedVars.undefined[v].currentState = "known";
-            changedStateOfAtLeastOneVariable = true;
-          }
-          else if(EL.undefinedVars.defined[v] != undefined){
-            EL.undefinedVars.defined[v].currentState = "known";
-            changedStateOfAtLeastOneVariable = true;
-          }
-        });
-
-        //we need to make sure we actually changed the state of a variable before se set i to 0 because if not we could end up in an infinite loop
-        if(changedStateOfAtLeastOneVariable){
-          //because we changed values and were able to identify new known-unknown variables we need
-          //call "UpdateKnownUnknownVariables" function which will parse the rawExpressionData from the first line with the new information we have put into the known unknown variables.
-          //By passing in "false" this function wont reset the variables currentState values which is what we want because we want the information we have just found to persist. Otherwise we would get a loop
-          EL.UpdateKnownUnknownVariables(false);
-          return;//after this function is done running it means it has already parsed all the lines starting from the top  so we just end right here
         }
-
+        index++;
       }
     }
   }
+}
+
+function ConvertStringToScientificNotation(str){
+  let scientificNotation = Number(str).toExponential().split("e");
+  scientificNotation[0] = Number(scientificNotation[0]).toFixed(6).toString()
+  if(scientificNotation[1] == "+0"){
+    scientificNotation[1] = "";
+  }else{
+    scientificNotation[1] = `\\cdot 10^{${scientificNotation[1].replace("+","")}}`;
+  }
+  return scientificNotation.join("");
 }
 
 function CheckForErrorsInExpression(ls, lineNumber, mfID){
@@ -235,7 +355,15 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
             results[i].push({success: str});
           }
           catch(err2){
-            results[i].push({error: err2.message});
+            try{
+              //by removing the vector unit we can figure out if the units don't match because the user is adding a scalar with a vector
+              math.evaluate(exprs[i][j].str.replace(/rad/g,"(m / m)").replace(/sr/g,"(m^2 / m^2)").replace(/vector/g,"")).toString();
+              results[i].push({error: "Adding a scalar with a vector"});
+            }
+            catch(err3){
+              results[i].push({error: err2.message});
+            }
+            
           }
         }
 
@@ -291,6 +419,7 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
 
       //check if units match for success equations
       let equationUnitsMatch = false;
+      let settingScalarToVector = false;
 
       try {
         //trying to add the units of each equation and see if they add if they don't then they are not the same unit so an error will occur
@@ -298,9 +427,9 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
         equationUnitsMatch = true;
       }
       catch(err){
+        let editedSuccesses = [];
         try{
           //removing rad and steradian from equations to see if they will equal each other because the editor can't recorgnize the arc formula  s=r\theta cuz units wise you are saying 1m=1m*rad
-          let editedSuccesses = [];
           for(var i = 0; i < successes.length; i++){
             editedSuccesses.push(successes[i].replace(/rad/g,"").replace(/sr/g,""));
           }
@@ -309,17 +438,52 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
         }
         catch(err2){
           equationUnitsMatch = false;
+          try{
+            for(var i = 0; i < editedSuccesses.length; i++){
+              editedSuccesses[i] = editedSuccesses[i].replace(/vector/g,"");
+            }
+            math.evaluate(editedSuccesses.join(" + ")).toString();
+            settingScalarToVector = true;
+          }
+          catch(err3){
+            settingScalarToVector = false;
+          }
         }
 
       }
 
       if(!equationUnitsMatch){
-        log.error.push({
-          error: EL.createLoggerErrorFromMathJsError("Units do not equal each other"),
-          info: successes,
-          lineNumber: lineNumber,
-          mfID: mfID,
-        });
+        if(settingScalarToVector){
+          log.error.push({
+            error: EL.createLoggerErrorFromMathJsError("Setting a vector equal to scalar"),
+            info: successes,
+            lineNumber: lineNumber,
+            mfID: mfID,
+          });
+
+          //we are going to add this information to the correct mathfield that has this error
+          MathFields[mfID].log.error.push({
+            error: EL.createLoggerErrorFromMathJsError("Setting a vector equal to scalar"),
+            info: successes,
+          });
+          
+        }
+        else{
+          log.error.push({
+            error: EL.createLoggerErrorFromMathJsError("Units do not equal each other"),
+            info: successes,
+            lineNumber: lineNumber,
+            mfID: mfID,
+          });
+
+          //we are going to add this information to the correct mathfield that has this error
+          MathFields[mfID].log.error.push({
+            error: EL.createLoggerErrorFromMathJsError("Units do not equal each other"),
+            info: successes,
+          });
+
+        }
+        
       }
       else{
         //if the units match then we should do a high level self consistency check
@@ -390,6 +554,13 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
         lineNumber: lineNumber,
         mfID: mfID,
       }});
+
+      //we are going to add this information to the correct mathfield that has this error
+      MathFields[mfID].log.warning.push({
+        warning: "Undefined Variables",
+        variables: trulyUndefinedVars,
+      });
+
     }
 
 
@@ -400,6 +571,11 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
           info: "",
           lineNumber: lineNumber,
           mfID: mfID,
+        });
+
+        //we are going to add this information to the correct mathfield that has this error
+        MathFields[mfID].log.error.push({
+          error: EL.createLoggerErrorFromMathJsError(error),
         });
       });
     }
@@ -1273,7 +1449,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
     //console.log(uniqueRIDStringArray);
     let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID);
     let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID)
-    //console.log(expression1 + " ?= " +  expression2);
+    console.log("uniqueRIDStringArray", uniqueRIDStringArray);
+    console.log(expression1 + " ?= " +  expression2);
     if(expression1 != null && expression2 != null){
       //because this is a high level check we need to make sure that both expressions use the same variables and if not we cannot be sure that the equations don't equal each other so we will not actaully do any check
       let expression1Variables = GetRidStringVariablesFromString(expression1, uniqueRIDStringArray);
@@ -1555,6 +1732,11 @@ function EvaluateStringInsideIntegralAndReturnNerdamerString(ls, uniqueRIDString
         mfID: mfID,
       }]});
 
+      //we are going to add this information to the correct mathfield that has this error
+      MathFields[mfID].log.error.push({
+        error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
+      });
+
       return null;
     }
 
@@ -1569,6 +1751,12 @@ function EvaluateStringInsideIntegralAndReturnNerdamerString(ls, uniqueRIDString
       lineNumber: lineNumber,
       mfID: mfID,
     }]});
+
+    //we are going to add this information to the correct mathfield that has this error
+    MathFields[mfID].log.error.push({
+      error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
+    });
+
     return null;
   }
 
@@ -1629,6 +1817,11 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
         mfID: mfID,
       }]});
 
+      //we are going to add this information to the correct mathfield that has this error
+      MathFields[mfID].log.error.push({
+        error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
+      });
+
       return null;
     }
 
@@ -1643,6 +1836,12 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
       lineNumber: lineNumber,
       mfID: mfID,
     }]});
+
+    //we are going to add this information to the correct mathfield that has this error
+    MathFields[mfID].log.error.push({
+      error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
+    });
+
     return null;
   }
 
@@ -1659,9 +1858,15 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   //this line is temporary. We will soon be able to support parsing and using these operators and notations
   if(ls.indexOf("\\int") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1){
     ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, true);//passing true as the last parameter tells this function that there are nerdamer functions in this string so don't try to replace the letters in the function names
-    return nerdamer.convertFromLaTeX(ls).expand().toString();//this is just a place holder for the actual value we will return
+    try{
+      return nerdamer.convertFromLaTeX(ls).expand().toString();//this is just a place holder for the actual value we will return
+    }catch(err){
+      console.log(err);
+      return null;
+    }
   }
   else{
+    console.log("unparsable characters")
     return null;
   }
 }
@@ -1721,6 +1926,8 @@ function ReturnDefiniteIntegralExpressionAndOtherExpression(dividedString, diffe
     }
     i++;
   }
+
+  console.log(`defint(${expression.integral},${lowerbound},${upperbound},${variableRidString})`);
 
   return {
     integral: nerdamer(`defint(${expression.integral},${lowerbound},${upperbound},${variableRidString})`).toString(),//now that we have gathered the information we need for the integral, we need to format the information properly so nerdamer can understand

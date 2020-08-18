@@ -4,7 +4,7 @@ let ListOfOperators = [
   "\\frac", "\\sqrt", "\\int", "\\oint", "\\sum", "\\prod", "\\triangledown","\\cdot","\\ast","\\bigcup","\\coprod","\\pm", "-", "+", "\\times","\\circ",
   "<", ">", "=","*", "\\doteq", "\\geq", "\\leq", "\\leqslant", "\\geqslant", "\\equiv", "\\neq", "\\ngtr", "\\nless", "\\nleqslant", "\\ngeqslant", "\\approx", "\\simeq", "\\cong", "\\propto",
   "\\leftarrow", "\\rightarrow", "\\Leftarrow", "\\Rightarrow", "\\leftrightarrow", "\\Leftrightarrow", "\\leftrightharpoons", "\\rightleftharpoons",
-  "\\left(", "\\right)","\\left|", "\\right|", "\\left \\|", "\\right \\|", "\\left[", "\\right]", "\\left [", "\\right ]", "\\left \\langle", "\\right \\rangle", "\\left \\{", "\\right \\}", "\\left |", "\\right |",
+  "\\left(", "\\right)","\\left|", "\\right|", "\\left \\|", "\\right \\|", "\\left[", "\\right]", "\\left [", "\\right ]", "\\left\\langle", "\\right\\rangle", "\\left \\{", "\\right \\}", "\\left |", "\\right |",
   "\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\arcsin", "\\arccos", "\\arctan", "\\exp", "\\lg", "\\ln", "\\log",
 ];
 

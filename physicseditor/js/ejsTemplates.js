@@ -87,7 +87,7 @@ let Templates = {
                   <div><%= log.error[i].error.description %></div>
                   <% if(log.error[i].latexExpressions != undefined){%>
                   <%for(let latexExpression of log.error[i].latexExpressions){%>
-                    <div style="display:block;" class="log-static-latex" latex="<%= latexExpression %>"><%= latexExpression %></div>
+                    <div style="display:block;" class="log-static-latex" latex="<%= latexExpression %>"></div>
                   <%}}%>
                 </div>
               </li>
@@ -103,7 +103,7 @@ let Templates = {
   `
   <div class="editor_line row">
     <div class="line_label col m1">
-      <span class="active line-number">1</span>
+      <span class="active line-number" mf="<%= rid %>">1</span>
       <span onclick="OpenEditorLog('warning')" class="line-warning" mf="<%= rid %>">
         <svg width="1em" height="1em" viewBox="0 0 16 16" class="amber-text text-lighten-2 bi bi-exclamation-triangle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 5zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
@@ -117,52 +117,79 @@ let Templates = {
       <span class="line-question" mf="<%= rid %>"><i class="fas fa-question-circle"></i></span>
     </div>
     <div class="col m11 my_math_field_col">
-      <div id="<%= rid %>" class="my_math_field" onkeydown="KeyLogger()" onkeyup="KeyLogger()" onmousedown="FocusOnThisMathField('<%= rid %>')"></div>
+      <div id="<%= rid %>" class="my_math_field" onkeydown="KeyLogger()" onkeyup="KeyLogger()" onmousedown="FocusOnThisMathField('<%= rid %>')" onfocusout="UnfocusOnThisMathField()"></div>
     </div>
   </div>
   `,
   "VariableCollection": {
     "physics-constant":
     `
-    <li class="collection-item <%= (opts.unused) ? "unused-variable" : "" %>">
-      <span class="static-physics-equation" latex="<%= opts.ls %>" rid="<%= opts.variable.rid %>"></span>
+    <div class="variable-row <%= (opts.unused) ? "unused-variable" : "" %>">
+      <span class="static-physics-equation" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+      <span class="variable-tag constant-info"><span latex="<%= opts.variable.value %>" rid="<%= opts.variable.rid %>"></span></span>
+      <span class="variable-tag constant-info"><span latex="<%= opts.variable.unit %>" rid="<%= opts.variable.rid %>"></span></span>
+      <span class="variable-tag physics-constant"><%= opts.variable.quantityDescription %></span>
       <span class="right delete-var" onclick="UpdateMyVariablesCollection({ls: '<%= opts.ls %>', rid: '<%= opts.variable.rid %>',remove: true, uncheckbox: true, editable: false})"><i class="material-icons">close</i></span>
-      <span class="new badge physics-constant" data-badge-caption="<%= opts.variable.quantityDescription %>"></span>
-      <span class="new badge constant-info" data-badge-caption=""><span latex="<%= opts.variable.unit %>" rid="<%= opts.variable.rid %>"></span></span>
-      <span class="new badge constant-info" data-badge-caption=""><span latex="=<%= opts.variable.value %>" rid="<%= opts.variable.rid %>"></span></span>
-    </li>
+    </div>
     `,
     "defined-variable":
     `
-    <li class="collection-item <%= (opts.unused) ? "unused-variable" : "" %>">
-      <span class="static-physics-equation editable-variable" latex="<%= opts.ls %>" rid="<%= opts.variable.rid %>"></span>
-      <span class="right delete-var" onclick="UpdateMyVariablesCollection({rid: '<%= opts.variable.rid %>',remove: true, editable: true})"><i class="material-icons">close</i></span>
-      <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="new badge <%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>" data-badge-caption="<%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>"></span>
-      <% if(opts.variable.dynamicUnits){%>
-        <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="new badge info units dynamic-units tooltipped" data-position="bottom" data-tooltip="This unit was dynamically created by the editor" data-badge-caption="<%= opts.variable.units %>"></span>
-      <%}else{%>
-        <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="new badge info units tooltipped" data-position="bottom" data-tooltip="This unit was set by the user or imported" data-badge-caption="<%= opts.variable.units %>"></span>
-      <%}%>
-      <% if(opts.variable.type == "vector" && !opts.variable.canBeVector){%>
-        <span class="new badge info cantBeVector btn-floating pulse tooltipped" data-position="left" data-tooltip="This unit can't be a vector" data-badge-caption="<%= opts.variable.type %>">
-          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bug" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M4.355.522a.5.5 0 0 1 .623.333l.291.956A4.979 4.979 0 0 1 8 1c1.007 0 1.946.298 2.731.811l.29-.956a.5.5 0 1 1 .957.29l-.41 1.352A4.985 4.985 0 0 1 13 6h.5a.5.5 0 0 0 .5-.5V5a.5.5 0 0 1 1 0v.5A1.5 1.5 0 0 1 13.5 7H13v1h1.5a.5.5 0 0 1 0 1H13v1h.5a1.5 1.5 0 0 1 1.5 1.5v.5a.5.5 0 1 1-1 0v-.5a.5.5 0 0 0-.5-.5H13a5 5 0 0 1-10 0h-.5a.5.5 0 0 0-.5.5v.5a.5.5 0 1 1-1 0v-.5A1.5 1.5 0 0 1 2.5 10H3V9H1.5a.5.5 0 0 1 0-1H3V7h-.5A1.5 1.5 0 0 1 1 5.5V5a.5.5 0 0 1 1 0v.5a.5.5 0 0 0 .5.5H3c0-1.364.547-2.601 1.432-3.503l-.41-1.352a.5.5 0 0 1 .333-.623zM4 7v4a4 4 0 0 0 3.5 3.97V7H4zm4.5 0v7.97A4 4 0 0 0 12 11V7H8.5zM12 6H4a3.99 3.99 0 0 1 1.333-2.982A3.983 3.983 0 0 1 8 2c1.025 0 1.959.385 2.666 1.018A3.989 3.989 0 0 1 12 6z"/>
-          </svg>
-        </span>
-      <%}else{%>
-      <span class="new badge info uneditable" data-badge-caption="<%= opts.variable.type %>"></span>
-      <%}%>
-    </li>
+    <div class="variable-row valign-wrapper <%= (opts.unused) ? "unused-variable" : "" %>">
+      <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
+        <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+        <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
+          <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
+          <% if(opts.variable.value != undefined){%>
+            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variable.rid %>" latex="<%= opts.variable.value %>"></span>
+          <%}%>  
+        <%}else if(opts.variable.state == "unknown"){%>
+          <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
+        <%}else if(opts.variable.state == "given"){%>
+          <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
+          <span class="variable-value" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+        <%}%>    
+
+        <% if(opts.variable.dynamicUnits){%>
+          <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info units dynamic-units tooltipped" data-position="bottom" data-tooltip="This unit was dynamically created by the editor"><%= opts.variable.units %></span>
+        <%}else{%>
+          <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info units tooltipped" data-position="bottom" data-tooltip="This unit was set by the user or imported"><%= opts.variable.units %></span>
+        <%}%>
+        <% if(opts.variable.type == "vector" && !opts.variable.canBeVector){%>
+          <span class="info cantBeVector btn-floating pulse tooltipped" data-position="bottom" data-tooltip="This unit can't be a vector">
+            <%= opts.variable.type %>
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bug" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M4.355.522a.5.5 0 0 1 .623.333l.291.956A4.979 4.979 0 0 1 8 1c1.007 0 1.946.298 2.731.811l.29-.956a.5.5 0 1 1 .957.29l-.41 1.352A4.985 4.985 0 0 1 13 6h.5a.5.5 0 0 0 .5-.5V5a.5.5 0 0 1 1 0v.5A1.5 1.5 0 0 1 13.5 7H13v1h1.5a.5.5 0 0 1 0 1H13v1h.5a1.5 1.5 0 0 1 1.5 1.5v.5a.5.5 0 1 1-1 0v-.5a.5.5 0 0 0-.5-.5H13a5 5 0 0 1-10 0h-.5a.5.5 0 0 0-.5.5v.5a.5.5 0 1 1-1 0v-.5A1.5 1.5 0 0 1 2.5 10H3V9H1.5a.5.5 0 0 1 0-1H3V7h-.5A1.5 1.5 0 0 1 1 5.5V5a.5.5 0 0 1 1 0v.5a.5.5 0 0 0 .5.5H3c0-1.364.547-2.601 1.432-3.503l-.41-1.352a.5.5 0 0 1 .333-.623zM4 7v4a4 4 0 0 0 3.5 3.97V7H4zm4.5 0v7.97A4 4 0 0 0 12 11V7H8.5zM12 6H4a3.99 3.99 0 0 1 1.333-2.982A3.983 3.983 0 0 1 8 2c1.025 0 1.959.385 2.666 1.018A3.989 3.989 0 0 1 12 6z"/>
+            </svg>
+          </span>
+        <%}%>
+      </div>
+      <div class="valign-wrapper" style="width: 30px; height:100%;">
+        <span class="right delete-var" onclick="UpdateMyVariablesCollection({rid: '<%= opts.variable.rid %>',remove: true, editable: true})"><i class="material-icons">close</i></span>
+      </div>
+    </div>
     `,
     "undefined-variable":
     `
-    <li class="collection-item undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>">
-      <span class="static-physics-equation editable-variable" latex="<%= opts.ls %>" rid="<%= opts.variable.rid %>"></span>
-      <span class="right delete-var" onclick="UpdateMyVariablesCollection({remove: true, cantRemove: true})"><i class="material-icons">close</i></span>
-      <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="new badge <%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>" data-badge-caption="<%= (opts.variable.state == "unknown" && opts.variable.currentState == "known") ? "known-unknown" : opts.variable.state  %>"></span>
-      <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="new badge info undefined-units units" data-badge-caption="<%= opts.variable.units %>"></span>
-      <span class="new badge info uneditable" data-badge-caption="<%= opts.variable.type %>"></span>
-    </li>
+    <div class="variable-row valign-wrapper undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>">
+      <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
+        <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+        <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
+          <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
+          <% if(opts.variable.value != undefined){%>
+            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variable.rid %>" latex="<%= opts.variable.value %>"></span>
+          <%}%>  
+        <%}else if(opts.variable.state == "unknown"){%>
+          <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
+        <%}else if(opts.variable.state == "given"){%>
+          <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
+          <span class="variable-value" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+        <%}%>  
+        <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info undefined-units units"><%= opts.variable.units %></span>
+      </div>
+      <div class="valign-wrapper" style="width: 30px; height: 100%;">
+        <span class="right delete-var" onclick="UpdateMyVariablesCollection({remove: true, cantRemove: true})"><i class="material-icons">close</i></span>
+      </div>
+    </div>
     `,
   },
   "units-search-results":
@@ -182,8 +209,13 @@ let Templates = {
   </div>
   <div class="row">
     <div class="col m12">
+      <span style="color: #616161; font-size: 14px;">By importing variables, the editor can understand what units a variable is which makes it easier to write equations and get them checked. For example, if you import the variable 't' as time whenever you use the variable 't' or 't' with any subscript the editor will understand that the variable has units of time</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col m12">
       <label>
-        <input id="import-all-mechanics-variables" type="checkbox" />
+        <input id="import-all-variables" type="checkbox" />
         <span>Import All Variables</span>
       </label>
     </div>
@@ -207,7 +239,7 @@ let Templates = {
             <% if(value.disabled){%>
             <label>
               <input class="variable-checkbox" type="checkbox" rid="<%= value.rid %>" latex="<%= key %>" disabled="disabled"/>
-              <span class=""></span>
+              <span class="already-imported-variable tooltipped" data-position="bottom" data-tooltip="This variable is already imported with possibly a different definition"></span>
             </label>
             <%}else if(value.checked){%>
               <label>
@@ -230,5 +262,29 @@ let Templates = {
   "no-variables-defined":
   `
   <div id="no-variables-defined" class="center">The physics constants you import and variables you use in the editor will appear in this tab</div>
+  `,
+  "mathfield-warning":
+  `
+  <%for(let i = 0; i < warnings.length; i++){%>
+    <div>
+      <span class="warning-header"><%= warnings[i].warning %>:</span> <%= warnings[i].variables.join(",") %>
+    </div>
+  <%}%> 
+  `,
+  "mathfield-error":
+  `
+  <%for(let i = 0; i < errors.length; i++){%>
+    <div>
+      <div class="error-header"><span class="left"><%= errors[i].error.type %>:</span></div>
+      <div><span class="left"><%= errors[i].error.description %></span></div>
+    </div>
+    <%if(errors[i].latexExpressions != undefined){%>
+      <div class="left">
+        <%for(let j = 0; j < errors[i].latexExpressions.length; j++){%>
+          <div><span class="log-static-latex" latex="<%= errors[i].latexExpressions[j] %>"></span></div>
+        <%}%>  
+      </div>
+    <%}%>  
+  <%}%>    
   `,
 };
