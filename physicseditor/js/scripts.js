@@ -37,7 +37,7 @@ $(document).ready(function(){
     onOpenEnd: function(){
       //there are some equations that are too long to fit into the space alotted so I am finding them and making their font size a bit smaller so they don't overlap into other equations
       $("#physics_equations .collapsible li.active .static-physics-equation").each(function(){
-        console.log($(this).width(), $(this).parent(".col").width());
+        //console.log($(this).width(), $(this).parent(".col").width());
         if($(this).width() > $(this).parent(".col").width()){
           $(this).css("font-size","13px");
         }

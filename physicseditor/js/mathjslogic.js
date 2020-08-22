@@ -41,7 +41,13 @@ math.import({
     }
     v = v.toString();
     return math.evaluate(`sqrt(myDotProduct(${v},${v}))`);
-  }
+  },
+  ln: function(value){
+    return math.evaluate(`log10(${value.toString()}) / log10(e)`);
+  },
+  customLog: function(base, value){
+    return math.evaluate(`log10(${value.toString()}) / log10(${base.toString()})`);
+  },
 });
 
 function GetUnitsFromMathJsVectorString(mathjsVectorString){
@@ -159,86 +165,93 @@ function IdentifyAllKnownVariablesAndTheirValues(exprs){
               SqrtLoop = 0;//resetting this global variable to 0 which makes sure that nerdamer doesn't go into a loop trying to solve for a variable
               let unknownVariableRIDString = ReplaceVariablesWithUniqueRIDString(unknownVariable, uniqueRIDStringArray).replace(/(\(|\)|\s)/g,"");//removing parentheses on the ends and white space because if the rid variable is "_ertyuio" this function will return " (_ertyuio) "
               //console.log(`${expression1} = ${expression2}, solved for: ${unknownVariableRIDString}`);
-              let solution = nerdamer(`${expression1} = ${expression2}`).solveFor(unknownVariableRIDString);
-              //console.log("solution",solution.toString());
-              if(solution.length > 0){//that means we found a solution
-                //we are going to gather every non-zero solution but if all solution are zero then we will send the zerio as the solution
-                let allNonZeroSolutions = solution.filter((s) => {return s.toString() != "0"});
-                //console.log("allNonZeroSolutions", allNonZeroSolutions);
-                let knownVariableValue;
-                if(allNonZeroSolutions.length == 0){
-                  knownVariableValue = solution[0].toString();
-                }
-                else{
-                  knownVariableValue = allNonZeroSolutions[0].toString();//grab the first non zero solution
-                }
-                //now that we have solved for this variable, we need to see if we can calculate its actual value
-                if(Object.keys(exprsCopy[index].variableValues.unknown).length + Object.keys(exprsCopy[index + 1].variableValues.unknown).length == 1){
-                  //this means that the only unknown variable value in these two expression set equal to each other is the variable we are trying to calculate its value
-                  //we now need to replace every UniqueRIDString with the value of the latex variable 
-                  let count = 0;
-                  let r;
-                  let allKnownVariableValues = Object.assign(exprsCopy[index].variableValues.known, exprsCopy[index + 1].variableValues.known);
-                  //console.log("allKnownVariableValues", allKnownVariableValues);
-                  //console.log("uniqueRIDStringArray",uniqueRIDStringArray);
-                  while(count < uniqueRIDStringArray.length){
-                    if(allKnownVariableValues[uniqueRIDStringArray[count].variable] != undefined){
-                      //console.log("uniqueRIDStringArray[count].ridString",uniqueRIDStringArray[count].ridString);
-                      r = new RegExp(uniqueRIDStringArray[count].ridString, 'g');
-                      knownVariableValue = knownVariableValue.replace(r, `(${allKnownVariableValues[uniqueRIDStringArray[count].variable]})`);
-                    }
-                    count++;
+              try{
+                let solution = nerdamer(`${expression1} = ${expression2}`).solveFor(unknownVariableRIDString);
+                //console.log("solution",solution.toString());
+                if(solution.length > 0){//that means we found a solution
+                  //we are going to gather every non-zero solution but if all solution are zero then we will send the zerio as the solution
+                  let allNonZeroSolutions = solution.filter((s) => {return s.toString() != "0"});
+                  //console.log("allNonZeroSolutions", allNonZeroSolutions);
+                  let knownVariableValue;
+                  if(allNonZeroSolutions.length == 0){
+                    knownVariableValue = solution[0].toString();
                   }
-                  try{
-                    //making sure that anything we replaced this string with is 
-                    knownVariableValue = CleanLatexString(knownVariableValue,["multiplication"]);
-                    knownVariableValue = nerdamer.convertFromLaTeX(knownVariableValue).toString();
-                    //console.log("knownVariableValue", knownVariableValue);
-                    //once we have replaced all unique rid strings with there variable values we need to try to evaluate this string using mathjs because it only allows for simple numbers and arrays so if it throws an error then we don't have a simple number or array (vector)
+                  else{
+                    knownVariableValue = allNonZeroSolutions[0].toString();//grab the first non zero solution
+                  }
+                  //now that we have solved for this variable, we need to see if we can calculate its actual value
+                  if(Object.keys(exprsCopy[index].variableValues.unknown).length + Object.keys(exprsCopy[index + 1].variableValues.unknown).length == 1){
+                    //this means that the only unknown variable value in these two expression set equal to each other is the variable we are trying to calculate its value
+                    //we now need to replace every UniqueRIDString with the value of the latex variable 
+                    let count = 0;
+                    let r;
+                    let allKnownVariableValues = Object.assign(exprsCopy[index].variableValues.known, exprsCopy[index + 1].variableValues.known);
+                    //console.log("allKnownVariableValues", allKnownVariableValues);
+                    //console.log("uniqueRIDStringArray",uniqueRIDStringArray);
+                    while(count < uniqueRIDStringArray.length){
+                      if(allKnownVariableValues[uniqueRIDStringArray[count].variable] != undefined){
+                        //console.log("uniqueRIDStringArray[count].ridString",uniqueRIDStringArray[count].ridString);
+                        r = new RegExp(uniqueRIDStringArray[count].ridString, 'g');
+                        knownVariableValue = knownVariableValue.replace(r, `(${allKnownVariableValues[uniqueRIDStringArray[count].variable]})`);
+                      }
+                      count++;
+                    }
                     try{
-                      knownVariableValue = math.evaluate(knownVariableValue).toString();
-                    }catch(err2){
-                      knownVariableValue = undefined;
-                      //console.log(err2);
+                      //making sure that anything we replaced this string with is 
+                      knownVariableValue = CleanLatexString(knownVariableValue,["multiplication"]);
+                      knownVariableValue = nerdamer.convertFromLaTeX(knownVariableValue).toString();
+                      //console.log("knownVariableValue", knownVariableValue);
+                      //once we have replaced all unique rid strings with there variable values we need to try to evaluate this string using mathjs because it only allows for simple numbers and arrays so if it throws an error then we don't have a simple number or array (vector)
+                      try{
+                        knownVariableValue = math.evaluate(knownVariableValue).toString();
+                      }catch(err2){
+                        knownVariableValue = undefined;
+                        //console.log(err2);
+                      }
                     }
+                    catch(err){
+                      knownVariableValue = undefined;
+                      //console.log(err);
+
+                    }
+                    
                   }
-                  catch(err){
+                  else{
                     knownVariableValue = undefined;
-                    //console.log(err);
-
                   }
-                  
-                }
-                else{
-                  knownVariableValue = undefined;
-                }
 
-                //now that we have tried to calcuate this known value regardless if we were succesful or failed we were able to solve for a unknown variable using all known values so we need to set the variable's "currenState" equal to "knonwn"
-                let foundMatchAndChangedVariableValueOrState = false
-                if(DefinedVariables[unknownVariable] != undefined){
-                  DefinedVariables[unknownVariable].currentState = "known";
-                  DefinedVariables[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
-                  foundMatchAndChangedVariableValueOrState = true;
-                }
-                else if(EL.undefinedVars.undefined[unknownVariable] != undefined){
-                  EL.undefinedVars.undefined[unknownVariable].currentState = "known";
-                  EL.undefinedVars.undefined[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
-                  foundMatchAndChangedVariableValueOrState = true;
-                }
-                else if(EL.undefinedVars.defined[unknownVariable] != undefined){
-                  EL.undefinedVars.defined[unknownVariable].currentState = "known";
-                  EL.undefinedVars.defined[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
-                  foundMatchAndChangedVariableValueOrState = true;
-                }
+                  //now that we have tried to calcuate this known value regardless if we were succesful or failed we were able to solve for a unknown variable using all known values so we need to set the variable's "currenState" equal to "knonwn"
+                  let foundMatchAndChangedVariableValueOrState = false
+                  if(DefinedVariables[unknownVariable] != undefined){
+                    DefinedVariables[unknownVariable].currentState = "known";
+                    DefinedVariables[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
+                    foundMatchAndChangedVariableValueOrState = true;
+                  }
+                  else if(EL.undefinedVars.undefined[unknownVariable] != undefined){
+                    EL.undefinedVars.undefined[unknownVariable].currentState = "known";
+                    EL.undefinedVars.undefined[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
+                    foundMatchAndChangedVariableValueOrState = true;
+                  }
+                  else if(EL.undefinedVars.defined[unknownVariable] != undefined){
+                    EL.undefinedVars.defined[unknownVariable].currentState = "known";
+                    EL.undefinedVars.defined[unknownVariable].value = (knownVariableValue) ? ConvertStringToScientificNotation(knownVariableValue) : undefined;
+                    foundMatchAndChangedVariableValueOrState = true;
+                  }
 
-                if(foundMatchAndChangedVariableValueOrState){
-                  //because we changed values and were able to identify new known variables we need
-                  //call "UpdateKnownUnknownVariables" function which will parse the rawExpressionData from the first line with the new information we have put into the known unknown variables.
-                  //By passing in "false" this function wont reset the variables currentState values which is what we want because we want the information we have just found to persist. Otherwise we would get a loop
-                  EL.UpdateKnownUnknownVariables(false);
-                  return;//after this function is done running it means it has already parsed all the lines starting from the top  so we just end right here
+                  if(foundMatchAndChangedVariableValueOrState){
+                    //because we changed values and were able to identify new known variables we need
+                    //call "UpdateKnownUnknownVariables" function which will parse the rawExpressionData from the first line with the new information we have put into the known unknown variables.
+                    //By passing in "false" this function wont reset the variables currentState values which is what we want because we want the information we have just found to persist. Otherwise we would get a loop
+                    EL.UpdateKnownUnknownVariables(false);
+                    return;//after this function is done running it means it has already parsed all the lines starting from the top  so we just end right here
+                  }
                 }
               }
+              catch(err5){
+                console.log("error");
+                //console.log(err5);//something went wrong when trying to sovle variable
+              }
+              
             }
           }
         }
@@ -351,13 +364,13 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
         catch(err){
           //if it throws an error then we can try evaluating the string but taking out radians and steradians because they are untiless pretty much but the editor see them as units
           try {
-            str = math.evaluate(exprs[i][j].str.replace(/rad/g,"(m / m)").replace(/sr/g,"(m^2 / m^2)")).toString();
+            str = math.evaluate(exprs[i][j].str.replace(/rad/g,"(1)").replace(/sr/g,"(1)")).toString();
             results[i].push({success: str});
           }
           catch(err2){
             try{
               //by removing the vector unit we can figure out if the units don't match because the user is adding a scalar with a vector
-              math.evaluate(exprs[i][j].str.replace(/rad/g,"(m / m)").replace(/sr/g,"(m^2 / m^2)").replace(/vector/g,"")).toString();
+              math.evaluate(exprs[i][j].str.replace(/rad/g,"(1)").replace(/sr/g,"(1)").replace(/vector/g,"")).toString();
               results[i].push({error: "Adding a scalar with a vector"});
             }
             catch(err3){
@@ -431,7 +444,7 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
         try{
           //removing rad and steradian from equations to see if they will equal each other because the editor can't recorgnize the arc formula  s=r\theta cuz units wise you are saying 1m=1m*rad
           for(var i = 0; i < successes.length; i++){
-            editedSuccesses.push(successes[i].replace(/rad/g,"").replace(/sr/g,""));
+            editedSuccesses.push(successes[i].replace(/rad/g,"(1)").replace(/sr/g,"(1)"));
           }
           equationUnits = math.evaluate(editedSuccesses.join(" + ")).toString();
           equationUnitsMatch = true;
@@ -446,6 +459,7 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
             settingScalarToVector = true;
           }
           catch(err3){
+            //console.log(err3);
             settingScalarToVector = false;
           }
         }
@@ -893,7 +907,7 @@ function SimpleConvertLatexStringToNerdamerReadableString(ls, uniqueRIDStringArr
   //first thing we need to do is convert all vectors latex string into a simple string so that Nerdamer can parse the variable
   //ls = ReplaceLatexVectorsWithNerdamerReadableVariables(ls);
   //we then need to remove unit vectors so \hat{ } because with this simple conversion we don't care about vectors we only care about units
-  ls = ls.replace(/\\hat\{[\s\d\w\\\^\-]*\}/g,"(1)");
+  ls = ls.replace(/\\hat\{[\s\d\w\\\^\-]*\}/g,"1");
   ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray);//this object holds
   ls = CleanLatexString(ls, ["fractions","addition","parentheses","brackets", "white-space"]);
   ls = CleanLatexString(ls,["multiplication"]);
@@ -916,7 +930,7 @@ function ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, recognize
     //if this is true then we have converted things to nerdamer functions before we passed it to this function so
     //we need to make sure that we dont recognize a letter in a nerdamer function as a variable
     if(recognizeNerdamerFunctions){
-      let nerdamerFunctions = ["integrate(","abs(","vector(","dot(","cross("];
+      let nerdamerFunctions = ["integrate(","abs(","vector(","dot(","cross(", "log(","log10(","diff("];
       for(var c = 0; c < nerdamerFunctions.length; c++){
         if(s.indexOf(nerdamerFunctions[c]) == 0){
           foundMatch = true;
@@ -1003,6 +1017,7 @@ function GenerateUniqueRIDStringForVariables(ls){
         variable: vars[i],
         ridString: `__${RandomVariableString()}`,
         differentialVariable: `d${vars[i]}`,
+        partialDifferentialVariable: `\\partial ${vars[i]}`,
         differentialRidString: `__${RandomVariableString()}`,
       });
     }
@@ -1074,7 +1089,32 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
     let latexFunctionConversions = {//i have to put 4 backslashes because these strings are going into a regex statement so i have to escape the backslashes
       "\\\\sqrt": "sqrt",
       "\\\\sin": "sin",
+      "\\\\sinh": "sinh",
+      "\\\\arcsin": "asin",
+      "\\\\arcsinh": "asinh",
       "\\\\cos": "cos",
+      "\\\\cosh": "cosh",
+      "\\\\arccos": "acos",
+      "\\\\arccosh": "acosh",
+      "\\\\tan": "tan",
+      "\\\\tanh": "tanh",
+      "\\\\arctan": "atan",
+      "\\\\arctanh": "atanh",
+      "\\\\cot": "cot",
+      "\\\\coth": "coth",
+      "\\\\arccot": "acot",
+      "\\\\arccoth": "acoth",
+      "\\\\csc": "csc",
+      "\\\\csch": "csch",
+      "\\\\arccsc": "acsc",
+      "\\\\arccsch": "acsch",
+      "\\\\sec": "sec",
+      "\\\\sech": "sech",
+      "\\\\arcsec": "asec",
+      "\\\\arcsech": "asech",
+      "\\\\ln": "ln",
+      "\\\\log\\s*\\\\left\\(": "log10(",
+      "\\\\log\\s*\\(": "log10(",
       "\\\\int": "",
       "\\\\sum": "",
     };
@@ -1095,7 +1135,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
             ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing integral formatted as: \int_(...)^(...)
           }
           else{//theere was trouble finding the closing bracket so just stop
-            console.log("trouble finding closing bracket for integral");
+            console.log("trouble finding closing parenthesis for integral");
             break;
           }
         }
@@ -1104,7 +1144,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
         }
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing bracket for integral");
+        console.log("trouble finding closing parenthesis for integral");
         break;
       }
     }
@@ -1122,6 +1162,67 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
       }
     }
 
+    //we need to replace all custom logs like log base 2 or log base 4.5 and so on with a function that can actually parse these logs 
+    //we want to convert something like this "\\log_{number}(expression)" to this "customLog(number, expression)"
+    while(ls.indexOf("\\log_{") != -1){
+      i1 = ls.indexOf("\\log_{");
+      i2 = FindIndexOfClosingBracket(ls.substring(i1 + "\\log_{".length));
+      if(i2 != null){
+        i2 += i1 + "\\log_{".length;//accounts for the shift because we used a substring of ls
+        //now that we have found the closing bracket we want to check that the stuff inside of it is a number otherwise we just break out of this while loop and give up
+        if(isNaN(ls.substring(i1 +  "\\log_{".length, i2))){
+          //if the if statement returns true than that means the string inside the log is not a number
+          break;
+        }
+        else{
+          //the string inside is a number
+          if(ls.substring(i2 + 1).indexOf("\\left(") == 0){
+            ls = `${ls.substring(0, i1)}customLog(${ls.substring(i1 +  "\\log_{".length, i2)},${ls.substring(i2 + 1 + "\\left(".length)}`;
+          }
+          else if(ls.substring(i2 + 1).indexOf("(") == 0){//this means the user has put parentheses after the custom log which means it is formatted properly to parse it and change it to a "customLog"
+            ls = `${ls.substring(0, i1)}customLog(${ls.substring(i1 +  "\\log_{".length, i2)},${ls.substring(i2 + 1 + "(".length)}`;
+          }
+          else{
+            break;//because the user hasn't yet formatted the string properly. they need to have something like "\\log_{number}(expression)" or "\\log_{number}()"
+          }
+          
+        }
+      }
+      else{//theere was trouble finding the closing bracket so just stop
+        console.log("trouble finding closing bracket");
+        break;
+      }
+    }
+
+    //we want to convert something like this "\\log_{}"
+    while(ls.indexOf("\\log_(") != -1){
+      i1 = ls.indexOf("\\log_(");
+      i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + "\\log_(".length));
+      if(i2 != null){
+        i2 += i1 + "\\log_(".length;//accounts for the shift because we used a substring of ls
+        //now that we have found the closing bracket we want to check that the stuff inside of it is a number otherwise we just break out of this while loop and give up
+        if(isNaN(ls.substring(i1 +  "\\log_(".length, i2))){
+          //if the if statement returns true than that means the string inside the log is not a number
+          break;
+        }
+        else{
+          //the string inside is a number
+          if(ls.substring(i2 + 1).indexOf("\\left(") == 0){
+            ls = `${ls.substring(0, i1)}customLog(${ls.substring(i1 +  "\\log_(".length, i2)},${ls.substring(i2 + 1 + "\\left(".length)}`;
+          }
+          else if(ls.substring(i2 + 1).indexOf("(") == 0){//this means the user has put parentheses after the custom log which means it is formatted properly to parse it and change it to a "customLog"
+            ls = `${ls.substring(0, i1)}customLog(${ls.substring(i1 +  "\\log_(".length, i2)},${ls.substring(i2 + 1 + "(".length)}`;
+          }
+          else{
+            break;//because the user hasn't yet formatted the string properly. they need to have something like "\\log_{number}(expression)" or "\\log_{number}()"
+          }
+        }
+      }
+      else{//theere was trouble finding the closing bracket so just stop
+        console.log("trouble finding closing parenhesis");
+        break;
+      }
+    }
 
     let r;
     for(const [key, value] of Object.entries(latexFunctionConversions)){
@@ -1449,8 +1550,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
     //console.log(uniqueRIDStringArray);
     let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID);
     let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID)
-    console.log("uniqueRIDStringArray", uniqueRIDStringArray);
-    console.log(expression1 + " ?= " +  expression2);
+    //console.log("uniqueRIDStringArray", uniqueRIDStringArray);
+    //console.log(expression1 + " ?= " +  expression2);
     if(expression1 != null && expression2 != null){
       //because this is a high level check we need to make sure that both expressions use the same variables and if not we cannot be sure that the equations don't equal each other so we will not actaully do any check
       let expression1Variables = GetRidStringVariablesFromString(expression1, uniqueRIDStringArray);
@@ -1476,6 +1577,18 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
                   count++;
                 }
               }
+              try{
+                //there is a case where both expressions are numbers but are equivalent but when calcuating their values the calculation is off by some decimal places
+                //an example would be log10(25)/log10(5) = 2 but when calculate the leftside gives a very long decimal that is approaching 2 so we use the function "toFixed" to round it to the 12th decimal place
+                let num1 = math.evaluate(expression1).toExponential().split("e");
+                let num2 = math.evaluate(expression2).toExponential().split("e");
+                isEqual = nerdamer(`${Number(num1[0]).toFixed(10)}e${num1[1]}`).eq(`${Number(num2[0]).toFixed(10)}e${num2[1]}`)
+              }
+              catch(err){
+                isEqual = false;
+              }
+
+
               if(!isEqual){
                 //console.log("not equal");
                 expressionThatAreNotCorrect.push({
@@ -1531,6 +1644,105 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
     }
   }
   return expressionThatAreNotCorrect;
+}
+
+function FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, uniqueRIDStringArray, lineNumber, mfID){
+  //this function goes through the ls and replaces every instance of a derivative notation with its correct nerdamer string
+  //we are going to loop through each differential variable and see if it is being used in a derivative and format it to something nerdamer can understand
+  let index = 0; 
+  let i1 = 0;
+  let i2 = 0;
+  while(index < uniqueRIDStringArray.length){
+    let dv = uniqueRIDStringArray[index].differentialVariable;
+    let pdv = uniqueRIDStringArray[index].partialDifferentialVariable;
+    //first derivative
+    while(ls.indexOf(`\\frac{d}{${dv}}`) != -1){
+      //we found a differential variable operator and we are checking if it is formatted properly in such a way that we can actually do the derivative of the expression inside
+      i1 = ls.indexOf(`\\frac{d}{${dv}}`);
+      if(ls.substring(i1 + `\\frac{d}{${dv}}`.length).indexOf("\\left(") == 0){
+        i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + `\\frac{d}{${dv}}\\left(`.length));
+        if(i2 != null){
+          i2 += i1 + `\\frac{d}{${dv}}\\left(`.length;//this accounts for the shift because we used a substring of ls
+          //next we need to format the string with nerdamer function "diff"
+          ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{d}{${dv}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable})${ls.substring(i2+1)}`
+        }
+        else{
+          console.log("couldn't find closing parenthesis");
+          return null;
+        }
+      }
+      else{
+        return null;//the user hasn't formatted the derivative in such a way that we can actually calculate what it is
+      }
+    }
+
+    //second derivative
+    while(ls.indexOf(`\\frac{\\d^{2}}{${dv}^{2}}`) != -1){
+      //we found a differential variable operator and we are checking if it is formatted properly in such a way that we can actually do the derivative of the expression inside
+      i1 = ls.indexOf(`\\frac{\\d^{2}}{${dv}^{2}}`);
+      if(ls.substring(i1 + `\\frac{\\d^{2}}{${dv}^{2}}`.length).indexOf("\\left(") == 0){
+        i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + `\\frac{\\d^{2}}{${dv}^{2}}\\left(`.length));
+        if(i2 != null){
+          i2 += i1 + `\\frac{\\d^{2}}{${dv}^{2}}\\left(`.length;//this accounts for the shift because we used a substring of ls
+          //next we need to format the string with nerdamer function "diff"
+          ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{\\d^{2}}{${dv}^{2}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable}, 2)${ls.substring(i2+1)}`
+        }
+        else{
+          console.log("couldn't find closing parenthesis");
+          return null;
+        }
+      }
+      else{
+        return null;//the user hasn't formatted the derivative in such a way that we can actually calculate what it is
+      }
+    }
+
+    //first partial derivative 
+    while(ls.indexOf(`\\frac{\\partial}{${pdv}}`) != -1){
+      //we found a differential variable operator and we are checking if it is formatted properly in such a way that we can actually do the derivative of the expression inside
+      i1 = ls.indexOf(`\\frac{\\partial}{${pdv}}`);
+      if(ls.substring(i1 + `\\frac{\\partial}{${pdv}}`.length).indexOf("\\left(") == 0){
+        i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + `\\frac{\\partial}{${pdv}}\\left(`.length));
+        if(i2 != null){
+          i2 += i1 + `\\frac{\\partial}{${pdv}}\\left(`.length;//this accounts for the shift because we used a substring of ls
+          //next we need to format the string with nerdamer function "diff"
+          ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{\\partial}{${pdv}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable})${ls.substring(i2+1)}`
+        }
+        else{
+          console.log("couldn't find closing parenthesis");
+          return null;
+        }
+      }
+      else{
+        return null;//the user hasn't formatted the derivative in such a way that we can actually calculate what it is
+      }
+    }
+
+    //second partial derivative
+    while(ls.indexOf(`\\frac{\\partial^{2}}{${pdv}^{2}}`) != -1){
+      //we found a differential variable operator and we are checking if it is formatted properly in such a way that we can actually do the derivative of the expression inside
+      i1 = ls.indexOf(`\\frac{\\partial^{2}}{${pdv}^{2}}`);
+      if(ls.substring(i1 + `\\frac{\\partial^{2}}{${pdv}^{2}}`.length).indexOf("\\left(") == 0){
+        i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + `\\frac{\\partial^{2}}{${pdv}^{2}}\\left(`.length));
+        if(i2 != null){
+          i2 += i1 + `\\frac{\\partial^{2}}{${pdv}^{2}}\\left(`.length;//this accounts for the shift because we used a substring of ls
+          //next we need to format the string with nerdamer function "diff"
+          ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{\\partial^{2}}{${pdv}^{2}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable}, 2)${ls.substring(i2+1)}`
+        }
+        else{
+          console.log("couldn't find closing parenthesis");
+          return null;
+        }
+      }
+      else{
+        return null;//the user hasn't formatted the derivative in such a way that we can actually calculate what it is
+      }
+    }
+
+    index++;
+  }
+
+  return ls;
 }
 
 function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID){
@@ -1854,12 +2066,15 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   ls = FindAndWrapVectorsThatAreBeingMultiplied(ls).replace(/(myCrossProduct)/g,"cross").replace(/(myDotProduct)/g,"dot");//the replacing what i call cross and dot product with what nerdamer recognizes as a cross or dot product
   ls = FormatVectorsIntoNerdamerVectors(ls);
   //we need to see if we can parse \int into a nerdamer string like integrate(x,x). and if we can't convert all of them then the if statement below will not allow us to check if the strings are equal
+  ls = FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, uniqueRIDStringArray, lineNumber, mfID);
+  if(ls == null){return null;}//a derivative is formatted incorrectly so we can't check if expressions are equal
   ls = FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID);
+  ls = FindAndConvertLatexLogsToNerdamerReadableStrings(ls);
   //this line is temporary. We will soon be able to support parsing and using these operators and notations
-  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1){
+  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1 && ls.indexOf("\\ln") == -1 && ls.indexOf("\\log") == -1){
     ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, true);//passing true as the last parameter tells this function that there are nerdamer functions in this string so don't try to replace the letters in the function names
     try{
-      return nerdamer.convertFromLaTeX(ls).expand().toString();//this is just a place holder for the actual value we will return
+      return nerdamer.convertFromLaTeX(ls).evaluate().expand().toString();//this is just a place holder for the actual value we will return
     }catch(err){
       console.log(err);
       return null;
@@ -1873,6 +2088,36 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
 
 function FormatVectorsIntoNerdamerVectors(ls){
   return ls.replace(/\(\[/g, "vector(").replace(/\]\)/g, ")");
+}
+
+function FindAndConvertLatexLogsToNerdamerReadableStrings(ls){
+  //first thing we need to do is change all "\\ln" natural logs in to "log" which is the way nerdamer understands natural log
+  ls = ls.replace(/\\ln/g,"log");
+  //then we need to find every instance of "\\log\\left(" log base 10 and change it into "log10" which is nerdamers log base 10 function
+  ls = ls.replace(/\\log\\left\(/g,"log10(").replace(/\\log\(/g,"log10(");
+  while(ls.indexOf("\\log_{") != -1){
+    i1 = ls.indexOf("\\log_{");
+    i2 = FindIndexOfClosingBracket(ls.substring(i1 + "\\log_{".length));
+    if(i2 != null){
+      i2 += i1 + "\\log_{".length;//accounts for the shift because we used a substring of ls
+      //now that we have found the closing bracket we want to check that the stuff inside of it is a number otherwise we just break out of this while loop and give up
+      //ls.substring(i1 +  "\\log_{".length, i2) holds the base of the log
+      //the string inside is a number
+      if(ls.substring(i2 + 1).indexOf("\\left(") == 0){
+        ls = `${ls.substring(0, i1)}log10(${ls.substring(i1 +  "\\log_{".length, i2)})^(-1)*log10(${ls.substring(i2 + 1 + "\\left(".length)}`;
+      }
+      else{
+        break;//because the user hasn't yet formatted the string properly. they need to have something like "\\log_{number}(expression)" or "\\log_{number}()"
+      }
+    }
+    else{//theere was trouble finding the closing bracket so just stop
+      console.log("trouble finding closing bracket");
+      break;
+    }
+  }
+  
+  return ls;
+
 }
 
 function ReturnIntegralExpressionAndOtherExpression(dividedString, differentialVariableRidString, variableRidString){

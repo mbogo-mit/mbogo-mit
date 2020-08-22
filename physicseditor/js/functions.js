@@ -432,16 +432,14 @@ function MathFieldKeyPressEnter(el, enterClicked = false){
 
 }
 
-function UnfocusOnThisMathField(){
+function UnfocusMathFields(){
   FocusedMathFieldId = "none";
   SetMathFieldsUI();
 }
 
 function FocusOnThisMathField(rid){
-  setTimeout(function(r){
-    FocusedMathFieldId = r;
-    SetMathFieldsUI();
-  },100, rid);
+  FocusedMathFieldId = rid;
+  SetMathFieldsUI();
 }
 
 function MoveCursor1Line(id, move = "down", direction = "right"){
@@ -1200,31 +1198,67 @@ function CheckForAndDisplayRelevantEquations(){
 
     $(`#physics_equations .${section} .static-physics-equation.mq-math-mode`).each(function(){
       let quantities = JSON.parse($(this).attr("quantities"));
-      let isRelevantEquation = false;
+      let logIt = false;
+      //console.log($(this).attr("latex"));
+      let isRelevantEquation = true;
+      let atLeastOneKnownValue = false;
       for (const [key, value] of Object.entries(quantities)) {
-        if(usedQuantities[key] != undefined){//checking if user has defined the quantity that this equation uses
-          if(usedQuantities[key].number >= value){//the user has defined this variable at least the same number of times this equation needs or more
-            if(usedQuantities[key].state == "given"){
-              isRelevantEquation = true;
+        if(AcceptablePhysicalQuantities.includes(key)){
+          if(usedQuantities[key] != undefined){//checking if user has defined the quantity that this equation uses
+            if(usedQuantities[key].number >= value){//the user has defined this variable at least the same number of times this equation needs or more
+              if(usedQuantities[key].state == "given" || usedQuantities[key].state == "known"){
+                atLeastOneKnownValue = true;
+              }
+            }
+            else{
+              isRelevantEquation = false;//the equation is not relevant because this equation needs a specific quantity a specific number of times and the user hasn't defined a quantity enough times
+              if(logIt){
+                console.log(1);
+              }
+              break;
             }
           }
           else{
-            isRelevantEquation = false;//the equation is not relevant because this equation needs a specific quantity a specific number of times and the user hasn't defined a quantity enough times
-            break;
+            //if we can't find this quantity directly we need to check if it is a physics constant quantity which in that case the information would be stored under a general physics quantity name with a specific list of physics quantity descriptions
+            if(usedQuantities[PhysicsConstantToQuantity[key]] != undefined){
+              if(!usedQuantities[PhysicsConstantToQuantity[key]].quantityDescriptions.includes(key)){//if this specified quantity is not even included in the quantityDescriptions array which keeps track of specifics about the physical quantity then the equation is not relevant
+                isRelevantEquation = false;//the equation is not relevant because there is a quantity that this equation needs that the user hasn't defined
+                if(logIt){
+                  console.log(2);
+                  console.log("key",key);
+                  console.log("array", usedQuantities[PhysicsConstantToQuantity[key]].quantityDescriptions);
+                }
+                break;
+              }
+              else{
+                atLeastOneKnownValue = true;//all quantityDescriptions holds information from physics constants which are automatically known
+              }
+            }
+            else{
+              isRelevantEquation = false;//the equation is not relevant because there is a quantity that this equation needs that the user hasn't defined
+              if(logIt){
+                console.log(3);
+                console.log("key", key);
+                console.log("PhysicsConstantToQuantity[key]", PhysicsConstantToQuantity[key]);
+                console.log('usedQuantities[PhysicsConstantToQuantity[key]]', usedQuantities[PhysicsConstantToQuantity[key]]);
+              }
+              break;
+            } 
           }
         }
         else{
-          isRelevantEquation = false;//the equation is not relevant because there is a quantity that this equation needs that the user hasn't defined
-          break;
+          console.log(`misspelled key: ${key}`);
+            isRelevantEquation = false;//misspelled quantity
+            break;
         }
       }
 
-      if(isRelevantEquation){
-        $(this).addClass("relevant-equation");
+      if(isRelevantEquation && atLeastOneKnownValue){
+        $(this).parent().addClass("relevant-equation");
         numberOfRelevantEquationsInSection += 1;
       }
       else{
-        $(this).removeClass("relevant-equation");
+        $(this).parent().removeClass("relevant-equation");
       }
 
     });
@@ -1253,15 +1287,21 @@ function CheckForAndDisplayRelevantEquations(){
 }
 
 function GetAllUsedQuantities(){
-  let usedQuantities = {};
+  let usedQuantities = {
+    unitless: {number: 1000, state: "given"},//this is for any equation that needs a unitless variable we can assume any number can fit the job and because it is a number it is known. 1000 is just a big number so it meets any requirement for a specific equation
+  };
 
   for (const [key, value] of Object.entries(PreDefinedVariables)) {
     if(value.quantity != undefined){
       if(usedQuantities[value.quantity] == undefined){
-        usedQuantities[value.quantity] = {number: 1, state: value.state, quantityDescription: value.quantityDescription};
+        usedQuantities[value.quantity] = {number: 1, state: value.state, quantityDescriptions: [value.quantityDescription] };
       }
       else{
         usedQuantities[value.quantity].number += 1;
+        //we need to add the quantityDescription to the list of quantityDescriptions if it doesn't already exist
+        if(!usedQuantities[value.quantity].quantityDescriptions.includes(value.quantityDescription)){
+          usedQuantities[value.quantity].quantityDescriptions.push(value.quantityDescription);
+        }
       }
     }
   }
@@ -1269,7 +1309,7 @@ function GetAllUsedQuantities(){
   for (const [key, value] of Object.entries(DefinedVariables)) {
     if(value.quantity != undefined){
       if(usedQuantities[value.quantity] == undefined){
-        usedQuantities[value.quantity] = {number: 1, state: value.state};
+        usedQuantities[value.quantity] = {number: 1, state: value.state, quantityDescriptions: []};
       }
       else{
         usedQuantities[value.quantity].number += 1;
@@ -1280,7 +1320,7 @@ function GetAllUsedQuantities(){
   for (const [key, value] of Object.entries(EL.undefinedVars.defined)) {
     if(value.quantity != undefined){
       if(usedQuantities[value.quantity] == undefined){
-        usedQuantities[value.quantity] = {number: 1, state: value.state};
+        usedQuantities[value.quantity] = {number: 1, state: value.state, quantityDescriptions: []};
       }
       else{
         usedQuantities[value.quantity].number += 1;
@@ -1368,7 +1408,47 @@ function RemoveDifferentialOperatorDFromLatexString(ls){
     delta = 1;
     skipCharacter = false;
     str = ls.substring(i);
-    if(str[0] == "d" && str.length > 1){//checking that the "d" we are looking at is not the last character in the string if it is we must assume that it is not a differntial operator
+    if(str.indexOf("\\frac{d}{d") == 0 && str.length > "\\frac{d}{d".length){//checking that the "d" we are looking at is not the last character in the string if it is we must assume that it is not a differntial operator
+      for(let c = 0; c < acceptableStrings.length; c++){
+        if(str.substring("\\frac{d}{d".length).indexOf(acceptableStrings[c]) == 0){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
+          skipCharacter = true;//we want to skip this character
+          delta = "\\frac{d}{d".length;
+          newLs+= "\\frac{1}{";//adjusting the string so that "\\frac{d}{dt}" -> "\\frac{1}{t}"
+          break;//once we find a character that works we don't have to continue to parse through the rest of the array
+        }
+      }
+    }
+    else if(str.indexOf("\\frac{d^{2}}{d") == 0 && str.length > "\\frac{d^{2}}{d".length){//checking that the "d" we are looking at is not the last character in the string if it is we must assume that it is not a differntial operator
+      for(let c = 0; c < acceptableStrings.length; c++){
+        if(str.substring("\\frac{d^{2}}{d".length).indexOf(`${acceptableStrings[c]}^{2}`) == 0){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
+          skipCharacter = true;//we want to skip this character
+          delta = "\\frac{d^{2}}{d".length;
+          newLs+= "\\frac{1}{";//adjusting the string so that "\\frac{d}{dt}" -> "\\frac{1}{t}"
+          break;//once we find a character that works we don't have to continue to parse through the rest of the array
+        }
+      }
+    }
+    else if(str.indexOf("\\frac{\\partial}{\\partial ") == 0 && str.length > "\\frac{\\partial}{\\partial ".length){//checking that the "d" we are looking at is not the last character in the string if it is we must assume that it is not a differntial operator
+      for(let c = 0; c < acceptableStrings.length; c++){
+        if(str.substring("\\frac{\\partial}{\\partial ".length).indexOf(acceptableStrings[c]) == 0){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
+          skipCharacter = true;//we want to skip this character
+          delta = "\\frac{\\partial}{\\partial ".length;
+          newLs+= "\\frac{1}{";//adjusting the string so that "\\frac{d}{dt}" -> "\\frac{1}{t}"
+          break;//once we find a character that works we don't have to continue to parse through the rest of the array
+        }
+      }
+    }
+    else if(str.indexOf("\\frac{\\partial^{2}}{\\partial ") == 0 && str.length > "\\frac{\\partial^{2}}{\\partial ".length){//checking that the "d" we are looking at is not the last character in the string if it is we must assume that it is not a differntial operator
+      for(let c = 0; c < acceptableStrings.length; c++){
+        if(str.substring("\\frac{\\partial^{2}}{\\partial ".length).indexOf(`${acceptableStrings[c]}^{2}`) == 0){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
+          skipCharacter = true;//we want to skip this character
+          delta = "\\frac{\\partial^{2}}{\\partial ".length;
+          newLs+= "\\frac{1}{";//adjusting the string so that "\\frac{d}{dt}" -> "\\frac{1}{t}"
+          break;//once we find a character that works we don't have to continue to parse through the rest of the array
+        }
+      }
+    }
+    else if(str[0] == "d" && str.length > 1){//checking that the "d" we are looking at is not the last character in the string if it is we must assume that it is not a differntial operator
       for(let c = 0; c < acceptableStrings.length; c++){
         if(str.indexOf(acceptableStrings[c]) == 1){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
           skipCharacter = true;//we want to skip this character
@@ -1386,13 +1466,31 @@ function RemoveDifferentialOperatorDFromLatexString(ls){
           break;//once we find a character that works we don't have to continue to parse through the rest of the array
         }
       }
-
     }
     else if(str.indexOf("\\Delta") == 0 && str.length > "\\Delta".length){//we check for \Delta again without a space because in latex when a latex string comes after another one there is no need for a space. the space is only for no latex strings
       for(let c = 0; c < acceptableStrings.length; c++){
         if(str.substring("\\Delta".length).indexOf(acceptableStrings[c]) == 0){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
           skipCharacter = true;//we want to skip this character
           delta = "\\Delta".length;
+          break;//once we find a character that works we don't have to continue to parse through the rest of the array
+        }
+      }
+    }
+    else if(str.indexOf("\\partial ") == 0 && str.length > "\\partial ".length){//checking that the "\\partial" we are looking at is not the last character in the string if it is we must assume that it is not a differntial operator
+      for(let c = 0; c < acceptableStrings.length; c++){
+        if(str.substring("\\partial ".length).indexOf(acceptableStrings[c]) == 0){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
+          skipCharacter = true;//we want to skip this character
+          delta = "\\partial ".length;
+          break;//once we find a character that works we don't have to continue to parse through the rest of the array
+        }
+      }
+
+    }
+    else if(str.indexOf("\\partial") == 0 && str.length > "\\partial".length){//we check for \Delta again without a space because in latex when a latex string comes after another one there is no need for a space. the space is only for no latex strings
+      for(let c = 0; c < acceptableStrings.length; c++){
+        if(str.substring("\\partial".length).indexOf(acceptableStrings[c]) == 0){//this means that the acceptable character comes right after "d" and uses "d" as a differntial operator for example the equation: dxdydz=dv, where x,y,z,v all use "d" as an operator
+          skipCharacter = true;//we want to skip this character
+          delta = "\\partial".length;
           break;//once we find a character that works we don't have to continue to parse through the rest of the array
         }
       }
@@ -1483,10 +1581,10 @@ function DisplayUnitDropdownSearchMenu(el, rid){
 function RenderSIUnitsSearch(){
   //everytime you search you should disable the updated button because no si unit is selected
   $("#btn-update-variable-units").addClass("disabled");
-  let search = $("#input-user-units-search").val();
+  let search = $("#input-user-units-search").val().toLowerCase();
   results = [];
   for(const [key, value] of Object.entries(UnitReference)){
-    if(key.search(search) != -1){
+    if(key.toLowerCase().search(search) != -1){
       results.push(key);
     }
   }

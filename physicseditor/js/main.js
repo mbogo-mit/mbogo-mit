@@ -4,6 +4,7 @@ var MQ = MathQuill.getInterface(2); // keeps the API stable
 //initializing first line
 CreateNewMathField("first_math_field");
 
+
 function CreateNewMathField(id){
   //el is a jquery Element
   var m = MQ.MathField(document.getElementById(id), {
@@ -12,7 +13,7 @@ function CreateNewMathField(id){
     sumStartsWithNEquals: true,
     supSubsRequireOperand: true,
     autoCommands: `sqrt sum int hat ${LatexGreekLetters.join(' ').replace(/\s\\psi/g,"").replace(/\\/g,"")}`,
-    autoOperatorNames: 'sin cos csc sec tan arcsin arccos cot sinh cosh tanh log ln',
+    autoOperatorNames: 'sin sinh arcsin arcsinh cos cosh arccos arccosh tan tanh arctan arctanh cot coth arccot arccoth csc csch arccsc arccsch sec sech arcsec arcsech log ln',
     charsThatBreakOutOfSupSub: '+-=<>',
     handlers: {
       edit: function() {

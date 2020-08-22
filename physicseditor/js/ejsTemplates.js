@@ -117,7 +117,7 @@ let Templates = {
       <span class="line-question" mf="<%= rid %>"><i class="fas fa-question-circle"></i></span>
     </div>
     <div class="col m11 my_math_field_col">
-      <div id="<%= rid %>" class="my_math_field" onkeydown="KeyLogger()" onkeyup="KeyLogger()" onmousedown="FocusOnThisMathField('<%= rid %>')" onfocusout="UnfocusOnThisMathField()"></div>
+      <div id="<%= rid %>" class="my_math_field" onkeydown="KeyLogger()" onkeyup="KeyLogger()" onmousedown="FocusOnThisMathField('<%= rid %>')"></div>
     </div>
   </div>
   `,
@@ -125,7 +125,7 @@ let Templates = {
     "physics-constant":
     `
     <div class="variable-row <%= (opts.unused) ? "unused-variable" : "" %>">
-      <span class="static-physics-equation" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+      <span class="static-physics-equation tooltipped" data-position="left" data-tooltip="<%= opts.ls%>" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
       <span class="variable-tag constant-info"><span latex="<%= opts.variable.value %>" rid="<%= opts.variable.rid %>"></span></span>
       <span class="variable-tag constant-info"><span latex="<%= opts.variable.unit %>" rid="<%= opts.variable.rid %>"></span></span>
       <span class="variable-tag physics-constant"><%= opts.variable.quantityDescription %></span>
@@ -136,7 +136,7 @@ let Templates = {
     `
     <div class="variable-row valign-wrapper <%= (opts.unused) ? "unused-variable" : "" %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
-        <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+        <span class="static-physics-equation editable-variable tooltipped" data-position="left" data-tooltip="<%= opts.ls%>" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
         <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
           <% if(opts.variable.value != undefined){%>
@@ -172,7 +172,7 @@ let Templates = {
     `
     <div class="variable-row valign-wrapper undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
-        <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+        <span class="static-physics-equation editable-variable tooltipped" data-position="left" data-tooltip="<%= opts.ls%>" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
         <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
           <% if(opts.variable.value != undefined){%>
@@ -197,7 +197,7 @@ let Templates = {
   <% for(let i = 0; i < results.length; i++){%>
   <div class="row my-row si-unit-row" onclick="UpdateVariableUnits($(this))" fullUnitssString="<%= results[i] %>">
     <div class="col m12">
-      <%= results[i] %>
+      <%- results[i] %>
     </div>
   </div>
   <% } %>
@@ -234,7 +234,7 @@ let Templates = {
         <% for (const [key, value] of Object.entries(importedVariables)) {%>
         <tr>
           <td><span class="static-physics-equation" latex="<%= key %>"></span></td>
-          <td><%= value.quantity %> (<%= value.units %>)</td>
+          <td><%= value.quantityDescription %> (<%= value.units %>)</td>
           <td>
             <% if(value.disabled){%>
             <label>
