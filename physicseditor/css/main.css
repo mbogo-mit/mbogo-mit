@@ -32,11 +32,19 @@ body {
 }
 
 #my-navbar {
-  padding: 12px 0px;
+  padding: 15px 10px;
   font-size: 16px;
   font-weight: bold;
   background-image: linear-gradient(to bottom right, #5680e9, #8860d0);
   color: white;
+}
+
+#my-navbar .btn {
+  margin-left: 10px;
+  background-color: transparent;
+  line-height: 30px;
+  height: 30px;
+  top: -3px;
 }
 
 #my-navbar > a {
@@ -57,6 +65,10 @@ body {
   color: #5680e9;
 }
 
+
+.physics-equation-headers {
+  margin: 20px 0px !important;
+}
 
 .static-physics-equation .mq-empty {
   background-color: transparent !important;
@@ -422,14 +434,16 @@ body {
   border: none !important;
 }
 
+#physics_equations .collapsible-header {
+  padding: 0px 15px !important;
+}
+
 #physics_equations .collapsible-header:hover{
   background-image: linear-gradient(to bottom right, #84ceeb, #ffffff);
-  /*transition: background-color 0.5s;*/
 }
 
 #physics_equations li.active .collapsible-header{
   background-image: linear-gradient(to bottom right, #84ceeb, #ffffff);
-  transition: background-color 0.5s;
 }
 
 #physics_equations .collapsible .collapsible-header, #physics_equations .collapsible-body {
@@ -782,4 +796,16 @@ body {
 
 #btn-update-imported-variables:not(.disabled), #btn-cancel-imported-variables {
   background-color: #5680e9 !important;
+}
+
+.btn-import-variable-definition {
+  line-height: 30px;
+  height: 30px;
+  margin-left: 10px;
+  background-image: linear-gradient(to bottom right, #5680e9, #84ceeb);
+  display: none;
+}
+
+#physics_equations .collapsible-header:hover .btn-import-variable-definition {
+  display: inline-block;
 }

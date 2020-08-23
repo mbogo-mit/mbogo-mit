@@ -2076,12 +2076,12 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
     try{
       return nerdamer.convertFromLaTeX(ls).evaluate().expand().toString();//this is just a place holder for the actual value we will return
     }catch(err){
-      console.log(err);
+      //console.log(err);
       return null;
     }
   }
   else{
-    console.log("unparsable characters")
+    //console.log("unparsable characters")
     return null;
   }
 }

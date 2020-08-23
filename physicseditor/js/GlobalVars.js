@@ -9,7 +9,7 @@ function RID(){
 
   return rid;
 }
-
+let FirstTimeThroughDemo = true;
 let SqrtLoop = 0;
 let LastVariableRIDChangedToGiven = null;
 let EditingMathFields = false;
@@ -64,6 +64,7 @@ let ImportVariableDefinitions = {
     "R": {units: "unitless", quantityDescription: "Reynolds number", quantity: "unitless", vector: false, unitsMathjs: "1", rid: RID(),},
     "\\vec{r}": {units: "m", quantityDescription: "radius", quantity: "length", vector: true, unitsMathjs: "1 m",rid: RID(),},
     "\\rho": {units: "kg/m^3", quantityDescription: "mass density", quantity: "mass density", vector: false, unitsMathjs: "1 kg/m^3", rid: RID(),},
+    "\\vec{s}": {units: "m", quantityDescription: "length", quantity: "length", vector: true, unitsMathjs: "1 m",rid: RID(),},
     "\\sigma": {units: "N/m^2", quantityDescription: "uniaxial stress", quantity: "stress", vector: false, unitsMathjs: "1 N/m^2", rid: RID(),},
     "T": {units: "s", quantityDescription: "period", quantity: "time", vector: false, unitsMathjs: "1 s", rid: RID(),},
     "t": {units: "s", quantityDescription: "time", quantity: "time", vector: false, unitsMathjs: "1 s", rid: RID(),},

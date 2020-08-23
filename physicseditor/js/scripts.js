@@ -26,7 +26,9 @@ $(document).ready(function(){
   MessageBoxMathFields.warning.m1 = MQ.StaticMath($("#warning-box-undefined-vars")[0]);
 
   $('.tabs').tabs();
-  $("#modal-physics-equation-more-information").modal();
+  $('.dropdown-trigger').dropdown();
+
+  $("#modal-physics-equation-more-information, #modal-user-guide").modal();
   $("#modal_import_variable_definition").modal({
     onOpenStart: function(){
       $("#btn-update-imported-variables").addClass("disabled");
@@ -44,6 +46,7 @@ $(document).ready(function(){
       });
     }
   });
+
   $('.tooltipped').tooltip();
   $('#side-nav-editor-log').sidenav({
     edge: 'right',
