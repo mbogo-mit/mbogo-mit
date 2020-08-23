@@ -70,6 +70,10 @@ function EditorLogger(){
       description: "Expressions inside any log must be unitless. Check all expressions on this line that are inside a log and make sure they simplify to a unitless expression",
       example: "",
     },
+    "Unexpected type of argument in function pow": {
+      description: "All expressions in the exponent must simplify down to a unitless expression. Check that all exponents on this line simplify down to a unitless value.",
+      example: "",
+    },
     "defaultError": {
       description: "There is something wrong with an equation on this line. This may be a problem with the Editor. Please contact customer support if the issue persists",
       example: "",
