@@ -74,6 +74,38 @@ function EditorLogger(){
       description: "All expressions in the exponent must simplify down to a unitless expression. Check that all exponents on this line simplify down to a unitless value.",
       example: "",
     },
+    "Unit in function sin is no angle": {
+      description: "All expressions in sin function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
+    "Unit in function cos is no angle": {
+      description: "All expressions in cos function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
+    "Unit in function tan is no angle": {
+      description: "All expressions in tan function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
+    "Unit in function csc is no angle": {
+      description: "All expressions in csc function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
+    "Unit in function sec is no angle": {
+      description: "All expressions in sec function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
+    "Unexpected type of argument in function asin": {
+      description: "All expressions in arcsin function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
+    "Unexpected type of argument in function acos": {
+      description: "All expressions in arccos function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
+    "Unexpected type of argument in function atan": {
+      description: "All expressions in arctan function must simplify to be radians, steradians, or unitless",
+      example: "",
+    },
     "defaultError": {
       description: "There is something wrong with an equation on this line. This may be a problem with the Editor. Please contact customer support if the issue persists",
       example: "",

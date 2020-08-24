@@ -75,8 +75,8 @@ function ThisIsTheBeginningOfAVariable(state){
     //we need to see if the current character could be the start of a variable
     if(subLs[0] == "\\"){
       //it could equal a blackslash because it is the start of a vector variable '\vec{}'
-      if(subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0 || subLs.indexOf("\\overline{") == 0){
-        let size = (subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0) ? "\\bar{".length : "\\overline{".length;
+      if(subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0 || subLs.indexOf("\\dot{") == 0 || subLs.indexOf("\\overline{") == 0){
+        let size = (subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0 || subLs.indexOf("\\dot{") == 0) ? "\\bar{".length : "\\overline{".length;
         answer.yes = true;
         answer.substring = subLs.substring(0,size);
         answer.newState.currentlyParsingVariable = true;
@@ -117,7 +117,12 @@ function ThisIsTheContinuationOfAVariable(state){
   }
 
   if(state.currentlyParsingVariable){
-    if(subLs.indexOf("_{") == 0){//this is the only that is an acceptable continuation of a variable without the need of brackets
+    if(subLs.indexOf("'") == 0){
+      answer.yes = true;
+      answer.substring = subLs.substring(0,1);
+      answer.newState.index += 1;
+    }
+    else if(subLs.indexOf("_{") == 0){//this is the only that is an acceptable continuation of a variable without the need of brackets
       answer.yes = true;
       answer.substring = subLs.substring(0,2);
       answer.newState.numberOfRightBracketsNeeded += 1;//because the "_" needs an opening and closing bracket

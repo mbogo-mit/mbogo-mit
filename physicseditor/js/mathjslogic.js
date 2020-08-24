@@ -272,18 +272,70 @@ function ConvertStringToScientificNotation(str){
   return scientificNotation.join("");
 }
 
+function SplitLsIntoExpressions(ls){
+  let defaultExpressiosn = [ls];
+  //this function takes in an ls and splits it into an array of latex expressions based on semicolons and commas
+  let expressions = [];
+  let i = 0;
+  let i2 = 0;
+  let startIndex = 0;
+  let delta = 1;
+  let str = "";
+  while(i < ls.length){
+    delta = 1;
+    str = ls.substring(i);
+    if(str[0] == "," || str[0] == ";"){
+      expressions.push(ls.substring(startIndex, i));
+      startIndex = i+1;//we want the next character we keep track of after the comma
+      delta = 1;
+    }
+    else if(str[0] == "("){
+      //we need to find the closing parentheses and not parse anything in th middle
+      i2 = FindIndexOfClosingParenthesis(str.substring(1));
+      if(i2 != null){
+        delta = i2 + 1;//adding one accounts for the shift because we used a substring
+      }
+      else{
+        console.log("couldn't find closing parentheses");
+        return defaultExpressiosn;//if we can't parse one part of the ls right then we will not parse it at all and just send up a default expression
+      }
+    }
+    else if(str[0] == "{"){
+      //we need to find the closing bracekt and not parse anything in th middle
+      i2 = FindIndexOfClosingBracket(str.substring(1));
+      if(i2 != null){
+        delta = i2 + 1;//adding one accounts for the shift because we used a substring
+      }
+      else{
+        console.log("couldn't find closing bracket");
+        return defaultExpressiosn;//if we can't parse one part of the ls right then we will not parse it at all and just send up a default expression
+      }
+    }
+    i += delta;
+  }
+
+  //before we return the value we need to add the last expression to the list of expressions if it has a length greater than 0
+  if(ls.substring(startIndex).length > 0){
+    expressions.push(ls.substring(startIndex));
+  }
+
+  return expressions;
+}
+
 function CheckForErrorsInExpression(ls, lineNumber, mfID){
   ls = RemoveCommentsFromLatexString(ls);
   ls = PutBracketsAroundAllSubsSupsAndRemoveEmptySubsSups(ls);
   ls = SimplifyFunctionDefinitionToJustFunctionVariable(ls);//converts "f(x,y)=xy" to f=xy
-
-  let expressions = ls.split(";");
+  let expressions = SplitLsIntoExpressions(ls);
   let rawData = expressions.map((str) => {
     let i = 0;
+    let i2 = 0;
+    let delta = 1;
     let startIndex = 0;
     let splittedExpressions = [];
     let foundMatch = false;
     while(i < str.length){
+      delta = 1;
       foundMatch = false;
       for(let delimiter of EqualityOperators){
         if(delimiter.indexOf("\\") == 0){
@@ -300,12 +352,34 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
             operator: delimiter,
           });
           startIndex = i + delimiter.length;
-          i += delimiter.length -1;
+          delta = delimiter.length;
           break;
         }
       }
+      if(!foundMatch){
+        if(str[i] == "("){
+          //we need to find the closing parentheses and not parse anything in th middle
+          i2 = FindIndexOfClosingParenthesis(str.substring(i + 1));
+          if(i2 != null){
+            delta = i2 + 1;//adding one accounts for the shift because we used a substring
+          }
+          else{
+            console.log("couldn't find closing parentheses");
+          }
+        }
+        else if(str[i] == "{"){
+          //we need to find the closing bracekt and not parse anything in th middle
+          i2 = FindIndexOfClosingBracket(str.substring(i + 1));
+          if(i2 != null){
+            delta = i2 + 1;//adding one accounts for the shift because we used a substring
+          }
+          else{
+            console.log("couldn't find closing bracket");
+          }
+        }
+      }
 
-      i++;
+      i += delta;
     }
     //then when we are done with the while loop we have to add the rest of the expression into the "splittedExpressions" array because there is no operator at the end of the string
     splittedExpressions.push({
@@ -912,7 +986,12 @@ function SimpleConvertLatexStringToNerdamerReadableString(ls, uniqueRIDStringArr
   ls = CleanLatexString(ls, ["fractions","addition","parentheses","brackets", "white-space"]);
   ls = CleanLatexString(ls,["multiplication"]);
   ls = CleanLatexString(ls,["latexFunctions"]);
-  return nerdamer.convertFromLaTeX(ls).toString();
+  try{
+    let convertedLs = nerdamer.convertFromLaTeX(ls).toString();
+    return convertedLs;
+  }catch(err){
+    return ls;
+  }
 }
 
 function ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, recognizeNerdamerFunctions = false){
@@ -1161,6 +1240,49 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
         break;
       }
     }
+
+    for(let operation of ["sum", "prod"]){
+      //this code clear sums from ls string that look like \sum_(...)^(...) or \sum ^(...)
+      while(ls.indexOf(`\\${operation}_(`) != -1){
+        i1 = ls.indexOf(`\\${operation}_(`);
+        i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + `\\${operation}_(`.length));
+        if(i2 != null){
+          i2 += i1 + `\\${operation}_(`.length;//accounts for the shift because we used a substring of ls
+          if(ls[i2 + 1] == "^"){//this means the integral is formated like: \int_(...)^(...)
+            i3 = FindIndexOfClosingParenthesis(ls.substring(i2 + 3));
+            if(i3 != null){
+              i3 += i2 + 3;//adjust for shift
+              ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing integral formatted as: \int_(...)^(...)
+            }
+            else{//theere was trouble finding the closing bracket so just stop
+              console.log("trouble finding closing parenthesis for integral");
+              break;
+            }
+          }
+          else{
+            ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing integral formatted as: \int_(...)
+          }
+        }
+        else{//theere was trouble finding the closing bracket so just stop
+          console.log("trouble finding closing parenthesis for integral");
+          break;
+        }
+      }
+
+      while(ls.indexOf(`\\${operation} ^(`) != -1){
+        i1 = ls.indexOf(`\\${operation} ^(`);
+        i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + `\\${operation} ^(`.length));
+        if(i2 != null){
+          i2 += i1 + `\\${operation} ^(`.length;//accounts for the shift because we used a substring of ls
+          ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing integral formatted as: \int^(...)
+        }
+        else{//theere was trouble finding the closing bracket so just stop
+          console.log("trouble finding closing bracket for integral");
+          break;
+        }
+      }
+    }
+    
 
     //we need to replace all custom logs like log base 2 or log base 4.5 and so on with a function that can actually parse these logs 
     //we want to convert something like this "\\log_{number}(expression)" to this "customLog(number, expression)"
@@ -2070,8 +2192,9 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   if(ls == null){return null;}//a derivative is formatted incorrectly so we can't check if expressions are equal
   ls = FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID);
   ls = FindAndConvertLatexLogsToNerdamerReadableStrings(ls);
-  //this line is temporary. We will soon be able to support parsing and using these operators and notations
-  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1 && ls.indexOf("\\ln") == -1 && ls.indexOf("\\log") == -1){
+  ls = FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls);
+  //we have this if statement because if after we are done parsing the latex into nerdamer is it still has these pieces of text in it then we cant go further because nerdamer doesn't know how to handle these texts properly
+  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\prod") == -1 && ls.indexOf("\\sum") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1 && ls.indexOf("\\ln") == -1 && ls.indexOf("\\log") == -1){
     ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, true);//passing true as the last parameter tells this function that there are nerdamer functions in this string so don't try to replace the letters in the function names
     try{
       return nerdamer.convertFromLaTeX(ls).evaluate().expand().toString();//this is just a place holder for the actual value we will return
@@ -2088,6 +2211,130 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
 
 function FormatVectorsIntoNerdamerVectors(ls){
   return ls.replace(/\(\[/g, "vector(").replace(/\]\)/g, ")");
+}
+
+function GetSummationBound(bound, ls){
+  let obj;
+  if(bound == "lower"){
+    obj = {
+      variable: null,
+      lowerbound: null,
+    }
+    let a = ls.split("=");
+    if(a.length == 2){
+      if(Number.isInteger(Number(a[1]))){
+        let numberOfVariables = 0;
+        let v;
+        let foundUnallowedCharacter = false;
+        for(var j = 0; j < ListOfOperators.length; j++){
+          if(a[0].indexOf(ListOfOperators[j]) != -1){
+            foundUnallowedCharacter = true;
+            break;
+          }
+        }
+        if(!foundUnallowedCharacter){
+          let allVariables = Object.keys(DefinedVariables).concat(Object.keys(PreDefinedVariables)).concat(Object.keys(EL.undefinedVars.undefined)).concat(Object.keys(EL.undefinedVars.defined));
+          //console.log("allvariables", allVariables);
+          for(var i = 0; i < allVariables.length; i++){
+            if(a[0].indexOf(allVariables[i]) != -1){
+              numberOfVariables++;
+              v = allVariables[i];
+            }
+          }
+          if(numberOfVariables == 1){
+            obj = {
+              variable: v,
+              lowerbound: Number(a[1]),
+            }
+          }
+        }
+      }
+    }
+  }
+  else{
+    if(Number.isInteger(Number(ls)) && ls.length > 0){
+      obj = {
+        upperbound: ls,
+      }
+    }else{
+      obj = {
+        upperbound: null,
+      }
+    }
+  }
+
+  return obj;
+}
+
+function FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls){
+  let i1 = 0;
+  let i2 = 0;
+  let i3 = 0;
+  let i4 = 0;
+  for(var operation of [["sum","sum"], ["prod","product"]]){
+    while(ls.indexOf(`\\${operation[0]}_{`) != -1){
+
+      let params = {
+        variable: null,
+        lowerbound: null,
+        upperbound: null,
+      };
+  
+      i1 = ls.indexOf(`\\${operation[0]}_{`);
+      i2 = FindIndexOfClosingBracket(ls.substring(i1  + `\\${operation[0]}_{`.length));
+      if(i2 != null){
+        i2 += i1  + `\\${operation[0]}_{`.length;//this accounts for the shift beecause we used a substring of ls
+        //we need to now check that the lowerbound of this summation is formatted properly
+        Object.assign(params, GetSummationBound("lower", ls.substring(i1 + `\\${operation[0]}_{`.length, i2)));
+        if(params.lowerbound != null){
+          //next we need to see if there is an upper bound and if it is formatted properly
+          if(ls.substring(i2 + 1).indexOf("^{") == 0){
+            i3 = FindIndexOfClosingBracket(ls.substring(i2 + 1 + "^{".length));
+            if(i3 != null){
+              i3 += i2 + 1 + "^{".length;
+              //we need to now check that the upperbound is formatted properly
+              Object.assign(params, GetSummationBound("upper",ls.substring(i2 + 1 + "^{".length, i3))); 
+              if(params.upperbound != null){
+                //now that we have checked that everything is formatted properly we need to see if  this summation has parentheses right after it so we know  what we are summing
+                if(ls.substring(i3 + 1).indexOf("\\left(") == 0){
+                  i4 = FindIndexOfClosingParenthesis(ls.substring(i3 + 1 + "\\left(".length));
+                  if(i4 != null){
+                    i4 += i3 + 1 + "\\left(".length;//this accounts for the shift because we are using a substring of ls
+                    //replacing the latex sum with a nerdamer sum with the form "sum(expression, variable, lowerbound, upperbound)"
+                    ls = `${ls.substring(0,i1)} ${operation[1]}(${ls.substring(i3 + 1 + "\\left(".length, i4 - "\\right".length)}, ${params.variable}, ${params.lowerbound}, ${params.upperbound}) ${ls.substring(i4+1)}`;
+                  }else{
+                    console.log("couldn't find index of closing parentheses");
+                    break;
+                  }
+                }else{
+                  console.log("summation doesn't have parentheses after it");
+                  break;
+                }
+              }else{
+                console.log("upper bound not formatted properly");
+                break;
+              }
+            }else{
+              console.log("couldn't find index of closing bracket");
+              break;
+            }
+          }else{
+            console.log("no upper bound found");
+            break;
+          }
+        }else{
+          console.log("lower bound not formatted properly")
+          break;
+        }
+      }else{
+        console.log("couldn't find index of closing bracket");
+        break;
+      }
+    }
+  }
+  
+
+  return ls;
 }
 
 function FindAndConvertLatexLogsToNerdamerReadableStrings(ls){

@@ -146,7 +146,7 @@ let Templates = {
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variable.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
         <%}%>    
 
         <% if(opts.variable.dynamicUnits){%>
@@ -182,7 +182,7 @@ let Templates = {
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variable.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
         <%}%>  
         <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info undefined-units units"><%= opts.variable.units %></span>
       </div>
