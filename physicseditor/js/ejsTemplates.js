@@ -267,9 +267,9 @@ let Templates = {
   `
   <%for(let i = 0; i < warnings.length; i++){%>
     <div>
-      <span class="warning-header"><%= warnings[i].warning %>:</span> <%= warnings[i].variables.join(",") %>
+      <span class="warning-header"><%= warnings[i].warning %>:</span><span class="log-static-latex" latex="<%= warnings[i].variables.join(",") %>"></span>
     </div>
-  <%}%> 
+  <%}%>  
   `,
   "mathfield-error":
   `

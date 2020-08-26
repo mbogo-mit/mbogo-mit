@@ -634,6 +634,12 @@ function RenderAllMathFieldLogs(){
       $(`.line_label > .line-warning[mf='${key}']`).addClass('active');
       //after we figure what meassage to send we need tooltip the icon with information
       $(`.line_label > .line-warning[mf='${key}']`).tooltip({html: ejs.render(Templates["mathfield-warning"], {warnings: MathFields[key].log.warning})});
+      $(`.line_label > .line-warning[mf='${key}']`).hover(function(){
+        $(this).tooltip("open");
+        $(".log-static-latex").each(function(){
+          MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+        });
+      });
     }
     else if(MathFields[key].log.error.length > 0){
       $(`.line_label > .line-error[mf='${key}']`).addClass('active');
