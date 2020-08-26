@@ -13,9 +13,56 @@ let LatexGreekLetters = [
 ];
 
 
+function RemoveSumsAndProdsFromLatexString(ls){
+  for(let operation of ["sum", "prod"]){
+    //this code clear sums from ls string that look like \sum_{...}^{...} or \sum ^{...}
+    while(ls.indexOf(`\\${operation}_{`) != -1){
+      i1 = ls.indexOf(`\\${operation}_{`);
+      i2 = FindIndexOfClosingBracket(ls.substring(i1 + `\\${operation}_{`.length));
+      if(i2 != null){
+        i2 += i1 + `\\${operation}_{`.length;//accounts for the shift because we used a substring of ls
+        if(ls[i2 + 1] == "^"){//this means the sum is formated like: \sum_{...}^{...}
+          i3 = FindIndexOfClosingBracket(ls.substring(i2 + 3));
+          if(i3 != null){
+            i3 += i2 + 3;//adjust for shift
+            ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing sum formatted as: \sum_{...}^{...}
+          }
+          else{//theere was trouble finding the closing bracket so just stop
+            console.log("trouble finding closing bracket for sum or prod");
+            break;
+          }
+        }
+        else{
+          ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing sum formatted as: \sum_{...}
+        }
+      }
+      else{//theere was trouble finding the closing bracket so just stop
+        console.log("trouble finding closing bracket for sum or prod");
+        break;
+      }
+    }
+
+    while(ls.indexOf(`\\${operation} ^{`) != -1){
+      i1 = ls.indexOf(`\\${operation} ^{`);
+      i2 = FindIndexOfClosingBracket(ls.substring(i1 + `\\${operation} ^{`.length));
+      if(i2 != null){
+        i2 += i1 + `\\${operation} ^{`.length;//accounts for the shift because we used a substring of ls
+        ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing integral formatted as: \int ^{...}
+      }
+      else{//theere was trouble finding the closing bracket so just stop
+        console.log("trouble finding closing bracket for sum or prod");
+        break;
+      }
+    }
+  }
+
+  return ls;
+}
+
 function GetVariablesFromLatexString(ls){
   ls = PutBracketsAroundAllSubsSupsAndRemoveEmptySubsSups(ls);
   ls = RemoveDifferentialOperatorDFromLatexString(ls);
+  ls = RemoveSumsAndProdsFromLatexString(ls);//we will implement this line once we have more support for setting and defining parameters from summations
   let vars = [];
   let str = "";
   let answer;

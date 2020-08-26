@@ -274,17 +274,21 @@ let Templates = {
   "mathfield-error":
   `
   <%for(let i = 0; i < errors.length; i++){%>
-    <div>
-      <div class="error-header"><span class="left"><%= errors[i].error.type %>:</span></div>
-      <div><span class="left"><%= errors[i].error.description %></span></div>
-    </div>
-    <%if(errors[i].latexExpressions != undefined){%>
-      <div class="left">
-        <%for(let j = 0; j < errors[i].latexExpressions.length; j++){%>
-          <div><span class="log-static-latex" latex="<%= errors[i].latexExpressions[j] %>"></span></div>
-        <%}%>  
+    <div class="row my-row">
+      <div class="row my-row">
+        <div class="error-header"><span class="left"><%= errors[i].error.type %>:</span></div>
+        <div><span class="left"><%= errors[i].error.description %></span></div>
       </div>
-    <%}%>  
-  <%}%>    
+      <%if(errors[i].latexExpressions != undefined){%>
+        <div class="row my-row">
+          <div class="left">
+            <%for(let j = 0; j < errors[i].latexExpressions.length; j++){%>
+              <div><span class="log-static-latex" latex="<%= errors[i].latexExpressions[j] %>"></span></div>
+            <%}%>  
+          </div>
+        </div>
+      <%}%>  
+    </div>
+  <%}%>     
   `,
 };

@@ -1,7 +1,9 @@
 function EditorLogger(){
 
   this.rawExpressionData = {};
+  this.rawExpressionDataForDeeperCheck = {};//this object is a filtered copy of "this.rawExpressionData" and DoHighLevelSelfConsistencyCheck() populates this object with filtered data
   this.linesToCheckForSelfConsistency = [];
+  this.expressionsThatDontActuallyEqualEachOther = {};
 
   this.undefinedVars = {
     undefined: {},
@@ -50,12 +52,28 @@ function EditorLogger(){
       description: "You have incorrect equations on this line",
       example: "",
     },
+    "Expressions don't equal": {
+      description: "These equations may be symbolically equal but when the variable values are plugged in the expressions don't equal",
+      example: "",
+    },
     "Expressions found inside integral without differential variable": {
       description: "All expressions inside the parentheses of an integral must be multiplied by a differential variable, for exmaple: dx,dy,dt,etc",
       example: "",
     },
     "Integral bounds not formatted properly": {
       description: "There is an integral on this line that has a lower bound defined but not an upper bound defined or vise versa",
+      example: "",
+    },
+    "Integral not formatted correctly for editor": {
+      description: "The integrand and differential variable(s) need to be wrapped in parentheses for the editor to parse and evaluate the integral. Look at example below",
+      example: "",
+    },
+    "Summation not formatted correctly for editor": {
+      description: "The summation arguement must be wrapped in parentheses for the editor to parse and evaluate the summation. Look at example below",
+      example: "",
+    },
+    "Product not formatted correctly for editor": {
+      description: "The product arguement must be wrapped in parentheses for the editor to parse and evaluate the product. Look at example below",
       example: "",
     },
     "Value expected": {
@@ -132,10 +150,11 @@ function EditorLogger(){
     }
 
     //after we have gone through all the lines and parsed everything we will have a list of lines that we can check for selfConsistency so lets do that
-
     this.CheckLinesForSelfConsistency();
-
+    //we use the same list of lines we can check for self consistency to check if we can figure out if we can identify known values and also check that equations actually equal each other not just symbolically
     this.UpdateKnownUnknownVariables();
+    //after this function runs it will populate "this.expressionsThatDontActuallyEqualEachOther" with information about equations that don't actually equal each other so we need to add the errors that this object represents
+    this.AddErrorsFromExpressionsThatDontActuallyEqualEachOther();
 
     //after parsing through everything and building up the list of defined undefined variables we need to check if there are any relevant equations for the set of variables we have in DefinedVariables and this.undefinedVars.defined
     CheckForAndDisplayRelevantEquations();
@@ -143,17 +162,25 @@ function EditorLogger(){
     this.display({dontRenderMyVariablesCollection: opts.dontRenderMyVariablesCollection});
   }
 
-  this.ParsePreviousLinesAgainWithNewInfoAboutUnknownVariables = function(endingLineNumber){
-    for(const [lineNumber, expressions] of Object.entries(this.rawExpressionData)){
-      if(lineNumber > endingLineNumber){
-        break;//we break the job of this function was only to parse previous lines and the current line we were on when we called this function
-      }
-      else{
-        IdentifyAllKnownVariablesAndTheirValues(expressions);
-      }
+  this.AddErrorsFromExpressionsThatDontActuallyEqualEachOther = function(){
+    let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
+    let errors = [];
+    for(const [lineNumber, latexExpressions] of Object.entries(this.expressionsThatDontActuallyEqualEachOther)){
+      errors.push({
+        error: this.createLoggerErrorFromMathJsError("Expressions don't equal"),
+        info: "",
+        latexExpressions: latexExpressions.filter((value, index, self)=>{return self.indexOf(value) === index}),//filtering so that there is only unique sets of equations because we don't need the same equation showing up twice
+        lineNumber: lineNumber,
+        mfID: orderedIds[lineNumber],
+      });
+
+      MathFields[orderedIds[lineNumber]].log.error.push({
+        error: this.createLoggerErrorFromMathJsError("Expressions don't equal"),
+        latexExpressions: latexExpressions.filter((value, index, self)=>{return self.indexOf(value) === index}),//filtering so that there is only unique sets of equations because we don't need the same equation showing up twice,
+      });
 
     }
-
+    this.addLog({error: errors});//adding errors to the log
   }
 
   this.ParsePreviousLinesAgainWithNewInfoAboutUndefinedVariables = function(endingLineNumber){
@@ -183,6 +210,7 @@ function EditorLogger(){
     let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
     let lineNumber;
     let mfID;
+    this.rawExpressionDataForDeeperCheck = {};//we need to clear this object because it will be populated with data from "DoHighLevelSelfConssistencyCheck()""
     //this function will go through the "this.linesToCheckForSelfConsistency" array and do a high level check for self consistency
     //this makes sures that there are no duplicate values in the array
     this.linesToCheckForSelfConsistency = this.linesToCheckForSelfConsistency.filter((value, index, self)=>{
@@ -217,7 +245,6 @@ function EditorLogger(){
               error: this.createLoggerErrorFromMathJsError("Integral bounds not formatted properly"),
             });
           }
-
         }
 
         if(expressionsThatDontEqualEachOtherOnThisLine.length > 0){
@@ -252,15 +279,27 @@ function EditorLogger(){
 
   }
 
+  this.CheckLinesForKnownVariables = function(){
+    let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
+    let mfID;
+    let j;
+    for(const [lineNumber, a] of Object.entries(this.rawExpressionDataForDeeperCheck)){
+      mfID = orderedIds[lineNumber];
+      j = 0;
+      while(j < a.length){
+        IdentifyAllKnownVariablesAndTheirValues2(a[j], lineNumber, mfID);
+        j++;
+      }
+    }
+  }
+
   this.UpdateKnownUnknownVariables = function(reset = true){
     //we need to first reset all unknown variables current state to "unknown" so that they have to prove that they are known every time the user makes an edit in the editor
     if(reset){
       this.ResetAllUnknownVariblesToCurrentStateUnknown();
     }
-    //after we have identified all of the undefined and variables and defined undefined variables and have created logs for everything we need to evaluate which variables are unknown and which variables where initil unknown but are defined by all known variables
-    for(const [lineNumber, expressions] of Object.entries(this.rawExpressionData)){
-      IdentifyAllKnownVariablesAndTheirValues(expressions);
-    }
+    this.expressionsThatDontActuallyEqualEachOther = {};//we have to reset this object everytime we run this function because this.CheckLinesForKnownVariables() will populuate this object with the most up to date expressions that don't actually equal each other
+    this.CheckLinesForKnownVariables();
   }
 
   this.recordUndefinedVariables = function(undefinedVars){
@@ -472,32 +511,6 @@ function EditorLogger(){
     $(".log-static-latex").each(function(){
       MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
     });
-
-    /*
-    //we need to first clear all the messages from every mathfield and set them to the default state before we populate them with information and render
-    for (const [key, value] of Object.entries(MathFields)) {
-      MathFields[key].message = {
-        question: null,//is this variable a physics constant
-        warning: null,//variable undefined,
-        error: null, //units don't match
-      };
-
-      RenderMessageUI(key);//then render the change
-    }
-
-    //display warnings and errors in the editor lines
-    for(var i = 0; i < log.error.length; i++){
-      MathFields[log.error[i].mfID].message.error = {type: 1};
-      RenderMessageUI(log.error[i].mfID);//takes the messages for a specific math field and renders it
-    }
-
-    for(var i = 0; i < log.warning.length; i++){
-      MathFields[log.warning[i].mfID].message.warning = {
-        type: 1,
-        vars: log.warning[i].variables,
-      }
-      RenderMessageUI(log.warning[i].mfID);//takes the messages for a specific math field and renders it
-    }*/
 
     if(!opts.dontRenderMyVariablesCollection){
       //after generating errors and defined undefined and defined undefined variables we need to rerender my variable collection

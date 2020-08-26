@@ -16,6 +16,8 @@ let EditingMathFields = false;
 let UnitsDropdownMenuOpen = false
 let ListOfPhysicsConstants;
 
+let PrecisionSigFigs = 6;
+
 let EditorKeyPresses = {};
 let HotKeySequenceReset = true;
 
@@ -260,14 +262,14 @@ let PreDefinedVariables = {
     state: "given",
     type: "constant",
     units: "unitless",
-    value: Math.PI.toFixed(5),
+    value: Math.PI.toFixed(PrecisionSigFigs),
     unitsMathjs: "1",
   },
   "e": {
     state: "given",
     type: "constant",
     units: "unitless",
-    value: Math.exp(1).toFixed(5),
+    value: Math.exp(1).toFixed(PrecisionSigFigs),
     unitsMathjs: "1",
   },
   "i": {

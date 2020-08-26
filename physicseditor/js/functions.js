@@ -936,10 +936,15 @@ function OrderCompileAndRenderMyVariablesCollection(){
   if(html == ""){//if there are no variables defined we will just show a nice message to the user so they know whats up
     html = ejs.render(Templates["no-variables-defined"]);
   }
+
   //we need to remove all tooltips in the collection before we create new ones
-  try{
-    $('#my_variables-collection-container .tooltipped').tooltip("destroy");
-  }catch(err){console.log(err);}
+  $('#my_variables-collection-container .tooltipped').each(function(){
+    try{
+      $(this).tooltip("destroy");
+    }catch(err){console.log(err);}
+  });
+  
+  
   $("#my_variables-collection-container .my-collection").html(html);//rendering new collection
   //Add event listeners and initialize static math fields
   $("#my_variables .my-collection span").each(function(){
