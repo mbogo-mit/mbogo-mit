@@ -160,7 +160,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
         if(foundMatch){
           splittedExpressions.push({
             parsed: false,
-            str: RemoveDifferentialOperatorDFromLatexString(str.substring(startIndex, i)),
+            str: RemoveDifferentialOperatorDFromLatexString(str.substring(startIndex, i)).replace(/\\oint/g,"\\int"),
             rawStr: str.substring(startIndex, i),
             operator: delimiter,
           });
@@ -197,7 +197,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
     //then when we are done with the while loop we have to add the rest of the expression into the "splittedExpressions" array because there is no operator at the end of the string
     splittedExpressions.push({
       parsed: false,
-      str: RemoveDifferentialOperatorDFromLatexString(str.substring(startIndex, i)),
+      str: RemoveDifferentialOperatorDFromLatexString(str.substring(startIndex, i)).replace(/\\oint/g,"\\int"),
       rawStr: str.substring(startIndex, i),
       operation: null,
     });
@@ -2247,7 +2247,7 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   ls = FindAndConvertLatexLogsToNerdamerReadableStrings(ls);
   ls = FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls, mfID);
   //we have this if statement because if after we are done parsing the latex into nerdamer is it still has these pieces of text in it then we cant go further because nerdamer doesn't know how to handle these texts properly
-  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\prod") == -1 && ls.indexOf("\\sum") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1 && ls.indexOf("\\ln") == -1 && ls.indexOf("\\log") == -1){
+  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\int") == -1 && ls.indexOf("\\prod") == -1 && ls.indexOf("\\sum") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1 && ls.indexOf("\\ln") == -1 && ls.indexOf("\\log") == -1){
     ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, true);//passing true as the last parameter tells this function that there are nerdamer functions in this string so don't try to replace the letters in the function names
     try{
       return nerdamer.convertFromLaTeX(ls).evaluate().expand().toString();//this is just a place holder for the actual value we will return
