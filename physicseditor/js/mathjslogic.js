@@ -251,13 +251,13 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
         catch(err){
           //if it throws an error then we can try evaluating the string but taking out radians and steradians because they are untiless pretty much but the editor see them as units
           try {
-            str = math.evaluate(exprs[i][j].str.replace(/rad/g,"(1)").replace(/sr/g,"(1)")).toString();
+            str = math.evaluate(exprs[i][j].str.replace(/rad/g,"m/m").replace(/sr/g,"m/m")).toString();
             results[i].push({success: str});
           }
           catch(err2){
             try{
               //by removing the vector unit we can figure out if the units don't match because the user is adding a scalar with a vector
-              math.evaluate(exprs[i][j].str.replace(/rad/g,"(1)").replace(/sr/g,"(1)").replace(/vector/g,"")).toString();
+              math.evaluate(exprs[i][j].str.replace(/rad/g,"m/m").replace(/sr/g,"m/m").replace(/vector/g,"")).toString();
               results[i].push({error: "Adding a scalar with a vector"});
             }
             catch(err3){
@@ -331,7 +331,7 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
         try{
           //removing rad and steradian from equations to see if they will equal each other because the editor can't recorgnize the arc formula  s=r\theta cuz units wise you are saying 1m=1m*rad
           for(var i = 0; i < successes.length; i++){
-            editedSuccesses.push(successes[i].replace(/rad/g,"(1)").replace(/sr/g,"(1)"));
+            editedSuccesses.push(successes[i].replace(/rad/g,"m/m").replace(/sr/g,"m/m"));
           }
           equationUnits = math.evaluate(editedSuccesses.join(" + ")).toString();
           equationUnitsMatch = true;
