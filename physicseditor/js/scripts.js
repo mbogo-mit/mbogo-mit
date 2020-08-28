@@ -109,4 +109,40 @@ $(document).ready(function(){
     $("#btn-update-imported-variables").removeClass("disabled");
   });
 
+
+  //adding event listener to physics equation headers so  that when they are mouseovered or mouse we can show or hide the informational videos accordingly
+  $(".static-physics-equation-header").mouseout(function(e){
+    let id = $(this).attr("infoId");
+    if($(e.relatedTarget).attr("id") != id && $(`#${id}`).find(e.relatedTarget).length == 0){
+      HideInfoPopup(id);
+    }
+  }).mouseover(function(){
+    if($(this).attr("info") != undefined){
+      let id = $(this).attr("infoId");
+      if($(`#${id}.more-information-videos-container`).length == 0){
+        //this means that more information Popup hasn't been created so we will create it
+        CreateInfoPopup(id, JSON.parse($(this).attr("info")));
+      }
+      DisplayInfoPopup(id, $(this).children('span')[0].getBoundingClientRect());
+    }
+    
+  });
+
+  $(".static-physics-equation-header > span").mouseout(function(e){
+    //if we mouseout into the spans parent we don't care but if we mouse out into something else then we do care
+    if(!$(e.relatedTarget).hasClass("static-physics-equation-header")){
+      HideInfoPopup($(this).parent(".static-physics-equation-header").attr("infoId"));
+    }
+  }).mouseover(function(){
+    let el = $(this).parent(".static-physics-equation-header");
+    if(el.attr("info") != undefined){
+      let id = el.attr("infoId");
+      if($(`#${id}.more-information-videos-container`).length == 0){
+        //this means that more information Popup hasn't been created so we will create it
+        CreateInfoPopup(id, JSON.parse(el.attr("info")));
+      }
+      DisplayInfoPopup(id, $(this)[0].getBoundingClientRect());
+    }
+  });
+
 });

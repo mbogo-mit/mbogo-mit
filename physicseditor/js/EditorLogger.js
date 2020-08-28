@@ -492,18 +492,6 @@ function EditorLogger(){
   }
 
   this.display = function(opts = {}){
-    let log = JSON.parse(JSON.stringify(this.log));//copying so we don't accidentally change the real log
-    //changing html of logger
-    let html = ejs.render(Templates["editorLogger"],{log: log});
-    $("#editor-log-container").html(html);
-    //once the html is inject we need to add materialize event listeners to all the collapsibles
-    $('#editor-log-container .collapsible').collapsible();
-    $("#editor-log-container .collapsible .collapsible-body.information-container").css("max-height",`${window.innerHeight - $("#editor-log-container .collapsible.log-container").height()}px`)
-    //changing html of log indicators in header
-    $("#btn-log-success-indicator .indicator-count").html(log.success.length);
-    $("#btn-log-info-indicator .indicator-count").html(log.info.length);
-    $("#btn-log-warning-indicator .indicator-count").html(log.warning.length);
-    $("#btn-log-error-indicator .indicator-count").html(log.error.length);
 
     RenderAllMathFieldLogs();
 

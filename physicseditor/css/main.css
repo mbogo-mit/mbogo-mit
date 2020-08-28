@@ -809,3 +809,69 @@ body {
 #physics_equations .collapsible-header:hover .btn-import-variable-definition {
   display: inline-block;
 }
+
+.more-information-videos-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: -10;
+  opacity: 0.0 !important;
+  width: 30vw;
+}
+
+.more-information-videos-container .carousel.carousel-slider img {
+  width: 100%;
+}
+
+.more-information-videos-container .carousel.carousel-slider {
+  height: 15vw !important;
+  border-radius: 5px;
+}
+
+.more-information-videos-container .video-thumbnail-container, .more-information-videos-container .video-title-container {
+  height:15vw;
+  width: 30vw;
+}
+
+.more-information-videos-container .video-title-container {
+  position:relative;
+  top:-15vw;
+  background-color: rgba(0,0,0,0.5);
+  padding: 10px;
+  font-size: 16px;
+}
+
+.more-information-videos-container.active {
+  opacity: 1.0 !important;
+}
+
+#btn-play-info-video {
+  background-image: linear-gradient(to bottom right, #5680e9, #8860d0);
+}
+
+.video-iframe-container{
+  position: absolute;
+  background-image: linear-gradient(to bottom right, #5680e9, #8860d0);
+  bottom: 0px;
+  right: 0px;
+}
+
+.video-iframe-container .close-iframe-container{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  cursor: pointer;
+  color: white;
+  background-image: linear-gradient(to bottom right, #5680e9, #8860d0);
+}
+
+.video-iframe-container .close-iframe-container:hover{
+  color: black;
+}
+
+.video-level.badge {
+  background-image: linear-gradient(to bottom right, #5680e9, #8860d0);
+  color: white;
+}
+
+

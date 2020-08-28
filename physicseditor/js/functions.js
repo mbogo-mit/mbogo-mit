@@ -1801,3 +1801,55 @@ function AnimateTyping(id,text){
     }, 500, id, text.substring(1));
   }
 }
+
+function CreateInfoPopup(id, info){
+  let html = ejs.render(Templates["video-info-popup"], {id: id, info: info});
+  $("#main-screen").append(html);
+  //after we append the popup to the document we need to initialize its carousels
+  $(`#${id} .carousel.carousel-slider`).carousel({fullWidth: true, indicators: true});
+  //adding event listener
+  $(`#${id}.more-information-videos-container`).mouseout(function(e){
+    //this if statement is say that the thing that cause the mouseout can't be an element inside the popup or the static physics equation that caused the popup to show if you want the popup to go away
+    if($(this).find(e.relatedTarget).length == 0 && !$(e.relatedTarget).hasClass('static-physics-equation-header') && $(e.relatedTarget).parents('.static-physics-equation-header').length == 0){
+      //this means that the mouseout happened because the user moved away from the video info container
+      HideInfoPopup($(this).attr("id"));
+    }
+  });
+}
+
+function DisplayInfoPopup(id, position){
+  $(`#${id}.more-information-videos-container`).css({
+    "z-index": 2,
+    "top": position.top,
+    "left": position.left - $(`#${id}.more-information-videos-container`).width() - 10,
+  });
+  $(`#${id}.more-information-videos-container`).addClass("active");
+}
+
+function SelectInfoPopup(id){
+  $(`#${id}.more-information-videos-container`).addClass("selected");
+}
+
+function HideInfoPopup(id){
+  $(`#${id}.more-information-videos-container`).removeClass("active");
+  $(`#${id}.more-information-videos-container`).removeClass("selected");
+  $(`#${id}.more-information-videos-container`).css({
+    "z-index": -10,
+    "top": 0,
+    "left": 0,
+  });
+}
+
+function PlayInfoVideo(id){
+  let info = JSON.parse($(`#${id}.more-information-videos-container`).attr("info"));
+  let index = M.Carousel.getInstance($(`#${id} .carousel.carousel-slider`)[0]).center;
+  let html = ejs.render(Templates["video-iframe-container"], {iframe: info.videos[index].iframe});
+  //now we need to display the videos iframe
+  $(".video-iframe-container").remove();//remove any existing videos
+  HideInfoPopup(id);//remove the popup because now we are about to show the video
+  $("#main-screen").append(html);
+}
+
+function CloseIframe(){
+  $(".video-iframe-container").remove();
+}

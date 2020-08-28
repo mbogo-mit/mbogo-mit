@@ -291,4 +291,32 @@ let Templates = {
     </div>
   <%}%>     
   `,
+  "video-info-popup":
+  `
+  <div id="<%= id %>" info="<%= JSON.stringify(info) %>" class="more-information-videos-container" onmouseover="SelectInfoPopup('<%= id %>')">
+    <div class="more-information-videos">
+        <div class="carousel carousel-slider">
+            <div class="carousel-fixed-item center">
+              <a id="btn-play-info-video" onclick="PlayInfoVideo('<%= id %>')" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">play_arrow</i></a>
+            </div>
+            <% for(let i = 0; i < info.videos.length; i++){%>
+            <div class="carousel-item white-text">
+              <div class="video-thumbnail-container"><img src="<%= info.videos[i].thumbnail %>"></div>
+              <div class="video-title-container">
+                <span class="new badge video-level <%= info.videos[i].level %>" data-badge-caption="<%= info.videos[i].level %>"></span>
+                <span><%= info.videos[i].title %></span>
+              </div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+  </div>
+  `,
+  "video-iframe-container":
+  `
+  <div class="video-iframe-container">
+    <%- iframe %>
+    <i class="material-icons close-iframe-container" onclick="CloseIframe()">close</i>
+  </div>
+  `,
 };
