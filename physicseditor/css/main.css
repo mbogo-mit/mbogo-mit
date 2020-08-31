@@ -1,6 +1,6 @@
 #determinate-loader {
   transition: width 2s;
-  background-color: #8860d0;
+  background-color:#8860d0;
 }
 #loading-screen {
   width: 100%;
@@ -11,10 +11,12 @@
   z-index: 10;
   padding-left: 10%;
   padding-right: 10%;
+  background-image: linear-gradient(to bottom right, #5680e9, #8860d0);
+  color: white;
 }
 
 #loading-screen .progress {
-  background-color: rgba(135, 96, 208, 0.2);
+  background-color: #ffffff;
 }
 
 [type="checkbox"]:not(:checked), [type="checkbox"]:checked {

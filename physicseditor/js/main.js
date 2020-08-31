@@ -1,9 +1,6 @@
 
 var MQ = MathQuill.getInterface(2); // keeps the API stable
 
-//initializing first line
-CreateNewMathField("first_math_field");
-
 
 function CreateNewMathField(id){
   //el is a jquery Element

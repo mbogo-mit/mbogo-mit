@@ -2,31 +2,33 @@
 <html lang="en">
   <head>
       <!-- Compiled and minified CSS -->
-  <link rel="stylesheet" href="lib/materialize/css/materialize.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="lib/materialize/js/materialize.min.js"></script>
+<title>Physics.io</title> 
+<link rel="icon" type="image/png" href="images/physicsicon.png"> 
+<link rel="stylesheet" href="lib/materialize/css/materialize.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="lib/materialize/js/materialize.min.js"></script>
 
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link type="text/css" rel="stylesheet" href="css/main.css"  media="screen,projection"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="css/main.css"  media="screen,projection"/>
 
-  <!-- Mathquill -->
-  <link rel="stylesheet" href="lib/mathquill/css/mathquill.css">
-  <script src="lib/mathquill/js/mathquill.js"></script>
-  <script type="text/javascript" src="lib/ejs/ejs.js"></script>
+<!-- Mathquill -->
+<link rel="stylesheet" href="lib/mathquill/css/mathquill.css">
+<script src="lib/mathquill/js/mathquill.js"></script>
+<script type="text/javascript" src="lib/ejs/ejs.js"></script>
 
-  <!-- AlgebraJs -->
-  <script src="lib/nerdamer/nerdamer.core.js"></script>
-  <script src="lib/nerdamer/Algebra.js"></script>
-  <script src="lib/nerdamer/Calculus.js"></script>
-  <script src="lib/nerdamer/Solve.js"></script>
-  <script src="lib/nerdamer/Extra.js"></script>
+<!-- AlgebraJs -->
+<script src="lib/nerdamer/nerdamer.core.js"></script>
+<script src="lib/nerdamer/Algebra.js"></script>
+<script src="lib/nerdamer/Calculus.js"></script>
+<script src="lib/nerdamer/Solve.js"></script>
+<script src="lib/nerdamer/Extra.js"></script>
 
-  <!-- MathJs -->
-  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.1.0/math.js"></script>-->
-  <script type="text/javascript" src="lib/mathjs/mathjs.min.js"></script>
+<!-- MathJs -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.1.0/math.js"></script>-->
+<script type="text/javascript" src="lib/mathjs/mathjs.min.js"></script>
 
-  <!--Let browser know website is optimized for mobile-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!--Let browser know website is optimized for mobile-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   </head>
   <body>
@@ -35,7 +37,7 @@
   <div class="col m12">
     <div class="row">
       <div class="col m12 center">
-        Loading Editor
+        <span style="font-size: 16px; font-weight: bold;">Loading Physics.io</span>
       </div>
     </div>
     <div class="row">
@@ -53,6 +55,7 @@
     <a href="/">Physics.io</a>
     <!--<a class="waves-effect waves-light btn right" href="#">Report an error</a>-->
     <a class="waves-effect waves-light btn modal-trigger right" href="#modal-user-guide">User Guide</a>
+    <a onclick="ClearEditorData();" class="waves-effect waves-light btn modal-trigger right" href="#modal-user-guide">Clear Editor Data</a>
 </div>
 <div id="modal-user-guide" class="modal modal-fixed-footer">
     <div class="modal-content">
@@ -186,7 +189,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header" infoId="abc50dbwqy" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/pfTTHx9kCHk?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Instantaneous speed and velocity | One-dimensional motion | Physics | Khan&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/pfTTHx9kCHk/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/GtoamALPOP0?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Position vs. time graphs | One-dimensional motion | Physics | Khan Academy&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/GtoamALPOP0/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;}]}">
+                  <div class="col m12 center static-physics-equation-header" infoId="zmd1034163" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/pfTTHx9kCHk?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Instantaneous speed and velocity | One-dimensional motion | Physics | Khan&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/pfTTHx9kCHk/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/GtoamALPOP0?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Position vs. time graphs | One-dimensional motion | Physics | Khan Academy&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/GtoamALPOP0/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;}]}">
                       
                       <span>Velocity</span>
                   </div>
@@ -212,7 +215,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header" infoId="uux4zammea" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/FOkQszg1-j8?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Acceleration | One-dimensional motion | Physics | Khan Academy&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/FOkQszg1-j8/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;}]}">
+                  <div class="col m12 center static-physics-equation-header" infoId="epfbk1ccj5" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/FOkQszg1-j8?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Acceleration | One-dimensional motion | Physics | Khan Academy&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/FOkQszg1-j8/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/sLw902V40L0?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Worked example: motion problems (with definite integrals) | AP Calculus AB | Khan Academy&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/sLw902V40L0/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
                   
                     <span>Acceleration</span>
                   </div>
@@ -238,7 +241,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header" infoId="98n0w6d9ex" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/hpWuZh6oTew?autoplay=1&amp;start=7\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Kinematics Part 1: Horizontal Motion&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/hpWuZh6oTew/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;}]}">
+                  <div class="col m12 center static-physics-equation-header" infoId="7sj6u7my6b" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/hpWuZh6oTew?autoplay=1&amp;start=7\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Kinematics Part 1: Horizontal Motion&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/hpWuZh6oTew/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/WABpcU0mHMU?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;How to use calculus in Kinematics - Displacement, Velocity &amp; Acceleration&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/WABpcU0mHMU/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
                   
                     <span>Linear Kinematics</span>
                   </div>
@@ -280,7 +283,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header" infoId="8wywmfumwb" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/kKKM8Y-u7ds?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Newton&#39;s Laws: Crash Course Physics #5&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/kKKM8Y-u7ds/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/g550H4e5FCY?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Newton&#39;s Law of Motion - First, Second &amp; Third - Physics&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/g550H4e5FCY/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
+                  <div class="col m12 center static-physics-equation-header" infoId="y5di6xqxmx" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/kKKM8Y-u7ds?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Newton&#39;s Laws: Crash Course Physics #5&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/kKKM8Y-u7ds/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/g550H4e5FCY?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Newton&#39;s Law of Motion - First, Second &amp; Third - Physics&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/g550H4e5FCY/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
                       
                       <span>Newton&#39;s 2nd Law</span>
                   </div>
@@ -306,7 +309,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Weight</span>
                   </div>
@@ -326,7 +329,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header" infoId="xa0oxjxt2p" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/fo_pmp5rtzo?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Friction: Crash Course Physics #6&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/fo_pmp5rtzo/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/ZA_D4O6l1lo?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Static and kinetic friction example | Forces and Newton&#39;s laws of motion | Physics | Khan Academy&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/ZA_D4O6l1lo/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
                   
                     <span>Dry Friction</span>
                   </div>
@@ -356,7 +359,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header" infoId="fvkybooojp" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/bpFK2VCRHUs?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Uniform Circular Motion: Crash Course Physics #7&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/bpFK2VCRHUs/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/FfNgm-w9Krw?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Centripetal force problem solving | Centripetal force and gravitation | Physics | Khan Academy&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/FfNgm-w9Krw/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
                       
                       <span>Centripetal Accel.</span>
                   </div>
@@ -382,7 +385,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header" infoId="szcms0sg3h" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/NIVNfI0RN2k?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Introduction to Momentum, Force, Newton&#39;s Second Law, Conservation of Linear Momentum, Physics&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/NIVNfI0RN2k/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/Fp7D5D8Bqjc?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Conservation of Momentum Physics Problems - Basic Introduction&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/Fp7D5D8Bqjc/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/9YRgHikdcqs?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Conservation of Momentum In Two Dimensions - 2D Elastic &amp; Inelastic Collisions - Physics Problems&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/9YRgHikdcqs/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
                   
                     <span>Momentum</span>
                   </div>
@@ -402,7 +405,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header" infoId="53cedfc4hc" info="{&#34;videos&#34;:[{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/Y-QOfc2XqOk?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Collisions: Crash Course Physics #10&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/Y-QOfc2XqOk/mqdefault.jpg&#34;,&#34;level&#34;:&#34;beginner&#34;},{&#34;iframe&#34;:&#34;&lt;iframe width=\&#34;560\&#34; height=\&#34;315\&#34; src=\&#34;https://www.youtube-nocookie.com/embed/9PA0MyxjsyQ?autoplay=1\&#34; frameborder=\&#34;0\&#34; allow=\&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\&#34; allowfullscreen&gt;&lt;/iframe&gt;&#34;,&#34;title&#34;:&#34;Physics: Mechanics- Momentum (6 of 9) What is Impulse?&#34;,&#34;thumbnail&#34;:&#34;https://img.youtube.com/vi/9PA0MyxjsyQ/mqdefault.jpg&#34;,&#34;level&#34;:&#34;intermediate&#34;}]}">
                   
                     <span>Impulse</span>
                   </div>
@@ -432,7 +435,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Impulse-momentum</span>
                   </div>
@@ -458,7 +461,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Work</span>
                   </div>
@@ -484,7 +487,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Work-Energy</span>
                   </div>
@@ -514,7 +517,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Kinetic Energy</span>
                   </div>
@@ -540,7 +543,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>General P.E.</span>
                   </div>
@@ -566,7 +569,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Gravitational P.E.</span>
                   </div>
@@ -590,7 +593,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Efficiency</span>
                   </div>
@@ -610,7 +613,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Power</span>
                   </div>
@@ -636,7 +639,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Power-Velocity</span>
                   </div>
@@ -666,7 +669,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Angular Velocity</span>
                   </div>
@@ -698,7 +701,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Angular Acceleration</span>
                   </div>
@@ -730,7 +733,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Rotational Kinematics</span>
                   </div>
@@ -772,7 +775,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Torque</span>
                   </div>
@@ -798,7 +801,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>2nd Law Of Rotation</span>
                   </div>
@@ -824,7 +827,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Moment of Inertia</span>
                   </div>
@@ -854,7 +857,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Rotational Work</span>
                   </div>
@@ -880,7 +883,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Rotational Power</span>
                   </div>
@@ -906,7 +909,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Rotational K.E.</span>
                   </div>
@@ -930,7 +933,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Angular Momentum</span>
                   </div>
@@ -962,7 +965,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Angular Impulse</span>
                   </div>
@@ -988,7 +991,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Universal Gravitation</span>
                   </div>
@@ -1012,7 +1015,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Gravitational Field</span>
                   </div>
@@ -1032,7 +1035,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Gravitational P.E.</span>
                   </div>
@@ -1052,7 +1055,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Gravitational Potential</span>
                   </div>
@@ -1076,7 +1079,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Orbital Speed</span>
                   </div>
@@ -1096,7 +1099,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Escape Speed</span>
                   </div>
@@ -1116,7 +1119,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Hooke&#39;s Law</span>
                   </div>
@@ -1140,7 +1143,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Spring P.E.</span>
                   </div>
@@ -1160,7 +1163,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>S.H.O.</span>
                   </div>
@@ -1180,7 +1183,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Simple Pendulum</span>
                   </div>
@@ -1204,7 +1207,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Frequency</span>
                   </div>
@@ -1224,7 +1227,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Angular Frequency</span>
                   </div>
@@ -1244,7 +1247,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Density</span>
                   </div>
@@ -1268,7 +1271,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Pressure</span>
                   </div>
@@ -1288,7 +1291,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Pressure in a Fluid</span>
                   </div>
@@ -1308,7 +1311,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Buoyancy</span>
                   </div>
@@ -1332,7 +1335,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Mass Flow Rate</span>
                   </div>
@@ -1358,7 +1361,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Volume Flow Rate</span>
                   </div>
@@ -1384,7 +1387,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Mass Continuity</span>
                   </div>
@@ -1408,7 +1411,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Volume Continuity</span>
                   </div>
@@ -1428,7 +1431,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Bernoulli&#39;s Equation</span>
                   </div>
@@ -1448,7 +1451,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Dynamic Viscosity</span>
                   </div>
@@ -1478,7 +1481,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Kinematic Viscosity</span>
                   </div>
@@ -1498,7 +1501,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Drag</span>
                   </div>
@@ -1518,7 +1521,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Mach Number</span>
                   </div>
@@ -1542,7 +1545,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Reynolds Number</span>
                   </div>
@@ -1562,7 +1565,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Froude Number</span>
                   </div>
@@ -1582,7 +1585,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Young&#39;s Modulus</span>
                   </div>
@@ -1612,7 +1615,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                       
                       <span>Shear Modulus</span>
                   </div>
@@ -1638,7 +1641,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Bulk Modulus</span>
                   </div>
@@ -1664,7 +1667,7 @@
               <div class="col m4">
                 <div class="row my-row">
                   
-                  <div class="col m12 center static-physics-equation-header">
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
                   
                     <span>Surface Tension</span>
                   </div>
@@ -1699,7 +1702,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Solid Expansion</span>
                   </div>
                 </div>
@@ -1729,7 +1734,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Liquid Expansion</span>
                   </div>
                 </div>
@@ -1747,7 +1754,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Sensible Heat</span>
                   </div>
                 </div>
@@ -1769,7 +1778,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Latent Heat</span>
                   </div>
                 </div>
@@ -1787,7 +1798,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Ideal Gas Law</span>
                   </div>
                 </div>
@@ -1805,7 +1818,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Molecular Constants</span>
                   </div>
                 </div>
@@ -1827,7 +1842,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Maxwell-Boltzmann</span>
                   </div>
                 </div>
@@ -1845,7 +1862,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Molecular K.E.</span>
                   </div>
                 </div>
@@ -1863,7 +1882,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Molecular Speed</span>
                   </div>
                 </div>
@@ -1897,7 +1918,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Heat Flow Rate</span>
                   </div>
                 </div>
@@ -1921,7 +1944,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Thermal Conduction</span>
                   </div>
                 </div>
@@ -1939,7 +1964,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Stefan-Boltzmann Law</span>
                   </div>
                 </div>
@@ -1961,7 +1988,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Displacement Law</span>
                   </div>
                 </div>
@@ -1979,7 +2008,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Internal Energy</span>
                   </div>
                 </div>
@@ -2003,7 +2034,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Thermodynamic Work</span>
                   </div>
                 </div>
@@ -2025,7 +2058,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>1st Law Of Thermo.</span>
                   </div>
                 </div>
@@ -2043,7 +2078,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Entropy</span>
                   </div>
                 </div>
@@ -2067,7 +2104,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Efficiency</span>
                   </div>
                 </div>
@@ -2107,7 +2146,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Periodic Waves</span>
                   </div>
                 </div>
@@ -2131,7 +2172,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Frequency</span>
                   </div>
                 </div>
@@ -2149,7 +2192,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Beat Frequency</span>
                   </div>
                 </div>
@@ -2171,7 +2216,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Intensity</span>
                   </div>
                 </div>
@@ -2189,7 +2236,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Intensity Level</span>
                   </div>
                 </div>
@@ -2207,7 +2256,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Pressure Level</span>
                   </div>
                 </div>
@@ -2229,7 +2280,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Doppler Effect</span>
                   </div>
                 </div>
@@ -2265,7 +2318,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Mach Angle</span>
                   </div>
                 </div>
@@ -2283,7 +2338,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Cerenkov Angle</span>
                   </div>
                 </div>
@@ -2305,7 +2362,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Interference Fringes</span>
                   </div>
                 </div>
@@ -2329,7 +2388,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Index Of Refraction</span>
                   </div>
                 </div>
@@ -2347,7 +2408,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Snell&#39;s Law</span>
                   </div>
                 </div>
@@ -2369,7 +2432,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Critical Angle</span>
                   </div>
                 </div>
@@ -2387,7 +2452,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Image Location</span>
                   </div>
                 </div>
@@ -2405,7 +2472,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Image Size</span>
                   </div>
                 </div>
@@ -2427,7 +2496,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Spherical Mirrors</span>
                   </div>
                 </div>
@@ -2465,7 +2536,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Coulomb&#39;s Law</span>
                   </div>
                 </div>
@@ -2489,7 +2562,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Electric Field</span>
                   </div>
                 </div>
@@ -2519,7 +2594,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Electric Potential</span>
                   </div>
                 </div>
@@ -2553,7 +2630,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Field &amp; Potential</span>
                   </div>
                 </div>
@@ -2583,7 +2662,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Capacitance</span>
                   </div>
                 </div>
@@ -2601,7 +2682,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Plate Capacitor</span>
                   </div>
                 </div>
@@ -2623,7 +2706,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Cylindrical Capacitor</span>
                   </div>
                 </div>
@@ -2641,7 +2726,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Spherical Capacitor</span>
                   </div>
                 </div>
@@ -2659,7 +2746,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Capacitor P.E.</span>
                   </div>
                 </div>
@@ -2693,7 +2782,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Electric Current</span>
                   </div>
                 </div>
@@ -2717,7 +2808,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Charge Density</span>
                   </div>
                 </div>
@@ -2735,7 +2828,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Current Density</span>
                   </div>
                 </div>
@@ -2763,7 +2858,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Ohm&#39;s Law</span>
                   </div>
                 </div>
@@ -2793,7 +2890,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Resitivity-Conductivity</span>
                   </div>
                 </div>
@@ -2811,7 +2910,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Electric Resistance</span>
                   </div>
                 </div>
@@ -2833,7 +2934,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Electric Power</span>
                   </div>
                 </div>
@@ -2863,7 +2966,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Resistors in series</span>
                   </div>
                 </div>
@@ -2881,7 +2986,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Resistors in parallel</span>
                   </div>
                 </div>
@@ -2903,7 +3010,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Capacitors in series</span>
                   </div>
                 </div>
@@ -2921,7 +3030,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Capacitors in parallel</span>
                   </div>
                 </div>
@@ -2939,7 +3050,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Magnetic force, charge</span>
                   </div>
                 </div>
@@ -2967,7 +3080,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Magnetic Force, current</span>
                   </div>
                 </div>
@@ -2991,7 +3106,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Biot-savart Law</span>
                   </div>
                 </div>
@@ -3009,7 +3126,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Solenoid</span>
                   </div>
                 </div>
@@ -3031,7 +3150,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Straight Wire</span>
                   </div>
                 </div>
@@ -3049,7 +3170,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Parallel Wires</span>
                   </div>
                 </div>
@@ -3067,7 +3190,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Electric Flux</span>
                   </div>
                 </div>
@@ -3095,7 +3220,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Magnetic Flux</span>
                   </div>
                 </div>
@@ -3119,7 +3246,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Motional Emf</span>
                   </div>
                 </div>
@@ -3137,7 +3266,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Induced Emf</span>
                   </div>
                 </div>
@@ -3165,7 +3296,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Gauss&#39;s Law</span>
                   </div>
                 </div>
@@ -3189,7 +3322,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Faraday&#39;s Law</span>
                   </div>
                 </div>
@@ -3213,7 +3348,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Ampere&#39;s Law</span>
                   </div>
                 </div>
@@ -3241,7 +3378,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>electromagnetic Plane Wave</span>
                   </div>
                 </div>
@@ -3265,7 +3404,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>em wave energy density</span>
                   </div>
                 </div>
@@ -3289,7 +3430,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Poynting Vector</span>
                   </div>
                 </div>
@@ -3311,7 +3454,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>em radiation pressure</span>
                   </div>
                 </div>
@@ -3349,7 +3494,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Lorentz Factor</span>
                   </div>
                 </div>
@@ -3367,7 +3514,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Time Dilation</span>
                   </div>
                 </div>
@@ -3391,7 +3540,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Length Contraction</span>
                   </div>
                 </div>
@@ -3419,7 +3570,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Relative Velocity</span>
                   </div>
                 </div>
@@ -3437,7 +3590,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Relativistic Energy</span>
                   </div>
                 </div>
@@ -3461,7 +3616,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Relativistic Momentum</span>
                   </div>
                 </div>
@@ -3489,7 +3646,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Energy-momentum</span>
                   </div>
                 </div>
@@ -3507,7 +3666,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Mass-energy</span>
                   </div>
                 </div>
@@ -3525,7 +3686,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Relativistic K.E.</span>
                   </div>
                 </div>
@@ -3547,7 +3710,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Relativistic Doppler Effect</span>
                   </div>
                 </div>
@@ -3571,7 +3736,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Photon Energy</span>
                   </div>
                 </div>
@@ -3595,7 +3762,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Photon Momentum</span>
                   </div>
                 </div>
@@ -3623,7 +3792,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Photoelectric Effect</span>
                   </div>
                 </div>
@@ -3647,7 +3818,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Schrodinger&#39;s Equation</span>
                   </div>
                 </div>
@@ -3671,7 +3844,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Uncertainty Principle</span>
                   </div>
                 </div>
@@ -3699,7 +3874,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Rydberg equation</span>
                   </div>
                 </div>
@@ -3717,7 +3894,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Half Life</span>
                   </div>
                 </div>
@@ -3735,7 +3914,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Absorbed Dose</span>
                   </div>
                 </div>
@@ -3757,7 +3938,9 @@
             
               <div class="col m4">
                 <div class="row my-row">
-                  <div class="col m12 center static-physics-equation-header modal-trigger" href="#modal-physics-equation-more-information">
+                  
+                  <div class="col m12 center static-physics-equation-header tooltipped" data-position="top" data-tooltip="Video Resources Coming Soon!">
+                  
                     <span>Effective Dose</span>
                   </div>
                 </div>
@@ -3811,8 +3994,8 @@
             <td><span class="static-physics-equation" latex="\frac{m}{s}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="wc8qyrz1h6" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="wc8qyrz1h6" symbol="c"></span>
+                <input class="physics-constant-checkbox-input" rid="pzia2lqv26" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="pzia2lqv26" symbol="c"></span>
               </label>
             </td>
           </tr>
@@ -3824,8 +4007,8 @@
             <td><span class="static-physics-equation" latex="J\cdot s"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="czey2bouqs" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="czey2bouqs" symbol="h"></span>
+                <input class="physics-constant-checkbox-input" rid="9m8v66yzz1" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="9m8v66yzz1" symbol="h"></span>
               </label>
             </td>
           </tr>
@@ -3837,8 +4020,8 @@
             <td><span class="static-physics-equation" latex="J\cdot s"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="mk56xx36ev" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="mk56xx36ev" symbol="\hbar"></span>
+                <input class="physics-constant-checkbox-input" rid="79mnt1o04c" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="79mnt1o04c" symbol="\hbar"></span>
               </label>
             </td>
           </tr>
@@ -3850,8 +4033,8 @@
             <td><span class="static-physics-equation" latex="\frac{m^{3}}{kg\cdot s^{2}}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="nltp4prndl" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="nltp4prndl" symbol="G"></span>
+                <input class="physics-constant-checkbox-input" rid="6542ug5itr" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="6542ug5itr" symbol="G"></span>
               </label>
             </td>
           </tr>
@@ -3863,8 +4046,8 @@
             <td><span class="static-physics-equation" latex="\frac{m}{s^2}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="ao69dqp93z" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="ao69dqp93z" symbol="g"></span>
+                <input class="physics-constant-checkbox-input" rid="orwtmpoomv" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="orwtmpoomv" symbol="g"></span>
               </label>
             </td>
           </tr>
@@ -3876,8 +4059,8 @@
             <td><span class="static-physics-equation" latex="\frac{J}{K}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="cqwtl2pnl0" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="cqwtl2pnl0" symbol="k_{b}"></span>
+                <input class="physics-constant-checkbox-input" rid="hy3xuag6zy" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="hy3xuag6zy" symbol="k_{b}"></span>
               </label>
             </td>
           </tr>
@@ -3889,8 +4072,8 @@
             <td><span class="static-physics-equation" latex="\frac{J}{mol}\cdot K"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="rfz1l2uda7" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="rfz1l2uda7" symbol="R"></span>
+                <input class="physics-constant-checkbox-input" rid="bmvo7mnei6" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="bmvo7mnei6" symbol="R"></span>
               </label>
             </td>
           </tr>
@@ -3902,8 +4085,8 @@
             <td><span class="static-physics-equation" latex="mol^{-1}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="2rcozrsasf" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="2rcozrsasf" symbol="N_{A}"></span>
+                <input class="physics-constant-checkbox-input" rid="enw7jawl3v" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="enw7jawl3v" symbol="N_{A}"></span>
               </label>
             </td>
           </tr>
@@ -3915,8 +4098,8 @@
             <td><span class="static-physics-equation" latex="C"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="78sfmrs699" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="78sfmrs699" symbol="e"></span>
+                <input class="physics-constant-checkbox-input" rid="ov5j16obte" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="ov5j16obte" symbol="e"></span>
               </label>
             </td>
           </tr>
@@ -3928,8 +4111,8 @@
             <td><span class="static-physics-equation" latex="\frac{N}{A^{2}}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="0ehn0dzomk" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="0ehn0dzomk" symbol="\mu_{0}"></span>
+                <input class="physics-constant-checkbox-input" rid="e3fgkspfrd" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="e3fgkspfrd" symbol="\mu_{0}"></span>
               </label>
             </td>
           </tr>
@@ -3941,8 +4124,8 @@
             <td><span class="static-physics-equation" latex="\frac{F}{m}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="i8bw6wn467" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="i8bw6wn467" symbol="\epsilon_{0}"></span>
+                <input class="physics-constant-checkbox-input" rid="xetf41lnf1" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="xetf41lnf1" symbol="\epsilon_{0}"></span>
               </label>
             </td>
           </tr>
@@ -3954,8 +4137,8 @@
             <td><span class="static-physics-equation" latex="N\cdot\frac{m^{2}}{C^{2}}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="q6zhbes89n" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="q6zhbes89n" symbol="k"></span>
+                <input class="physics-constant-checkbox-input" rid="f3bs2gl3d6" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="f3bs2gl3d6" symbol="k"></span>
               </label>
             </td>
           </tr>
@@ -3967,8 +4150,8 @@
             <td><span class="static-physics-equation" latex="\frac{C}{mol}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="scu0kxejom" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="scu0kxejom" symbol="F"></span>
+                <input class="physics-constant-checkbox-input" rid="2ddpka12dr" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="2ddpka12dr" symbol="F"></span>
               </label>
             </td>
           </tr>
@@ -3980,8 +4163,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="6glqabae9g" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="6glqabae9g" symbol="m_{e}"></span>
+                <input class="physics-constant-checkbox-input" rid="w5wo8dw3bq" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="w5wo8dw3bq" symbol="m_{e}"></span>
               </label>
             </td>
           </tr>
@@ -3993,8 +4176,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="eny0besb8p" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="eny0besb8p" symbol="m_{p}"></span>
+                <input class="physics-constant-checkbox-input" rid="ys9gxmmf68" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="ys9gxmmf68" symbol="m_{p}"></span>
               </label>
             </td>
           </tr>
@@ -4006,8 +4189,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="5rlzpgl9yy" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="5rlzpgl9yy" symbol="m_{n}"></span>
+                <input class="physics-constant-checkbox-input" rid="g1layydm9q" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="g1layydm9q" symbol="m_{n}"></span>
               </label>
             </td>
           </tr>
@@ -4019,8 +4202,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="f72l6b73ql" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="f72l6b73ql" symbol="u"></span>
+                <input class="physics-constant-checkbox-input" rid="h6hqo8i7lq" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="h6hqo8i7lq" symbol="u"></span>
               </label>
             </td>
           </tr>
@@ -4032,8 +4215,8 @@
             <td><span class="static-physics-equation" latex="\frac{W}{m^{2}}\cdot K^{4}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="mlfb0x9nqh" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="mlfb0x9nqh" symbol="\sigma"></span>
+                <input class="physics-constant-checkbox-input" rid="jrb9696ez1" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="jrb9696ez1" symbol="\sigma"></span>
               </label>
             </td>
           </tr>
@@ -4045,8 +4228,8 @@
             <td><span class="static-physics-equation" latex="m^{-1}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="u123ep7rsp" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="u123ep7rsp" symbol="R_{\infty}"></span>
+                <input class="physics-constant-checkbox-input" rid="cansrp2590" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="cansrp2590" symbol="R_{\infty}"></span>
               </label>
             </td>
           </tr>
@@ -4058,8 +4241,8 @@
             <td><span class="static-physics-equation" latex="\frac{J}{T}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="nojzjzma4w" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="nojzjzma4w" symbol="\mu_{B}"></span>
+                <input class="physics-constant-checkbox-input" rid="30hnn9yfz0" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="30hnn9yfz0" symbol="\mu_{B}"></span>
               </label>
             </td>
           </tr>
@@ -4071,8 +4254,8 @@
             <td><span class="static-physics-equation" latex="Wb"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="6kptydmby2" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="6kptydmby2" symbol="\Phi_{0}"></span>
+                <input class="physics-constant-checkbox-input" rid="hyntc2y2up" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="hyntc2y2up" symbol="\Phi_{0}"></span>
               </label>
             </td>
           </tr>
@@ -4084,8 +4267,8 @@
             <td><span class="static-physics-equation" latex="m\cdot K"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="xmigfszd2y" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="xmigfszd2y" symbol="b"></span>
+                <input class="physics-constant-checkbox-input" rid="82e03fsdrq" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="82e03fsdrq" symbol="b"></span>
               </label>
             </td>
           </tr>

@@ -1,16 +1,28 @@
 $(document).ready(function(){
 
+
   $("#determinate-loader").css("width","100%");
 
   ListOfPhysicsConstants = JSON.parse($("#main-screen").attr("lopc"));
 
   setTimeout(function(){
+    //we need to intialize user data if there is any to init
+    InitEditorWithEditorData();
     $("#loading-screen").animate({
       opacity: 0.0
     },500,function(){
       $(this).css("display","none");
     });
   },2100);
+
+  window.onbeforeunload = function (e) {
+    if(SaveEditorData){
+      SaveEditorDataToLocalStorage();
+    }else{
+      localStorage.removeItem("editor-data");
+    }
+    
+  };
 
 
   $(".static-physics-equation").each(function(i){
@@ -144,5 +156,6 @@ $(document).ready(function(){
       DisplayInfoPopup(id, $(this)[0].getBoundingClientRect());
     }
   });
+
 
 });
