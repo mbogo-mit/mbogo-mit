@@ -748,6 +748,7 @@ body {
 
 #units-dropdown-menu {
   position: absolute;
+  z-index: 2;
   top: 0px;
   left: 0px;
   display: none;
