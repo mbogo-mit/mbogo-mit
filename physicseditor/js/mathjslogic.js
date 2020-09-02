@@ -1553,8 +1553,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
                 expressionThatAreNotCorrect.push({
                   expression1: expressionArray[i].rawStr,
                   expression2: expressionArray[i+1].rawStr,
-                  calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
-                  calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
+                  calculatedExpression1: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression1), uniqueRIDStringArray),
+                  calculatedExpression2: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression2), uniqueRIDStringArray),
                   operator: expressionArray[i].operator,
                 });
               }else{
@@ -1568,8 +1568,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
-                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
-                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
+                calculatedExpression1: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression1), uniqueRIDStringArray),
+                calculatedExpression2: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression2), uniqueRIDStringArray),
                 operator: expressionArray[i].operator,
               });
             }
@@ -1580,8 +1580,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
-                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
-                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
+                calculatedExpression1: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression1), uniqueRIDStringArray),
+                calculatedExpression2: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression2), uniqueRIDStringArray),
                 operator: expressionArray[i].operator,
               });
             }
@@ -1592,8 +1592,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
-                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
-                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
+                calculatedExpression1: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression1), uniqueRIDStringArray),
+                calculatedExpression2: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression2), uniqueRIDStringArray),
                 operator: expressionArray[i].operator,
               });
             }
@@ -1604,8 +1604,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
-                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
-                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
+                calculatedExpression1: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression1), uniqueRIDStringArray),
+                calculatedExpression2: ReplaceUniqueRIDStringWithVariableLs(nerdamer.convertToLaTeX(expression2), uniqueRIDStringArray),
                 operator: expressionArray[i].operator,
               });
             }
