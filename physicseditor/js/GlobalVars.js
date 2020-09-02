@@ -422,7 +422,7 @@ let ListOfSIUnits = {
   "coefficient of friction" : {name: "unitless variable", symbol: "none", unitsMathjs: "1", canBeVector: false,},
   "energy efficiency" : {name: "unitless variable", symbol: "none", unitsMathjs: "1", canBeVector: false,},
   "coefficient of thermal expansion" : {name: "inverse kelvin", symbol: "1/K", unitsMathjs: "1 / K", canBeVector: false,},
-  "undefined": {name: "undefined variable", symbol: "none", unitsMathjs: "1 undefinedunit", canBeVector: true,},
+  "undefined units": {name: "undefined units", symbol: "none", unitsMathjs: "1 undefinedunit", canBeVector: true,},
 };
 
 let AcceptablePhysicalQuantities = ["speed of light in vacuum", "Planck constant","Reduced Plank's constant (h/2pi)","Newtonian constant of gravitation","Acceleration due to gravity","Boltzmann constant","molar gas constant","Avogadro's number","Charge of electron","Permeability of vacuum","Permittivity of vacuum","Coulomb constant","Faraday constant","electron mass","proton mass","neutron mass","Atomic mass unit","Stefan-Boltzmann constant","Rydberg constant","Bohr magneton","magnetic flux quantum h/2e","Wien displacement constant"].concat(Object.keys(ListOfSIUnits));

@@ -76,7 +76,7 @@ function IsSignleUndefinedVariable(ls){
 
 function ConvertStringToScientificNotation(str){
   let scientificNotation = Number(str).toExponential().split("e");
-  scientificNotation[0] = Number(scientificNotation[0]).toFixed(PrecisionSigFigs).toString()
+  scientificNotation[0] = Number(Number(scientificNotation[0]).toFixed(PrecisionSigFigs)).toString()
   if(scientificNotation[1] == "+0"){
     scientificNotation[1] = "";
   }else{
@@ -1553,6 +1553,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
                 expressionThatAreNotCorrect.push({
                   expression1: expressionArray[i].rawStr,
                   expression2: expressionArray[i+1].rawStr,
+                  calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
+                  calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
                   operator: expressionArray[i].operator,
                 });
               }else{
@@ -1566,6 +1568,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
+                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
+                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
                 operator: expressionArray[i].operator,
               });
             }
@@ -1576,6 +1580,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
+                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
+                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
                 operator: expressionArray[i].operator,
               });
             }
@@ -1586,6 +1592,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
+                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
+                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
                 operator: expressionArray[i].operator,
               });
             }
@@ -1596,6 +1604,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
               expressionThatAreNotCorrect.push({
                 expression1: expressionArray[i].rawStr,
                 expression2: expressionArray[i+1].rawStr,
+                calculatedExpression1: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray)),
+                calculatedExpression2: nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray)),
                 operator: expressionArray[i].operator,
               });
             }
@@ -1635,12 +1645,18 @@ function IdentifyAllKnownVariablesAndTheirValues2(expressionArray, lineNumber, m
       //the next thing we will check is if we can solve for any unknown variables and if there are no unknown variables 
       if(expressionArray[i].operator == "="){
         //this function checks if this equations can help solve for a unknown variable in it if there are any and also plugs in the values for known or given variables and sees if the expressions are actually equal
-        if(TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOther(expression1, expression2, Object.assign(expression1Variables, expression2Variables)) == "error"){
-          //this means that the expressions may be symbolically equal but when the variables values are plugged in they are not equal
-          if(EL.expressionsThatDontActuallyEqualEachOther[lineNumber] == undefined){
-            EL.expressionsThatDontActuallyEqualEachOther[lineNumber] = [];//setting the value equal to an array so that we can push values into it
-          }  
-          EL.expressionsThatDontActuallyEqualEachOther[lineNumber].push(`${expressionArray[i].rawStr} = ${expressionArray[i+1].rawStr}`);
+        let returnValue = TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOther(expression1, expression2, Object.assign(expression1Variables, expression2Variables));
+        if(returnValue != undefined){
+          if(returnValue.error == true){
+            //this means that the expressions may be symbolically equal but when the variables values are plugged in they are not equal
+            if(EL.expressionsThatDontActuallyEqualEachOther[lineNumber] == undefined){
+              EL.expressionsThatDontActuallyEqualEachOther[lineNumber] = [];//setting the value equal to an array so that we can push values into it
+            } 
+            //let exp1 = nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray));
+            //let exp2 = nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray));
+            //EL.expressionsThatDontActuallyEqualEachOther[lineNumber].push(`(${expressionArray[i].rawStr} = ${expressionArray[i+1].rawStr}) \\rightarrow (${exp1} \\neq ${exp2})`);
+            EL.expressionsThatDontActuallyEqualEachOther[lineNumber].push(`(${expressionArray[i].rawStr} \\neq ${expressionArray[i+1].rawStr}) \\rightarrow (${returnValue.num1} \\neq ${returnValue.num2})`);
+          }
         }
       }
       
@@ -1701,13 +1717,14 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
     try{
       //there is a case where both expressions are numbers but are equivalent but when calcuating their values the calculation is off by some decimal places
       //an example would be log10(25)/log10(5) = 2 but when calculate the leftside gives a very long decimal that is approaching 2 so we use the function "toFixed" to round it to the 12th decimal place
+      
       let num1 = math.evaluate(expression1).toExponential().split("e");
       let num2 = math.evaluate(expression2).toExponential().split("e");
       //we are going to the 6th significant figure because that is what the variable value goes up to everything else is truncated
       if(!nerdamer(`${Number(num1[0]).toFixed(PrecisionSigFigs)}e${num1[1]}`).eq(`${Number(num2[0]).toFixed(PrecisionSigFigs)}e${num2[1]}`)){
         //if the two expression are not equal then we need to throw an error: expression may be symbolically equal but when values are plug in for the variables they are not equal
         //console.log("error: expression may be symbolically equal but when values are plug in for the variables they are not equal");
-        return "error";
+        return {error: true, num1: ConvertStringToScientificNotation(num1.join("e")), num2: ConvertStringToScientificNotation(num2.join("e"))};
       }
     }catch(err){
       //console.log("couldn't evaluate if expressions are equal")
