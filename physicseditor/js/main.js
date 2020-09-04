@@ -10,7 +10,7 @@ function CreateNewMathField(id){
     sumStartsWithNEquals: true,
     supSubsRequireOperand: true,
     autoCommands: `sqrt prod sum int hat ${LatexGreekLetters.join(' ').replace(/\s\\psi/g,"").replace(/\\/g,"")}`,
-    autoOperatorNames: 'sin sinh arcsin arcsinh cos cosh arccos arccosh tan tanh arctan arctanh cot coth arccot arccoth csc csch arccsc arccsch sec sech arcsec arcsech log ln',
+    autoOperatorNames: 'lim sin sinh arcsin arcsinh cos cosh arccos arccosh tan tanh arctan arctanh cot coth arccot arccoth csc csch arccsc arccsch sec sech arcsec arcsech log ln',
     charsThatBreakOutOfSupSub: '+-=<>',
     handlers: {
       edit: function() {

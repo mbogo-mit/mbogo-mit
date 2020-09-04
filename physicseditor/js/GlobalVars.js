@@ -28,7 +28,7 @@ try{
 }catch(err){
 
 }
-
+let EquationSet = [];
 let SqrtLoop = 0;
 let LastVariableRIDChangedToGiven = null;
 let EditingMathFields = false;
@@ -283,6 +283,13 @@ let PreDefinedVariables = {
     type: "constant",
     units: "unitless",
     value: Math.PI.toFixed(PrecisionSigFigs),
+    unitsMathjs: "1",
+  },
+  "\\infty": {
+    state: "given",
+    type: "constant",
+    units: "unitless",
+    value: undefined,
     unitsMathjs: "1",
   },
   "e": {

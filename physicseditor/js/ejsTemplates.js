@@ -283,7 +283,7 @@ let Templates = {
         <div class="row my-row">
           <div class="left">
             <%for(let j = 0; j < errors[i].latexExpressions.length; j++){%>
-              <div><span class="log-static-latex" latex="<%= errors[i].latexExpressions[j] %>"></span></div>
+              <div><span class="log-static-latex left" latex="<%= errors[i].latexExpressions[j] %>"></span></div>
             <%}%>  
           </div>
         </div>

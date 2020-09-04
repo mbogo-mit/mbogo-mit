@@ -494,7 +494,6 @@ function MathFieldKeyPressEnter(el, enterClicked = false, RId = undefined){
   //first we need to copy everything after the cursor so that when we go to the next line that information goes to the next line and is removed from the current line
   let lsForNextLine = "";
   if(enterClicked){
-    console.log("FocusedMathFieldId", FocusedMathFieldId);
     let lsBeforeBackspace = MathFields[FocusedMathFieldId].mf.latex();
     MathFields[FocusedMathFieldId].mf.keystroke("Shift-Down");
     MathFields[FocusedMathFieldId].mf.write("");

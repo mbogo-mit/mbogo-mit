@@ -5,11 +5,12 @@ let ListOfOperators = [
   "<", ">", "=","*", "\\doteq", "\\geq", "\\leq", "\\leqslant", "\\geqslant", "\\equiv", "\\neq", "\\ngtr", "\\nless", "\\nleqslant", "\\ngeqslant", "\\approx", "\\simeq", "\\cong", "\\propto",
   "\\leftarrow", "\\rightarrow", "\\Leftarrow", "\\Rightarrow", "\\leftrightarrow", "\\Leftrightarrow", "\\leftrightharpoons", "\\rightleftharpoons",
   "\\left(", "\\right)","\\left|", "\\right|", "\\left \\|", "\\right \\|", "\\left[", "\\right]", "\\left [", "\\right ]", "\\left\\langle", "\\right\\rangle", "\\left \\{", "\\right \\}", "\\left |", "\\right |",
-  "\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\arcsin", "\\arccos", "\\arctan", "\\exp", "\\lg", "\\ln", "\\log",
+  "\\to", "\\lim","\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\arcsin", "\\arccos", "\\arctan", "\\exp", "\\lg", "\\ln", "\\log",
 ];
 
+//there are some latex strings in this array that aren't greek letters but the editor treats them like letters when it parses them
 let LatexGreekLetters = [
-  "\\hbar","\\nabla","\\alpha","\\beta", "\\gamma", "\\delta", "\\epsilon", "\\varepsilon", "\\zeta", "\\eta", "\\theta", "\\vartheta", "\\iota", "\\kappa", "\\lambda", "\\mu", "\\nu", "\\xi", "\\pi", "\\varpi", "\\rho", "\\varrho", "\\sigma", "\\varsigma", "\\tau", "\\upsilon", "\\phi", "\\varphi", "\\chi", "\\psi", "\\omega", "\\Gamma", "\\Delta", "\\Lambda", "\\Theta", "\\Xi", "\\Pi", "\\Upsilon", "\\Sigma", "\\Phi", "\\Psi", "\\Omega",
+  "\\infty","\\hbar","\\nabla","\\alpha","\\beta", "\\gamma", "\\delta", "\\epsilon", "\\varepsilon", "\\zeta", "\\eta", "\\theta", "\\vartheta", "\\iota", "\\kappa", "\\lambda", "\\mu", "\\nu", "\\xi", "\\pi", "\\varpi", "\\rho", "\\varrho", "\\sigma", "\\varsigma", "\\tau", "\\upsilon", "\\phi", "\\varphi", "\\chi", "\\psi", "\\omega", "\\Gamma", "\\Delta", "\\Lambda", "\\Theta", "\\Xi", "\\Pi", "\\Upsilon", "\\Sigma", "\\Phi", "\\Psi", "\\Omega",
 ];
 
 
@@ -282,6 +283,28 @@ function FindIndexOfClosingBracket(ls){
       unclosedBrackets += 1;
     }
     else if(ls[i] == "}"){
+      unclosedBrackets -= 1;
+    }
+
+    if(unclosedBrackets > 0){
+      i++;
+    }
+    else{
+      return i;
+    }
+
+  }
+  return null;
+}
+
+function FindIndexOfClosingSquareBracket(ls){
+  let unclosedBrackets = 1;
+  let i = 0;
+  while(i < ls.length){
+    if(ls[i] == "["){
+      unclosedBrackets += 1;
+    }
+    else if(ls[i] == "]"){
       unclosedBrackets -= 1;
     }
 

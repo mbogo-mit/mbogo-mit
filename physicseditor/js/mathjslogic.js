@@ -124,6 +124,17 @@ function SplitLsIntoExpressions(ls){
         return defaultExpressiosn;//if we can't parse one part of the ls right then we will not parse it at all and just send up a default expression
       }
     }
+    else if(str[0] == "["){
+      //we need to find the closing bracekt and not parse anything in th middle
+      i2 = FindIndexOfClosingSquareBracket(str.substring(1));
+      if(i2 != null){
+        delta = i2 + 1;//adding one accounts for the shift because we used a substring
+      }
+      else{
+        console.log("couldn't find closing bracket");
+        return defaultExpressiosn;//if we can't parse one part of the ls right then we will not parse it at all and just send up a default expression
+      }
+    }
     i += delta;
   }
 
@@ -621,7 +632,7 @@ function FindAndFormatUnitsOfMathjsVector(ls){
           newLs += `(${formattedVector})`;
         }
         catch(err){
-          console.log("Error occured trying to parse vector into MathJs Vector");
+          //console.log("Error occured trying to parse vector into MathJs Vector");
           //console.log(err);
         }
       }
@@ -822,7 +833,7 @@ function ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, recognize
     //if this is true then we have converted things to nerdamer functions before we passed it to this function so
     //we need to make sure that we dont recognize a letter in a nerdamer function as a variable
     if(recognizeNerdamerFunctions){
-      let nerdamerFunctions = ["integrate(","abs(","vector(","dot(","cross(", "log(","log10(","diff("];
+      let nerdamerFunctions = ["integrate(","limit(","abs(","vector(","dot(","cross(", "log(","log10(","diff("];
       for(var c = 0; c < nerdamerFunctions.length; c++){
         if(s.indexOf(nerdamerFunctions[c]) == 0){
           foundMatch = true;
@@ -1008,6 +1019,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
       "\\\\log\\s*\\\\left\\(": "log10(",
       "\\\\log\\s*\\(": "log10(",
       "\\\\int": "",
+      "\\\\lim": "",
       "\\\\sum": "",
     };
 
@@ -1050,6 +1062,32 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
       }
       else{//theere was trouble finding the closing bracket so just stop
         console.log("trouble finding closing bracket for integral");
+        break;
+      }
+    }
+
+    while(ls.indexOf("\\lim_(") != -1){
+      i1 = ls.indexOf("\\lim_(");
+      i2 = FindIndexOfClosingParenthesis(ls.substring(i1 + "\\lim_(".length));
+      if(i2 != null){
+        i2 += i1 + "\\lim_(".length;//accounts for the shift because we used a substring of ls
+        if(ls[i2 + 1] == "^"){//this means the integral is formated like: \int_(...)^(...)
+          i3 = FindIndexOfClosingParenthesis(ls.substring(i2 + 3));
+          if(i3 != null){
+            i3 += i2 + 3;//adjust for shift
+            ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing integral formatted as: \int_(...)^(...)
+          }
+          else{//theere was trouble finding the closing bracket so just stop
+            console.log("trouble finding closing parenthesis for integral");
+            break;
+          }
+        }
+        else{
+          ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing integral formatted as: \int_(...)
+        }
+      }
+      else{//theere was trouble finding the closing bracket so just stop
+        console.log("trouble finding closing parenthesis for integral");
         break;
       }
     }
@@ -1559,6 +1597,10 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
                 });
               }else{
                 symbolicallyEqual = "yes";
+                EquationSet.push({
+                  equation: `${expression1} = ${expression2}`,
+                  uniqueRIDStringArray: uniqueRIDStringArray,
+                });
               }
             }
           }
@@ -1645,7 +1687,7 @@ function IdentifyAllKnownVariablesAndTheirValues2(expressionArray, lineNumber, m
       //the next thing we will check is if we can solve for any unknown variables and if there are no unknown variables 
       if(expressionArray[i].operator == "="){
         //this function checks if this equations can help solve for a unknown variable in it if there are any and also plugs in the values for known or given variables and sees if the expressions are actually equal
-        let returnValue = TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOther(expression1, expression2, Object.assign(expression1Variables, expression2Variables));
+        let returnValue = TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOther(expression1, expression2, Object.assign(expression1Variables, expression2Variables), uniqueRIDStringArray);
         if(returnValue != undefined){
           if(returnValue.error == true){
             //this means that the expressions may be symbolically equal but when the variables values are plugged in they are not equal
@@ -1655,7 +1697,7 @@ function IdentifyAllKnownVariablesAndTheirValues2(expressionArray, lineNumber, m
             //let exp1 = nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression1, uniqueRIDStringArray));
             //let exp2 = nerdamer.convertToLaTeX(ReplaceUniqueRIDStringWithVariableLs(expression2, uniqueRIDStringArray));
             //EL.expressionsThatDontActuallyEqualEachOther[lineNumber].push(`(${expressionArray[i].rawStr} = ${expressionArray[i+1].rawStr}) \\rightarrow (${exp1} \\neq ${exp2})`);
-            EL.expressionsThatDontActuallyEqualEachOther[lineNumber].push(`(${expressionArray[i].rawStr} \\neq ${expressionArray[i+1].rawStr}) \\rightarrow (${returnValue.num1} \\neq ${returnValue.num2})`);
+            EL.expressionsThatDontActuallyEqualEachOther[lineNumber].push(`(${expressionArray[i].rawStr} \\neq ${expressionArray[i+1].rawStr}) \\Rightarrow (${returnValue.num1} \\neq ${returnValue.num2})`);
           }
         }
       }
@@ -1664,7 +1706,7 @@ function IdentifyAllKnownVariablesAndTheirValues2(expressionArray, lineNumber, m
   }
 }
 
-function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOther(exp1, exp2, expVars){
+function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOther(exp1, exp2, expVars, uniqueRIDStringArray){
   //this function takes expressions that make up an equation "{expression1} = {expression2}" and checks if the expression
   //has the right conditions to solve for an unknown variable and if it does it will try to solve for that unknown variable
   //if all the variables in the expression are known and there values are known we will plug in all of there values and see
@@ -1754,6 +1796,10 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
       }
 
       if(knownVariableValue != undefined){
+        EquationSet.push({
+          equation: `${exp1} = ${exp2}`,
+          uniqueRIDStringArray: uniqueRIDStringArray,
+        });
         //now that we have solved for this variable we need to see if we can calculate its actual value
         let actualValue = undefined;
         if(status.undefinedValuesCount <= 1){//you can only calculate the actual value of the variable if there is only one undefinedValue which would be the unknown variable we just sovled for
@@ -1762,8 +1808,8 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
             actualValue = math.evaluate(nerdamer(knownVariableValue, status.variableValues).evaluate().toString()).toString();
           }catch(err2){
             actualValue = undefined;
-            console.log(err2);
-            console.log("couldn't get actual value of variable that was unknown and now is known");
+            //console.log(err2);
+            //console.log("couldn't get actual value of variable that was unknown and now is known");
           }
         }
 
@@ -1795,8 +1841,8 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
         }
       }  
     }catch(err){
-      console.log(err);
-      console.log("couldn't figure out the solution to unknown variable");
+      //console.log(err);
+      //console.log("couldn't figure out the solution to unknown variable");
     }
   }
 
@@ -1901,6 +1947,173 @@ function FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, 
   return ls;
 }
 
+function DivideLimitIntoVariableAndValue(ls){
+  let obj = null;
+  let a = [];
+  // the limit can either be formmatted using the "\\to" or "\\rightarrow" latex string
+  if(ls.split("\\to").length == 2){
+    a = ls.split("\\to");
+  }else if(ls.split("\\rightarrow").length == 2){
+    a = ls.split("\\rightarrow");
+  }
+
+  if(a.length == 2){
+    //we need to make sure that there is only one variable on the left handside of the "\\to" operator and 0 or 1 variable on the right handside
+    let v = GetVariablesFromLatexString(a[0]);
+    let v2 = GetVariablesFromLatexString(a[1]);
+    if(v.length == 1 && v2.length <= 1){
+      let foundUnallowedCharacter = false;
+      let unallowedCharacters = ListOfOperators.concat(["^"]);
+      for(var j = 0; j < unallowedCharacters.length; j++){
+        if(a[0].indexOf(unallowedCharacters[j]) != -1 || a[1].indexOf(unallowedCharacters[j]) != -1){
+          foundUnallowedCharacter = true;
+          break;
+        }
+      }
+      if(!foundUnallowedCharacter){
+        if(v.length == 1){
+          obj = {
+            variable: v[0],
+            value: a[1],
+          }
+        }
+      }
+    }
+  }
+
+  return obj;
+}
+
+
+function FindAndParseLimitsAndReturnLatexStringWithNerdamerLimits(ls, uniqueRIDStringArray, lineNumber, mfID){
+  //this function takes a string and tries to find all the intsances of \\lim_{x\\to y}\\left(....\\right) and converter them to a nerdamer string like limit(...,x,y)
+  let newLs = "";
+  let s;
+  let i = 0;
+  let i2 = 0;
+  let i3 = 0;
+  let delta = 0;
+  let foundMatch = false;
+  while(i < ls.length){
+    foundMatch = false;
+    delta = 1;
+    s = ls.substring(i);
+    if(s.indexOf("\\lim") == 0){
+  
+      if(!foundMatch && s.indexOf("\\lim_{") == 0){
+        let limit;
+        let expression;
+        //we need to check if there is a definite integral
+        i2 = FindIndexOfClosingBracket(s.substring("\\lim_{".length));
+        if(i2 != null){
+          i2 += "\\lim_{".length;
+          limit = s.substring("\\lim_{".length, i2);
+          //console.log("substring:" + s.substring(i2+1));
+          if(s.substring(i2+1).indexOf("\\left(") == 0){//checking if there is an uppeerbound to this integral
+            i3 = FindIndexOfClosingParenthesis(s.substring(i2 + 1 + "\\left(".length));
+            if(i3 != null){
+              i3 += i2 + 1 + "\\left(".length;//acounts for the shift because we used a substring
+              expression = s.substring(i2 + 1 + "\\left(".length, i3 - "\\right".length);
+              //so we found a match but now we need to make sure that the limit is formatted correctly
+              foundMatch = true;
+              //now that we have the expression and the limit we need to make sure that the limit is formatted properly
+              //we need to divide the limit into the variable and the value it is approaching
+              let formattedLimit = DivideLimitIntoVariableAndValue(limit);
+              if(formattedLimit == null){
+                let errorAlreadyExists = false;
+                for(let error of MathFields[mfID].log.error){
+                  if(error.type == "Cannot evaluate limit"){
+                    errorAlreadyExists = true;
+                    break;
+                  }
+                }
+                if(!errorAlreadyExists){
+                  MathFields[mfID].log.error.push({
+                    error: EL.createLoggerErrorFromMathJsError("Cannot evaluate limit"),
+                    latexExpressions: [
+                      "x^{2}\\to a \\ \\text{variable can not be an expression}",
+                      "x\\to a^2,\\ x\\to a\\cdot b,\\ x\\to 4^3 \\ \\text{the value the variable approaches can not be an expression}",
+                      "x\\to a^{-},\\ x\\to a^{+} \\ \\text{the editor can not calculate or distinguish between approaching from the left or right}",
+                      "x\\to\\infty \\ \\text{the editor can not calculate limits that approach infinity}"
+                    ],
+                  });
+                }
+                return null;
+
+              }else{
+                delta = i3 + 1;
+                newLs += `limit(${expression}, ${formattedLimit.variable}, ${formattedLimit.value})`;
+              }
+              
+            }
+            else{
+              console.log("trouble finding closing bracket");
+              return null;
+            }
+          }
+          else{
+            let errorAlreadyExists = false;
+            for(let error of MathFields[mfID].log.error){
+              if(error.type == "Limit not formatted correctly for editor"){
+                errorAlreadyExists = true;
+                break;
+              }
+            }
+            if(!errorAlreadyExists){
+              MathFields[mfID].log.error.push({
+                error: EL.createLoggerErrorFromMathJsError("Limit not formatted correctly for editor"),
+                latexExpressions: ["\\lim_{x\\to\\infty}\\frac{sin\\left(x\\right)}{x} \\Rightarrow \\lim_{x\\to\\infty}\\left(\\frac{sin\\left(x\\right)}{x}\\right)"]
+              });
+            }
+            return null;
+          }
+        }
+        else{
+          console.log("trouble finding closing bracket");
+          return null;
+        }
+      }
+    }
+    
+
+    if(!foundMatch && s[0] == "\\"){
+      //it is possible that it is an operator or a greek letter
+      for(var c = 0; c < ListOfOperators.length; c++){
+        if(s.indexOf(ListOfOperators[c]) == 0){
+          foundMatch = true;
+          newLs += ListOfOperators[c];
+          if(["\\cdot","\\times"].includes(ListOfOperators[c])){
+            newLs += " ";//mathquill for some reason doesn't put a space after \\cdot or \\times
+          }
+          delta = ListOfOperators[c].length;
+          break;
+        }
+      }
+
+      if(!foundMatch){
+        for(var c = 0; c < LatexGreekLetters.length; c++){
+          if(s.indexOf(LatexGreekLetters[c]) == 0){
+            foundMatch = true;
+            newLs += LatexGreekLetters[c];
+            delta = LatexGreekLetters[c].length;
+            break;
+          }
+        }
+      }
+
+    }
+
+    if(!foundMatch){
+      delta = 1;
+      newLs += s[0];//just pass the value directly to the new latex string
+    }
+
+    i += delta;
+  }
+
+  return newLs;
+}
+
 function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID){
   //this function takes a string and tries to find all the intsances of \\int_{}^{}(...) and converter them to a nerdamer string like integarte(x,x)
   let newLs = "";
@@ -1999,7 +2212,7 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
                 if(!errorAlreadyExists){
                   MathFields[mfID].log.error.push({
                     error: EL.createLoggerErrorFromMathJsError("Integral not formatted correctly for editor"),
-                    latexExpressions: ["\\int_{x_1}^{x_2} xdx \\rightarrow \\int_{x_1}^{x_2}\\left(xdx\\right)"],
+                    latexExpressions: ["\\int_{x_1}^{x_2} xdx \\Rightarrow \\int_{x_1}^{x_2}\\left(xdx\\right)"],
                   });
                 }
                 
@@ -2033,7 +2246,7 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
         if(!errorAlreadyExists){
           MathFields[mfID].log.error.push({
             error: EL.createLoggerErrorFromMathJsError("Integral not formatted correctly for editor"),
-            latexExpressions: ["\\int_{x_1}^{x_2} xdx \\rightarrow \\int_{x_1}^{x_2}\\left(xdx\\right)"],
+            latexExpressions: ["\\int_{x_1}^{x_2} xdx \\Rightarrow \\int_{x_1}^{x_2}\\left(xdx\\right)"],
           });
         }
 
@@ -2258,6 +2471,8 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   ls = FindAndWrapVectorsThatAreBeingMultiplied(ls).replace(/(myCrossProduct)/g,"cross").replace(/(myDotProduct)/g,"dot");//the replacing what i call cross and dot product with what nerdamer recognizes as a cross or dot product
   ls = FormatVectorsIntoNerdamerVectors(ls);
   //we need to see if we can parse \int into a nerdamer string like integrate(x,x). and if we can't convert all of them then the if statement below will not allow us to check if the strings are equal
+  ls = FindAndParseLimitsAndReturnLatexStringWithNerdamerLimits(ls, uniqueRIDStringArray, lineNumber, mfID);
+  if(ls == null){return null;}//if we couldn't convert a latex limit to nerdamer limit there is no reason to continue because the evaluation wont work
   ls = FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, uniqueRIDStringArray, lineNumber, mfID);
   if(ls == null){return null;}//a derivative is formatted incorrectly so we can't check if expressions are equal
   ls = FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls, uniqueRIDStringArray, lineNumber, mfID);
@@ -2281,6 +2496,10 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
 
 function FormatVectorsIntoNerdamerVectors(ls){
   return ls.replace(/\(\[/g, "vector(").replace(/\]\)/g, ")");
+}
+
+function FormatNerdamerSquareBracketsToVectors(str){
+  return str.replace(/\[/g,"vector(").replace(/\]/g,")");
 }
 
 function GetSummationBound(bound, ls){
@@ -2327,6 +2546,8 @@ function GetSummationBound(bound, ls){
 
   return obj;
 }
+
+
 
 function FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls, mfID){
   let i1 = 0;
@@ -2380,7 +2601,7 @@ function FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls, mfID){
                   if(!errorAlreadyExists){
                     MathFields[mfID].log.error.push({
                       error: EL.createLoggerErrorFromMathJsError(`${operation[2]} not formatted correctly for editor`),
-                      latexExpressions: [`\\${operation[0]}_{n=1}^{2} n+1 \\rightarrow \\${operation[0]}_{n=1}^{2}\\left( n+1\\right)`],
+                      latexExpressions: [`\\${operation[0]}_{n=1}^{2} n+1 \\Rightarrow \\${operation[0]}_{n=1}^{2}\\left( n+1\\right)`],
                     });
                   }
                   //console.log("summation doesn't have parentheses after it");

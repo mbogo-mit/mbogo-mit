@@ -29,7 +29,7 @@ function EditorLogger(){
       example: "",
     },
     "Cannot read property 'toString' of undefined": {
-      description: "You have an empty expression or no expression on this line",
+      description: "You have an empty expression or an incomplete expression on this line",
       example: "",
     },
     "Units do not match": {
@@ -75,6 +75,13 @@ function EditorLogger(){
     "Product not formatted correctly for editor": {
       description: "The product arguement must be wrapped in parentheses for the editor to parse and evaluate the product. Look at example below",
       example: "",
+    },
+    "Limit not formatted correctly for editor": {
+      description: "The limit arguement must be wrapped in parentheses for the editor to parse and evaluate the limit. Look at example below",
+      example: "",
+    },
+    "Cannot evaluate limit": {
+      description: "The editor supports a limited range of limit formats. Below are examples of invalid limit expressions"
     },
     "Value expected": {
       description: "An equation on this line is formatted incorrectly",
@@ -372,6 +379,7 @@ function EditorLogger(){
   }
 
   this.clearLog = function(){
+    EquationSet = [];
     this.log = {
       success: [],
       info: [],
