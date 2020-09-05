@@ -1543,8 +1543,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
     //this line of code converts the two expressions we were analyzing into nerdeamer readable string then we use nerdamers .eq() function to check if they are equal. if they arent then we add these two expression to the "expressionThatDontEqualEachOther" array
     let uniqueRIDStringArray = GenerateUniqueRIDStringForVariables(`${expressionArray[i].rawStr} + ${expressionArray[i+1].rawStr}`);//passing both string and putting a plus inbetween them so that we generate a uniqueRIDStringArray that accounts for all the variables and differential variables used in both expressions
     //console.log(uniqueRIDStringArray);
-    let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID);
-    let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID)
+    let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID, true);
+    let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID, true)
     //console.log("uniqueRIDStringArray", uniqueRIDStringArray);
     //console.log(expression1 + " ?= " +  expression2);
     if(expression1 != null && expression2 != null){
@@ -1668,15 +1668,15 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
   return expressionThatAreNotCorrect;
 }
 
-function IdentifyAllKnownVariablesAndTheirValues2(expressionArray, lineNumber, mfID){
+function IdentifyAllKnownVariablesAndTheirValues(expressionArray, lineNumber, mfID){
   //so now we need to check if there is even a possiblity that we can do a high level check between these expressions
   for(let i = 0; i + 1 < expressionArray.length; i++){
     //we need to do an exact conversion from latex to a string that nerdamer can understand. they have a convertFromLatex function but it is very limited so we will use it sparingly
     //this line of code converts the two expressions we were analyzing into nerdeamer readable string then we use nerdamers .eq() function to check if they are equal. if they arent then we add these two expression to the "expressionThatDontEqualEachOther" array
     let uniqueRIDStringArray = GenerateUniqueRIDStringForVariables(`${expressionArray[i].rawStr} + ${expressionArray[i+1].rawStr}`);//passing both string and putting a plus inbetween them so that we generate a uniqueRIDStringArray that accounts for all the variables and differential variables used in both expressions
     //console.log(uniqueRIDStringArray);
-    let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID);
-    let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID)
+    let expression1 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i].rawStr, uniqueRIDStringArray, lineNumber, mfID, false);
+    let expression2 = ExactConversionFromLatexStringToNerdamerReadableString(expressionArray[i+1].rawStr, uniqueRIDStringArray, lineNumber, mfID, false)
     //console.log("uniqueRIDStringArray", uniqueRIDStringArray);
     //console.log(expression1 + " ?= " +  expression2);
     if(expression1 != null && expression2 != null){
@@ -2022,7 +2022,7 @@ function FindAndParseLimitsAndReturnLatexStringWithNerdamerLimits(ls, uniqueRIDS
               if(formattedLimit == null){
                 let errorAlreadyExists = false;
                 for(let error of MathFields[mfID].log.error){
-                  if(error.type == "Cannot evaluate limit"){
+                  if(error.error.type == "Cannot evaluate limit"){
                     errorAlreadyExists = true;
                     break;
                   }
@@ -2054,7 +2054,7 @@ function FindAndParseLimitsAndReturnLatexStringWithNerdamerLimits(ls, uniqueRIDS
           else{
             let errorAlreadyExists = false;
             for(let error of MathFields[mfID].log.error){
-              if(error.type == "Limit not formatted correctly for editor"){
+              if(error.error.type == "Limit not formatted correctly for editor"){
                 errorAlreadyExists = true;
                 break;
               }
@@ -2170,8 +2170,8 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
               if(s.substring(i3 + 1).indexOf("\\left(") == 0){//we need to have a opening parathensis
                 //console.log("lowerbound", lowerbound);
                 //console.log("upperbound", upperbound);
-                lowerbound = ExactConversionFromLatexStringToNerdamerReadableString(lowerbound, uniqueRIDStringArray, lineNumber, mfID);
-                upperbound = ExactConversionFromLatexStringToNerdamerReadableString(upperbound, uniqueRIDStringArray, lineNumber, mfID);
+                lowerbound = ExactConversionFromLatexStringToNerdamerReadableString(lowerbound, uniqueRIDStringArray, lineNumber, mfID, true);
+                upperbound = ExactConversionFromLatexStringToNerdamerReadableString(upperbound, uniqueRIDStringArray, lineNumber, mfID, true);
                 if(lowerbound != null && upperbound != null){
                   i4 = FindIndexOfClosingParenthesis(s.substring(i3 + 1 + "\\left(".length));
                   if(i4 != null){
@@ -2204,7 +2204,7 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
                 //the integral we were parsing was not formatted properly so we need to add an error to its MathField if there isnt one already
                 let errorAlreadyExists = false;
                 for(let error of MathFields[mfID].log.error){
-                  if(error.type == "Integral not formatted correctly for editor"){
+                  if(error.error.type == "Integral not formatted correctly for editor"){
                     errorAlreadyExists = true;
                     break;
                   }
@@ -2238,7 +2238,7 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
         //if we havent found a match and we know that the character at this index is "\\int" then we known that the "\\int" doesnt have a parentheses after it so we need to throw an error 
         let errorAlreadyExists = false;
         for(let error of MathFields[mfID].log.error){
-          if(error.type == "Integral not formatted correctly for editor"){
+          if(error.error.type == "Integral not formatted correctly for editor"){
             errorAlreadyExists = true;
             break;
           }
@@ -2419,6 +2419,23 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
       //Such expression means that they were not multiplied by the differential variable to begin with and for this reason they will not be apart of the integral we are going to make with this differential variable
       //the line below returns an object that holds the nerdamer integral string and an object that holds all other strings not divided by the differental variable (so back to normal)
       let expr = ReturnDefiniteIntegralExpressionAndOtherExpression(dividedString, uniqueRIDStringArray[differentialVariableIndexes[c]].differentialRidString, uniqueRIDStringArray[differentialVariableIndexes[c]].ridString, lowerbound, upperbound);
+      
+      if(expr.integral == "NaN"){
+        let errorAlreadyExists = false;
+        for(let error of MathFields[mfID].log.error){
+          if(error.error.type == "Definite integral returned 'NaN' (not a number)"){
+            errorAlreadyExists = true;
+            break;
+          }
+        }
+        if(!errorAlreadyExists){
+          MathFields[mfID].log.error.push({
+            error: EL.createLoggerErrorFromMathJsError("Definite integral returned 'NaN' (not a number)"),
+          });
+        }
+      }
+
+
       expression.other = expr.other;//expr.other is a string that holds an expression which has the expressiosn that couldn't be put in the integral because they were not multiplied by the correct differential variable
       expression.integral += `+${expr.integral}`;//adding the calculation of the integral to expression.integral which keeps track of all the values of the integrals added up
 
@@ -2464,11 +2481,28 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
 
 }
 
-function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStringArray, lineNumber, mfID){
+function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStringArray, lineNumber, mfID, throwError = false){
   //I'm wrapping the absolute value function in parentheses "(abs(....))" so that it doesn't through off the wrap vector
   ls = ls.replace(/\\left\|/g,"(abs(").replace(/\\right\|/g,"))");//this converts all absolute value signs into nerdamer function "abs(......)"
   ls = CleanLatexString(ls, ["square-brackets"]);//we need to make sure that brackets formatted in latex are cleaned and
   ls = FindAndWrapVectorsThatAreBeingMultiplied(ls).replace(/(myCrossProduct)/g,"cross").replace(/(myDotProduct)/g,"dot");//the replacing what i call cross and dot product with what nerdamer recognizes as a cross or dot product
+  if(ls.indexOf("\\times") != -1){
+    if(throwError){
+      let errorAlreadyExists = false;
+      for(let error of MathFields[mfID].log.error){
+        if(error.error.type == "Editor couldn't evaluate cross product"){
+          errorAlreadyExists = true;
+          break;
+        }
+      }
+      if(!errorAlreadyExists){
+        MathFields[mfID].log.error.push({
+          error: EL.createLoggerErrorFromMathJsError("Editor couldn't evaluate cross product"),
+        });
+      }
+    }
+    return null;
+  }
   ls = FormatVectorsIntoNerdamerVectors(ls);
   //we need to see if we can parse \int into a nerdamer string like integrate(x,x). and if we can't convert all of them then the if statement below will not allow us to check if the strings are equal
   ls = FindAndParseLimitsAndReturnLatexStringWithNerdamerLimits(ls, uniqueRIDStringArray, lineNumber, mfID);
@@ -2479,12 +2513,28 @@ function ExactConversionFromLatexStringToNerdamerReadableString(ls, uniqueRIDStr
   ls = FindAndConvertLatexLogsToNerdamerReadableStrings(ls);
   ls = FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls, mfID);
   //we have this if statement because if after we are done parsing the latex into nerdamer is it still has these pieces of text in it then we cant go further because nerdamer doesn't know how to handle these texts properly
-  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\int") == -1 && ls.indexOf("\\prod") == -1 && ls.indexOf("\\sum") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1 && ls.indexOf("\\ln") == -1 && ls.indexOf("\\log") == -1){
+  if(ls.indexOf("\\int") == -1 && ls.indexOf("\\prod") == -1 && ls.indexOf("\\sum") == -1 && ls.indexOf("\\nabla") == -1 && ls.indexOf("[") == -1 && ls.indexOf("]") == -1 && ls.indexOf("\\ln") == -1 && ls.indexOf("\\log") == -1){
     ls = ReplaceVariablesWithUniqueRIDString(ls, uniqueRIDStringArray, true);//passing true as the last parameter tells this function that there are nerdamer functions in this string so don't try to replace the letters in the function names
     try{
       return nerdamer.convertFromLaTeX(ls).evaluate().expand().toString();//this is just a place holder for the actual value we will return
     }catch(err){
       //console.log(err);
+      if(throwError){
+        //we need to throw a general error that this expression couldn't be parsed so the editor can not verify if the line is correct or not
+        let errorAlreadyExists = false;
+        for(let error of MathFields[mfID].log.error){
+          if(error.error.type == "Editor couldn't evaluate expression (this is probably an error with the editor)" && error.latexExpressions[0] == ls){
+            errorAlreadyExists = true;
+            break;
+          }
+        }
+        if(!errorAlreadyExists){
+          MathFields[mfID].log.error.push({
+            error: EL.createLoggerErrorFromMathJsError("Editor couldn't evaluate expression (this is probably an error with the editor)"),
+            latexExpressions: [ls],
+          });
+        }
+      }
       return null;
     }
   }
@@ -2593,7 +2643,7 @@ function FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls, mfID){
                   //a summation or product is not formatted properly
                   let errorAlreadyExists = false;
                   for(let error of MathFields[mfID].log.error){
-                    if(error.type == `${operation[2]} not formatted correctly for editor`){
+                    if(error.error.type == `${operation[2]} not formatted correctly for editor`){
                       errorAlreadyExists = true;
                       break;
                     }

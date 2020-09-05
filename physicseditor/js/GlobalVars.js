@@ -306,6 +306,13 @@ let PreDefinedVariables = {
     value: "i",
     unitsMathjs: "1i",
   },
+  "\\%": {
+    state: "given",
+    type: "constant",
+    units: "unitless",
+    value: "0.01",
+    unitsMathjs: "1",
+  },
 }
 
 let SimilarDefinedVariables = {};

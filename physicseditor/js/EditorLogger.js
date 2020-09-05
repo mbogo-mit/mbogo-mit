@@ -22,118 +22,107 @@ function EditorLogger(){
   this.errorTypes = {
     "Unexpected end of expression": {
       description: "An equation on this line is ending in an operation",
-      example: "",
+      
     },
     "Unexpected type of argument in function cross": {
       description: "You are crossing a vector with a scalar",
-      example: "",
+      
     },
     "Cannot read property 'toString' of undefined": {
       description: "You have an empty expression or an incomplete expression on this line",
-      example: "",
+      
     },
     "Units do not match": {
       description: "You are adding or substracting expressions that don't have the same units",
-      example: "",
+      
     },
     "Adding a scalar with a vector": {
       description: "Units match, but your adding a scalar with a vector",
-      example: "",
+      
     },
     "Setting a vector equal to scalar": {
       description: "Units match, but you are setting a vector quantity equal to a scalar quantity",
-      example: "",
+      
     },
     "Units do not equal each other": {
       description: "You have expressions that are set equal to each other that don't have the same units",
-      example: "",
+      
     },
     "Incorrect equations": {
       description: "You have incorrect equations on this line",
-      example: "",
+      
     },
     "Expressions don't equal": {
       description: "These equations may be symbolically equal but when the variable values are plugged in the expressions don't equal",
-      example: "",
     },
     "Expressions found inside integral without differential variable": {
       description: "All expressions inside the parentheses of an integral must be multiplied by a differential variable, for exmaple: dx,dy,dt,etc",
-      example: "",
     },
     "Integral bounds not formatted properly": {
       description: "There is an integral on this line that has a lower bound defined but not an upper bound defined or vise versa",
-      example: "",
     },
     "Integral not formatted correctly for editor": {
       description: "The integrand and differential variable(s) need to be wrapped in parentheses for the editor to parse and evaluate the integral. Look at example below",
-      example: "",
     },
     "Summation not formatted correctly for editor": {
       description: "The summation arguement must be wrapped in parentheses for the editor to parse and evaluate the summation. Look at example below",
-      example: "",
     },
     "Product not formatted correctly for editor": {
       description: "The product arguement must be wrapped in parentheses for the editor to parse and evaluate the product. Look at example below",
-      example: "",
     },
     "Limit not formatted correctly for editor": {
       description: "The limit arguement must be wrapped in parentheses for the editor to parse and evaluate the limit. Look at example below",
-      example: "",
     },
     "Cannot evaluate limit": {
       description: "The editor supports a limited range of limit formats. Below are examples of invalid limit expressions"
     },
     "Value expected": {
       description: "An equation on this line is formatted incorrectly",
-      example: "",
     },
     "Unexpected type of argument in function addScalar": {
       description: "There is an equation on this line that is adding a unitless value to a value with units",
-      example: "",
     },
     "Unexpected type of argument in function log": {
       description: "Expressions inside any log must be unitless. Check all expressions on this line that are inside a log and make sure they simplify to a unitless expression",
-      example: "",
     },
     "Unexpected type of argument in function pow": {
       description: "All expressions in the exponent must simplify down to a unitless expression. Check that all exponents on this line simplify down to a unitless value.",
-      example: "",
     },
     "Unit in function sin is no angle": {
       description: "All expressions in sin function must simplify to be radians, steradians, or unitless",
-      example: "",
     },
     "Unit in function cos is no angle": {
       description: "All expressions in cos function must simplify to be radians, steradians, or unitless",
-      example: "",
     },
     "Unit in function tan is no angle": {
       description: "All expressions in tan function must simplify to be radians, steradians, or unitless",
-      example: "",
     },
     "Unit in function csc is no angle": {
       description: "All expressions in csc function must simplify to be radians, steradians, or unitless",
-      example: "",
     },
     "Unit in function sec is no angle": {
       description: "All expressions in sec function must simplify to be radians, steradians, or unitless",
-      example: "",
     },
     "Unexpected type of argument in function asin": {
       description: "All expressions in arcsin function must simplify to be radians, steradians, or unitless",
-      example: "",
     },
     "Unexpected type of argument in function acos": {
       description: "All expressions in arccos function must simplify to be radians, steradians, or unitless",
-      example: "",
     },
     "Unexpected type of argument in function atan": {
       description: "All expressions in arctan function must simplify to be radians, steradians, or unitless",
-      example: "",
+    },
+    "Editor couldn't evaluate cross product": {
+      description: "The editor has limited support for parsing vector multiplication. For this reason the editor can not verify if this line is correct",
+    },
+    "Editor couldn't evaluate expression (this is probably an error with the editor)": {
+      description: "For some reason the editor couldn't evaluate the expression below",
+    },
+    "Definite integral returned 'NaN' (not a number)": {
+      description: "Editor couldn't calculate the value of the definite integral; therefore, the editor can not verify if the equations on this line are correct",
     },
     "defaultError": {
       description: "There is something wrong with an equation on this line. This may be a problem with the Editor. Please contact customer support if the issue persists",
-      example: "",
     }
   }
 
@@ -294,7 +283,7 @@ function EditorLogger(){
       mfID = orderedIds[lineNumber];
       j = 0;
       while(j < a.length){
-        IdentifyAllKnownVariablesAndTheirValues2(a[j], lineNumber, mfID);
+        IdentifyAllKnownVariablesAndTheirValues(a[j], lineNumber, mfID);
         j++;
       }
     }
