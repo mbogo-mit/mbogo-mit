@@ -28,6 +28,9 @@ try{
 }catch(err){
 
 }
+
+let ExecutionID = RID();
+
 let EquationSet = [];
 let SqrtLoop = 0;
 let LastVariableRIDChangedToGiven = null;
@@ -35,7 +38,7 @@ let EditingMathFields = false;
 let UnitsDropdownMenuOpen = false
 let ListOfPhysicsConstants;
 
-let PrecisionSigFigs = 6;
+let PrecisionSigFigs = 8;
 
 let EditorKeyPresses = {};
 let HotKeySequenceReset = true;
@@ -173,7 +176,7 @@ let ImportVariableDefinitions = {
     "q": {units: "C", quantityDescription: "electric charge", quantity: "electric charge", vector: false, unitsMathjs: "1 C", rid: "71xrjqii2qw29my",},
     "R": {units: "ohm", quantityDescription: "electric resistance", quantity: "electric resistance", vector: false, unitsMathjs: "1 ohm",rid: "386d7ozon0yq4mo",},
     "\\vec{r}": {units: "m", quantityDescription: "radius", quantity: "length", vector: true, unitsMathjs: "1 m",rid: "srloqhfg11wteha",},
-    "\\rho": {units: "C/m^3", quantityDescription: "electric charge density", quantity: "electric charge density", vector: false, unitsMathjs: " 1 C/m^3", rid: "bevbzuqac63eey1",},
+    "\\rho": {units: "C/m^3", quantityDescription: "electric volume charge density", quantity: "electric volume charge density", vector: false, unitsMathjs: " 1 C/m^3", rid: "bevbzuqac63eey1",},
     "\\vec{S}": {units: "W/m^2", quantityDescription: "energy flux density", quantity: "energy flux density", vector: true, unitsMathjs: "1 W/m^2", rid: "hpivmjubq4it53e",},
     "\\vec{s}": {units: "m", quantityDescription: "length", quantity: "length", vector: true, unitsMathjs: "1 m",rid: "k1oh4ww8xifgh89",},
     "\\sigma": {units: "(ohm*m)^-1", quantityDescription: "conductivity", quantity: "conductivity", vector: false, unitsMathjs: "1 / (ohm*m)",rid: "1mf4a2faoh7wvm1",},
@@ -315,6 +318,17 @@ let PreDefinedVariables = {
   },
 }
 
+/*
+variable: vars[i],
+          ridString: `__${RandomVariableString()}`,
+          differentialVariable: `d${vars[i]}`,
+          partialDifferentialVariable: `\\partial${space + vars[i]}`,
+          differentialRidString: `__${RandomVariableString()}`,
+          */
+let UniqueRIDStringObj = {
+
+};
+
 let SimilarDefinedVariables = {};
 
 let DefinedVariables = {};
@@ -367,6 +381,7 @@ let ListOfSIUnits = {
   "mass density" : {name: "kilogram per cubic meter", symbol: "kg/m^3",   unitsMathjs: "1 kg/m^3", canBeVector: false, },
   "specific volume" : {name: "cubic meter per kilogram", symbol: "m^3/kg",   unitsMathjs: "1 m^3/kg", canBeVector: false, },
   "current density" : {name: "ampere per square meter", symbol: "A/m^2",   unitsMathjs: "1 A/m^2", canBeVector: true, },
+  "linear current density" : {name: "ampere per meter", symbol: "A/m",   unitsMathjs: "1 A/m", canBeVector: true, },
   "magnetic field strength" : {name: "ampere per meter", symbol: "A/m",   unitsMathjs: "1 A/m", canBeVector: true,},
   "amount of substance concentration" : {name: "mole per cubic meter", symbol: "mol/m^3",   unitsMathjs: "1 mol/m^3", canBeVector: false, },
   "luminance" : {name: "candela per square meter", symbol: "cd/m^2",   unitsMathjs: "1 cd/m^2", canBeVector: true, },
@@ -422,7 +437,9 @@ let ListOfSIUnits = {
   "specific energy" : {name: "joule per kilogram", symbol: "J/kg",   unitsMathjs: "1 J/kg", canBeVector: false,  },
   "thermal conductivity" : {name: "watt per meter kelvin", symbol: "W/(m*K)",   unitsMathjs: "1 W/(m K)", canBeVector: false,   },
   "energy density" : {name: "joule per cubic meter", symbol: "J/m^3",   unitsMathjs: "1 J/m^3", canBeVector: false, },
-  "electric charge density" : {name: "coulomb per cubic meter", symbol: "C/m^3",   unitsMathjs: "1 C/m^3", canBeVector: false,  },
+  "electric volume charge density" : {name: "coulomb per cubic meter", symbol: "C/m^3",   unitsMathjs: "1 C/m^3", canBeVector: false,  },
+  "electric surface charge density" : {name: "coulomb per square meter", symbol: "C/m^2",   unitsMathjs: "1 C/m^2", canBeVector: false,  },
+  "electric linear charge density" : {name: "coulomb per meter", symbol: "C/m",   unitsMathjs: "1 C/m", canBeVector: false,  },
   "electric flux density" : {name: "coulomb per square meter", symbol: "C/m^2",   unitsMathjs: "1 C/m^2", canBeVector: false,  },
   "permittivity" : {name: "farad per meter", symbol: "F/m",   unitsMathjs: "1 F/m", canBeVector: false,  },
   "permeability" : {name: "henry per meter", symbol: "H/m",   unitsMathjs: "1 H/m", canBeVector: false,  },
@@ -430,7 +447,7 @@ let ListOfSIUnits = {
   "molar entropy" : {name: "joule per mole kelvin", symbol: "J/(mol*K)",   unitsMathjs: "1 J/(mol K)", canBeVector: false, },
   "exposure" : {name: "coulomb per kilogram", symbol: "C/kg",   unitsMathjs: "1 C/kg", canBeVector: false,  },
   "absorbed dose rate" : {name: "gray per second", symbol: "Gy/s",   unitsMathjs: "1 J/(kg s)", canBeVector: false,  },
-  "radiant intensity" : {name: "watt per steradian", symbol: "W/sr",   unitsMathjs: "1 W/sr", canBeVector: false, },
+  "radiant intensity" : {name: "watt per steradian", symbol: "W/sr",   unitsMathjs: "1 W/(1 sr)", canBeVector: false, },
   "radiance" : {name: "watt per square meter steradian", symbol: "W/(m^2*sr)",   unitsMathjs: "1 W/(m^2 sr)", canBeVector: false, },
   "catalytic concentration" : {name: "katal per cubic meter", symbol: "kat/m^3",   unitsMathjs: "1 kat/m^3", canBeVector: false, },
   "coefficient of friction" : {name: "unitless variable", symbol: "none", unitsMathjs: "1", canBeVector: false,},

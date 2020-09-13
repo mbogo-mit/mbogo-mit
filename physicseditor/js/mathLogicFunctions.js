@@ -123,15 +123,24 @@ function ThisIsTheBeginningOfAVariable(state){
     //we need to see if the current character could be the start of a variable
     if(subLs[0] == "\\"){
       //it could equal a blackslash because it is the start of a vector variable '\vec{}'
-      if(subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0 || subLs.indexOf("\\dot{") == 0 || subLs.indexOf("\\overline{") == 0){
-        let size = (subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0 || subLs.indexOf("\\dot{") == 0) ? "\\bar{".length : "\\overline{".length;
+      let size = null;
+      if(subLs.indexOf("\\vec{") == 0 || subLs.indexOf("\\bar{") == 0 || subLs.indexOf("\\hat{") == 0 || subLs.indexOf("\\dot{") == 0){
+        size = "\\vec{".length;
+      }else if(subLs.indexOf("\\overline{") == 0){
+        size = "\\overline{".length;
+      }else if(subLs.indexOf("\\comp1{") == 0 || subLs.indexOf("\\comp2{") == 0 || subLs.indexOf("\\comp3{") == 0){
+        size = "\\comp1{".length;
+      }else if(subLs.indexOf("\\dim{") == 0){
+        size = "\\dim{".length;
+      }
+
+      if(size != null){
         answer.yes = true;
         answer.substring = subLs.substring(0,size);
         answer.newState.currentlyParsingVariable = true;
         answer.newState.numberOfRightBracketsNeeded = 1;//because the vec has a left bracket
         answer.newState.index += size;
-      }
-      else{
+      }else{
         //this checks if the variable is like a greek letter which be formatted in a latex keyword
         for(var i = 0; i < LatexGreekLetters.length; i++){
           if(subLs.indexOf(LatexGreekLetters[i]) == 0){
@@ -305,6 +314,28 @@ function FindIndexOfClosingSquareBracket(ls){
       unclosedBrackets += 1;
     }
     else if(ls[i] == "]"){
+      unclosedBrackets -= 1;
+    }
+
+    if(unclosedBrackets > 0){
+      i++;
+    }
+    else{
+      return i;
+    }
+
+  }
+  return null;
+}
+
+function FindIndexOfClosingPipe(ls){
+  let unclosedBrackets = 1;
+  let i = 0;
+  while(i < ls.length){
+    if(ls.substring(i).indexOf("\\left|") == 0){
+      unclosedBrackets += 1;
+    }
+    else if(ls.substring(i).indexOf("\\right|") == 0){
       unclosedBrackets -= 1;
     }
 

@@ -80,7 +80,7 @@ function EditorLogger(){
       description: "An equation on this line is formatted incorrectly",
     },
     "Unexpected type of argument in function addScalar": {
-      description: "There is an equation on this line that is adding a unitless value to a value with units",
+      description: "There is an equation on this line that is adding a unitless value to a value with units or adding a vector with a scalar",
     },
     "Unexpected type of argument in function log": {
       description: "Expressions inside any log must be unitless. Check all expressions on this line that are inside a log and make sure they simplify to a unitless expression",
@@ -120,6 +120,33 @@ function EditorLogger(){
     },
     "Definite integral returned 'NaN' (not a number)": {
       description: "Editor couldn't calculate the value of the definite integral; therefore, the editor can not verify if the equations on this line are correct",
+    },
+    "Dimension mismatch. Matrix A": {
+      description: "You are adding vectors that don't have the same number of demensions",
+    },
+    "Vectors with length 3 expected": {
+      description: "You have a cross product on this line that is not with a 3 demensional vector",
+    },
+    "Two different coordinate systems used in cross product": {
+      description: "You must be consistent with the coordinate system you use when doing the cross product. Editor detected the two coordinate systems below",
+    },
+    "Couldn't identify coordinate system used in cross product": {
+      description: "You need to be more specific about which coordinate system you are using. Look Below for examples"
+    },
+    "Two different coordinate systems used in cross product": {
+      description: "You must be consistent with the coordinate system you use in the cross product"
+    },
+    "Two different coordinate systems used in expression": {
+      description: "You must be consistent with the coordinate system you use in an expression. If you are writing an equation that specifically relates two different coordinate systems please ignore this error."
+    },
+    "Unit vectors from two different coordinate systems detected in expression": {
+      description: "You must use the same coordinate system in an expression. If you are writing an equation that specifically relates two different coordinate systems please ignore this error."
+    },
+    "Vector found in integral bounds": {
+      description: "Integral bounds must evaluate to a scalar value",
+    },
+    "Mismatched absolute value sign": {
+      description: "There is an absolute value sign that is not formatted correctly on this line"
     },
     "defaultError": {
       description: "There is something wrong with an equation on this line. This may be a problem with the Editor. Please contact customer support if the issue persists",
@@ -253,6 +280,13 @@ function EditorLogger(){
               "\\le": ">",
               "\\ge": "<",
             };
+
+            //there is a case where this string has latex characters mathquill can't render because I made them up for the purpose of calculations. These characters are \\comp1{...} \\comp2{...} and \\comp3{...}
+            //if we have any of these characters in the calculatedExpression1 or calculatedExpression2 we will only tell the user that the equations are wrong we will not show the calculated value
+            if(/\\comp\d\{/.test(`${value.calculatedExpression1} ${value.calculatedExpression2}`)){
+              return `(${value.expression1} ${oppositeOperator[value.operator]} ${value.expression2})`;
+            }
+            
             return `(${value.expression1} ${oppositeOperator[value.operator]} ${value.expression2}) \\rightarrow (${value.calculatedExpression1} ${oppositeOperator[value.operator]} ${value.calculatedExpression2})`;
           });
           //console.log(latexExpressions);

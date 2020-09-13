@@ -33,6 +33,20 @@ body {
   overflow-x: hidden;
 }
 
+#parsing-changes-loading-bar {
+  margin: -2px 0px -2px 0px;
+  position: relative;
+  visibility: hidden;
+  z-index: 10;
+  background-color: rgb(255, 174, 255);
+  /*background-color: rgb(190, 245, 255);*/
+}
+
+#parsing-changes-loading-bar .indeterminate {
+  background-color: rgba(204, 17, 204, 0.5);
+  /*background-color: rgb(89, 224, 247, 0.8);*/
+}
+
 #my-navbar {
   padding: 15px 10px;
   font-size: 16px;
