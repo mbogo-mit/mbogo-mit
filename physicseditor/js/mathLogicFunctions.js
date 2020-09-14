@@ -1,12 +1,12 @@
-let ListOfFunctions = ["\\sum", "\\prod","\\sqrt","\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\arcsin", "\\arccos", "\\arctan", "\\exp", "\\lg", "\\ln", "\\log",];
+let ListOfFunctions = ["\\operatorname{arcsinh}", "\\operatorname{arccosh}", "\\arctanh", "\\operatorname{arccoth}", "\\operatorname{arccsch}", "\\operatorname{arcsech}", "\\arcsin", "\\arccos", "\\arctan", "\\operatorname{arccot}", "\\operatorname{arccsc}", "\\operatorname{arcsec}", "\\prod", "\\sqrt", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\operatorname{csch}", "\\operatorname{sech}", "\\sum", "\\sin", "\\cos", "\\tan", "\\cot", "\\csc", "\\sec", "\\exp", "\\log", "\\lg", "\\ln"]
 
 let ListOfOperators = [
   "\\frac", "\\sqrt", "\\int", "\\oint", "\\sum", "\\prod", "\\triangledown","\\cdot","\\ast","\\bigcup","\\coprod","\\pm", "-", "+", "\\times","\\circ",
   "<", ">", "=","*", "\\doteq", "\\geq", "\\leq", "\\leqslant", "\\geqslant", "\\equiv", "\\neq", "\\ngtr", "\\nless", "\\nleqslant", "\\ngeqslant", "\\approx", "\\simeq", "\\cong", "\\propto",
   "\\leftarrow", "\\rightarrow", "\\Leftarrow", "\\Rightarrow", "\\leftrightarrow", "\\Leftrightarrow", "\\leftrightharpoons", "\\rightleftharpoons",
   "\\left(", "\\right)","\\left|", "\\right|", "\\left \\|", "\\right \\|", "\\left[", "\\right]", "\\left [", "\\right ]", "\\left\\langle", "\\right\\rangle", "\\left \\{", "\\right \\}", "\\left |", "\\right |",
-  "\\to", "\\lim","\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\sinh", "\\cosh", "\\tanh", "\\coth", "\\arcsin", "\\arccos", "\\arctan", "\\exp", "\\lg", "\\ln", "\\log",
-];
+  "\\to", "\\lim","\\sin", "\\sinh", "\\arcsin", "\\operatorname{arcsinh}", "\\cos", "\\cosh", "\\arccos", "\\operatorname{arccosh}", "\\tan", "\\tanh", "\\arctan", "\\arctanh", "\\cot", "\\coth", "\\operatorname{arccot}", "\\operatorname{arccoth}", "\\csc", "\\operatorname{csch}", "\\operatorname{arccsc}", "\\operatorname{arccsch}", "\\sec", "\\operatorname{sech}", "\\operatorname{arcsec}", "\\operatorname{arcsech}", "\\exp", "\\lg", "\\ln", "\\log",
+].sort((a,b)=>{return a.length > b.length ? -1 : 1});//ordering the strings by length
 
 //there are some latex strings in this array that aren't greek letters but the editor treats them like letters when it parses them
 let LatexGreekLetters = [

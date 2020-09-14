@@ -1,5 +1,6 @@
 function EditorLogger(){
 
+  this.currentlyParsing = false;
   this.rawExpressionData = {};
   this.rawExpressionDataForDeeperCheck = {};//this object is a filtered copy of "this.rawExpressionData" and DoHighLevelSelfConsistencyCheck() populates this object with filtered data
   this.linesToCheckForSelfConsistency = [];
@@ -112,6 +113,83 @@ function EditorLogger(){
     "Unexpected type of argument in function atan": {
       description: "All expressions in arctan function must simplify to be radians, steradians, or unitless",
     },
+    //trig functions--------------------------------
+    "Too few arguments in function sin": {
+      description: "You have a sin function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function cos": {
+      description: "You have a cos function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function tan": {
+      description: "You have a tan function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function asin": {
+      description: "You have a arcsin function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function acos": {
+      description: "You have a arccos function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function atan": {
+      description: "You have a arctan function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function csc": {
+      description: "You have a arccsc function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function sec": {
+      description: "You have a arcsec function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function cot": {
+      description: "You have a arccot function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function acsc": {
+      description: "You have a arccsc function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function asec": {
+      description: "You have a arcsec function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function acot": {
+      description: "You have a arccot function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function sinh": {
+      description: "You have a sinh function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function cosh": {
+      description: "You have a cosh function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function tanh": {
+      description: "You have a tanh function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function asinh": {
+      description: "You have a arcsinh function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function acosh": {
+      description: "You have a arccosh function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function atanh": {
+      description: "You have a arctanh function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function csch": {
+      description: "You have a arccsch function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function sech": {
+      description: "You have a arcsech function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function coth": {
+      description: "You have a arccoth function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function acsch": {
+      description: "You have a arccsch function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function asech": {
+      description: "You have a arcsech function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function acoth": {
+      description: "You have a arccoth function on this line that doesn't have an expression inside it",
+    },
+    "Too few arguments in function log10": {
+      description: "You have a log function on this line that doesn't have an expression inside it",
+    },
+    //end of trig functions----------------------
     "Editor couldn't evaluate cross product": {
       description: "The editor has limited support for parsing vector multiplication. For this reason the editor can not verify if this line is correct",
     },
@@ -148,12 +226,19 @@ function EditorLogger(){
     "Mismatched absolute value sign": {
       description: "There is an absolute value sign that is not formatted correctly on this line"
     },
+    "Empty absolute value sign": {
+      description: "There is an absolute value sign on this line that doesn't have an expression inside of it",
+    },
+    "Editor couldn't evaluate a definite integral on this line": {
+      description: "This is a problem with the editor. It occasionally has trouble evaluating some types of definite integrals",
+    },
     "defaultError": {
       description: "There is something wrong with an equation on this line. This may be a problem with the Editor. Please contact customer support if the issue persists",
     }
   }
 
   this.GenerateEditorErrorMessages = function(opts = {}){
+    this.currentlyParsing = true;
     let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
     this.clearLog();//clearing log befor adding to it
     this.saveUndefinedVariablesData();
@@ -183,6 +268,7 @@ function EditorLogger(){
     CheckForAndDisplayRelevantEquations();
 
     this.display({dontRenderMyVariablesCollection: opts.dontRenderMyVariablesCollection});
+    this.currentlyParsing = false;
   }
 
   this.AddErrorsFromExpressionsThatDontActuallyEqualEachOther = function(){

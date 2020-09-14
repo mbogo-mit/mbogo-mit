@@ -156,6 +156,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
   ls = ReplaceCommentsWithSemicolonInLatexString(ls);
   ls = PutBracketsAroundAllSubsSupsAndRemoveEmptySubsSups(ls);
   ls = SimplifyFunctionDefinitionToJustFunctionVariable(ls);//converts "f(x,y)=xy" to f=xy
+  ls = ReformatTrigonmetryRaisedToAPower(ls);//changes for example sin^2(x) -> (sin(x))^2, and sin^-1(x) -> arcsin(x)
   let expressions = SplitLsIntoExpressions(ls);
   let rawData = expressions.map((str) => {
     let i = 0;
@@ -466,12 +467,6 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
     //so after possibly updating the list of defined undefined variables we need to see if there are any truly undefined variables and log them as a warning
     let trulyUndefinedVars = GetTrulyUndefinedVariables(MathFields[mfID].mf.latex());
     if(trulyUndefinedVars.length > 0){
-      EL.addLog({warning: {
-        warning: "Undefined Variables",
-        variables: trulyUndefinedVars,
-        lineNumber: lineNumber,
-        mfID: mfID,
-      }});
 
       //we are going to add this information to the correct mathfield that has this error
       MathFields[mfID].log.warning.push({
@@ -1066,30 +1061,41 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
       "\\\\sin": "sin",
       "\\\\sinh": "sinh",
       "\\\\arcsin": "asin",
-      "\\\\arcsinh": "asinh",
+      "\\\\operatorname\\{arcsinh\\}": "asinh",
+      "\\\\operatorname\\(arcsinh\\)": "asinh",
       "\\\\cos": "cos",
       "\\\\cosh": "cosh",
       "\\\\arccos": "acos",
-      "\\\\arccosh": "acosh",
+      "\\\\operatorname\\{arccosh\\}": "acosh",
+      "\\\\operatorname\\(arccosh\\)": "acosh",
       "\\\\tan": "tan",
       "\\\\tanh": "tanh",
       "\\\\arctan": "atan",
       "\\\\arctanh": "atanh",
       "\\\\cot": "cot",
       "\\\\coth": "coth",
-      "\\\\arccot": "acot",
-      "\\\\arccoth": "acoth",
+      "\\\\operatorname\\{arccot\\}": "acot",
+      "\\\\operatorname\\(arccot\\)": "acot",
+      "\\\\operatorname\\{arccoth\\}": "acoth",
+      "\\\\operatorname\\(arccoth\\)": "acoth",
       "\\\\csc": "csc",
-      "\\\\csch": "csch",
-      "\\\\arccsc": "acsc",
-      "\\\\arccsch": "acsch",
+      "\\\\operatorname\\{csch\\}": "csch",
+      "\\\\operatorname\\(csch\\)": "csch",
+      "\\\\operatorname\\{arccsc\\}": "acsc",
+      "\\\\operatorname\\(arccsc\\)": "acsc",
+      "\\\\operatorname\\{arccsch\\}": "acsch",
+      "\\\\operatorname\\(arccsch\\)": "acsch",
       "\\\\sec": "sec",
-      "\\\\sech": "sech",
-      "\\\\arcsec": "asec",
-      "\\\\arcsech": "asech",
+      "\\\\operatorname\\{sech\\}": "sech",
+      "\\\\operatorname\\(sech\\)": "sech",
+      "\\\\operatorname\\{arcsec\\}": "asec",
+      "\\\\operatorname\\(arcsec\\)": "asec",
+      "\\\\operatorname\\{arcsech\\}": "asech",
+      "\\\\operatorname\\(arcsech\\)": "asech",
       "\\\\ln": "ln",
       "\\\\log\\s*\\\\left\\(": "log10(",
       "\\\\log\\s*\\(": "log10(",
+      "\\\\log": "log10",
       "\\\\int": "",
       "\\\\lim": "",
       "\\\\sum": "",
@@ -2380,6 +2386,8 @@ function DoHighLevelSelfConsistencyCheck(expressionArray, lineNumber, mfID){
           if(Object.keys(expression1Variables).filter((v) => {return !Object.keys(expression2Variables).includes(v)}).length == 0){
             //using all of nerdamer's equality functions to figure out if the expression is correct
             if(expressionArray[i].operator == "="){
+              console.log("expression1", expression1);
+              console.log("expression2", expression2);
               if(!nerdamer(expression1).eq(expression2)){//nerdamer equal to function
                 let isEqual = false;
                 //before we can be sure that these two expression are not equal we need to check if both are vectors because for some reason nerdamer returns false even if the expressions are both "[x,y,z]"
@@ -2644,6 +2652,7 @@ function RemoveUnitVectorRIDStringFromString(str){
 }
 
 
+
 function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOther(exp1, exp2, expVars, uniqueRIDStringArray){
   //this function takes expressions that make up an equation "{expression1} = {expression2}" and checks if the expression
   //has the right conditions to solve for an unknown variable and if it does it will try to solve for that unknown variable
@@ -2656,7 +2665,7 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
   //if that doesn't work for some reason, either because a variable is known or given but the actual value is undefined or if the variable is actuallly
   //unknown we will stop that and we will transition to trying to solve for unknown variables symbolically
   let status = {
-    undefinedValuesCount: 0,//keeps track of how many variables don't know their value which is different then being unknown, because a varibale could be set as a give or known but not konwn its actual value
+    undefinedValuesArray: [],//keeps track of how many variables don't know their value which is different then being unknown, because a varibale could be set as a give or known but not konwn its actual value
     unknownVariable: null,//keeps track of the unknown variable we are trying to solve for if there are any and if there are more than one then we don't do anything and we just "return"
     variableValues: {},//object that holds all the variable in ridString format as the "key" and the variables value as the "value"
   }
@@ -2681,16 +2690,16 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
         status.variableValues[key] = nerdamer.convertFromLaTeX(CleanLatexString(v.value, ["multiplication"])).toString();
       }catch(err){//we couldn't convert latex string to something that nerdamer could understand so we cant be sure that this variable's value is known
         console.log("couldn't convert variable value to nerdamer value");
-        status.undefinedValuesCount += 1;
+        status.undefinedValuesArray.push(null);
       }
     }else{
-      status.undefinedValuesCount += 1;
+      status.undefinedValuesArray.push(key);
     }
   }
 
   //if we haven't returned by this point then we can continue on and see if we can either plug in all 
   //the values for all the variables in exp1 and exp2 or if there is one unknown we can try to solve for it
-  if(status.unknownVariable == null && status.undefinedValuesCount == 0){//this means that all the variables in exp1 and exp2 are given or known and know there exact values
+  if(status.unknownVariable == null && status.undefinedValuesArray.length == 0){//this means that all the variables in exp1 and exp2 are given or known and know there exact values
     let expression1 = nerdamer(exp1, status.variableValues).evaluate().toString();
     let expression2 = nerdamer(exp2, status.variableValues).evaluate().toString();
     try{
@@ -2709,78 +2718,97 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
       //console.log("couldn't evaluate if expressions are equal")
       return {type: "stop"};
     }
-  }else if(status.unknownVariable != null){//this means there is one unknown variable that we can try to solve for
-    try{
-      //we are going to try to solve for the unknown variable
-      SqrtLoop = 0;
-      let solution = nerdamer(`${exp1} = ${exp2}`).solveFor(status.unknownVariable);
-      let knownVariableValue;
-      if(Array.isArray(solution)){//that means we found a solution
-        if(solution.length > 0){
-          //we are going to gather every non-zero solution but if all solution are zero then we will send the zerio as the solution
-          let allNonZeroSolutions = solution.filter((s) => {return s.toString() != "0"});
-          //console.log("allNonZeroSolutions", allNonZeroSolutions);
-          
-          if(allNonZeroSolutions.length == 0){
-            knownVariableValue = solution[0].toString();
-          }
-          else{
-            knownVariableValue = allNonZeroSolutions[0].toString();//grab the first non zero solution
-          }
-        }
-      }else{//if the solution is not an array then it is just a simple expression that has a value
-        knownVariableValue = solution.toString();
-      }
+  }else{
+    //there are two cases we have to account for that act surprsingly similar.
+    
+    //Scenario 1: The first one is if the the variable we are solving for is unknown so status.unknownVariable != null
+    //and the status.undefinedValuesArray will have a length of 1 which represents the unknown variable.
+    
+    //Scenario 2: the second scenario is if a variable is known but it is the only variable that doesn't know its exact value.
+    //In this case status.unknownVariable == null and status.undefinedValuesArray will have a length of 1 as well, which represents
+    //the one known variable that doesn't know its exact value.
 
-      if(knownVariableValue != undefined){
-        EquationSet.push({
-          equation: `${exp1} = ${exp2}`,
-          uniqueRIDStringArray: uniqueRIDStringArray,
-        });
-        //now that we have solved for this variable we need to see if we can calculate its actual value
-        let actualValue = undefined;
-        if(status.undefinedValuesCount <= 1){//you can only calculate the actual value of the variable if there is only one undefinedValue which would be the unknown variable we just sovled for
-          try{
-            //console.log(knownVariableValue, status.variableValues);
-            actualValue = math.evaluate(nerdamer(knownVariableValue, status.variableValues).evaluate().toString()).toString();
-          }catch(err2){
-            actualValue = undefined;
-            //console.log(err2);
-            //console.log("couldn't get actual value of variable that was unknown and now is known");
-          }
-        }
-
-        //now we have to do that part where we change the variables currentState to known because it is now known
-        let foundMatchAndChangedVariableValueOrState = false
-        let k = expVars[status.unknownVariable];
-        if(DefinedVariables[k] != undefined){
-          DefinedVariables[k].currentState = "known";
-          DefinedVariables[k].value = (actualValue) ? ConvertStringToScientificNotation(actualValue) : undefined;
-          foundMatchAndChangedVariableValueOrState = true;
-        }
-        else if(EL.undefinedVars.undefined[k] != undefined){
-          EL.undefinedVars.undefined[k].currentState = "known";
-          EL.undefinedVars.undefined[k].value = (actualValue) ? ConvertStringToScientificNotation(actualValue) : undefined;
-          foundMatchAndChangedVariableValueOrState = true;
-        }
-        else if(EL.undefinedVars.defined[k] != undefined){
-          EL.undefinedVars.defined[k].currentState = "known";
-          EL.undefinedVars.defined[k].value = (actualValue) ? ConvertStringToScientificNotation(actualValue) : undefined;
-          foundMatchAndChangedVariableValueOrState = true;
-        }
-
-        if(foundMatchAndChangedVariableValueOrState){
-          //because we changed values and were able to identify new known variables we need
-          //call "UpdateKnownUnknownVariables" function which will parse the rawExpressionData from the first line with the new information we have put into the known unknown variables.
-          //By passing in "false" this function wont reset the variables currentState values which is what we want because we want the information we have just found to persist. Otherwise we would get a loop
-          EL.UpdateKnownUnknownVariables(false);
-          return {type: "done"};//after this function is done running it means it has already parsed all the lines starting from the top  so we just end right here
-        }
-      }  
-    }catch(err){
-      //console.log(err);
-      //console.log("couldn't figure out the solution to unknown variable");
+    let variableToSolveFor = null;
+    if(status.unknownVariable != null){//Scenario 1
+      variableToSolveFor = status.unknownVariable;
+    }else if(status.undefinedValuesArray.length == 1 && status.undefinedValuesArray[0] != null){//Scenario 2
+      variableToSolveFor = status.undefinedValuesArray[0];
     }
+
+    if(variableToSolveFor != null){
+      try{
+        //we are going to try to solve for the unknown variable
+        SqrtLoop = 0;
+        let solution = nerdamer(`${exp1} = ${exp2}`).solveFor(variableToSolveFor);
+        let knownVariableValue;
+        if(Array.isArray(solution)){//that means we found a solution
+          if(solution.length > 0){
+            //we are going to gather every non-zero solution but if all solution are zero then we will send the zerio as the solution
+            let allNonZeroSolutions = solution.filter((s) => {return s.toString() != "0"});
+            //console.log("allNonZeroSolutions", allNonZeroSolutions);
+            
+            if(allNonZeroSolutions.length == 0){
+              knownVariableValue = solution[0].toString();
+            }
+            else{
+              knownVariableValue = allNonZeroSolutions[0].toString();//grab the first non zero solution
+            }
+          }
+        }else{//if the solution is not an array then it is just a simple expression that has a value
+          knownVariableValue = solution.toString();
+        }
+  
+        if(knownVariableValue != undefined){
+          EquationSet.push({
+            equation: `${exp1} = ${exp2}`,
+            uniqueRIDStringArray: uniqueRIDStringArray,
+          });
+          //now that we have solved for this variable we need to see if we can calculate its actual value
+          let actualValue = undefined;
+          if(status.undefinedValuesArray.length <= 1){//you can only calculate the actual value of the variable if there is only one undefinedValue which would be the unknown variable we just sovled for
+            try{
+              //console.log(knownVariableValue, status.variableValues);
+              actualValue = math.evaluate(nerdamer(knownVariableValue, status.variableValues).evaluate().toString()).toString();
+            }catch(err2){
+              actualValue = undefined;
+              //console.log(err2);
+              //console.log("couldn't get actual value of variable that was unknown and now is known");
+            }
+          }
+  
+          //now we have to do that part where we change the variables currentState to known because it is now known
+          let foundMatchAndChangedVariableValueOrState = false
+          let k = expVars[variableToSolveFor];
+          if(DefinedVariables[k] != undefined){
+            DefinedVariables[k].currentState = "known";
+            DefinedVariables[k].value = (actualValue) ? ConvertStringToScientificNotation(actualValue) : undefined;
+            foundMatchAndChangedVariableValueOrState = true;
+          }
+          else if(EL.undefinedVars.undefined[k] != undefined){
+            EL.undefinedVars.undefined[k].currentState = "known";
+            EL.undefinedVars.undefined[k].value = (actualValue) ? ConvertStringToScientificNotation(actualValue) : undefined;
+            foundMatchAndChangedVariableValueOrState = true;
+          }
+          else if(EL.undefinedVars.defined[k] != undefined){
+            EL.undefinedVars.defined[k].currentState = "known";
+            EL.undefinedVars.defined[k].value = (actualValue) ? ConvertStringToScientificNotation(actualValue) : undefined;
+            foundMatchAndChangedVariableValueOrState = true;
+          }
+  
+          if(foundMatchAndChangedVariableValueOrState){
+            //because we changed values and were able to identify new known variables we need
+            //call "UpdateKnownUnknownVariables" function which will parse the rawExpressionData from the first line with the new information we have put into the known unknown variables.
+            //By passing in "false" this function wont reset the variables currentState values which is what we want because we want the information we have just found to persist. Otherwise we would get a loop
+            EL.UpdateKnownUnknownVariables(false);
+            return {type: "done"};//after this function is done running it means it has already parsed all the lines starting from the top  so we just end right here
+          }
+        }  
+      }catch(err){
+        //console.log(err);
+        //console.log("couldn't figure out the solution to unknown variable");
+      }
+    }
+
   }
 
   return {type: "stop"};
@@ -3275,12 +3303,6 @@ function EvaluateStringInsideIntegralAndReturnNerdamerString(ls, uniqueRIDString
 
     if(expression.other != "0"){
       //if there is other stuff in the integral that was not able to be integrated then we need to throw an error
-      EL.addLog({error: [{
-        error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
-        info: "",
-        lineNumber: lineNumber,
-        mfID: mfID,
-      }]});
 
       //we are going to add this information to the correct mathfield that has this error
       MathFields[mfID].log.error.push({
@@ -3295,12 +3317,6 @@ function EvaluateStringInsideIntegralAndReturnNerdamerString(ls, uniqueRIDString
   }
   else{
     //if we couldn't find any differential variables and the user has typed out an integral we need to throw an error
-    EL.addLog({error: [{
-      error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
-      info: "",
-      lineNumber: lineNumber,
-      mfID: mfID,
-    }]});
 
     //we are going to add this information to the correct mathfield that has this error
     MathFields[mfID].log.error.push({
@@ -3359,7 +3375,13 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
           mfID: mfID,
           error: "Definite integral returned 'NaN' (not a number)",
         });
-
+        return null;
+      }else if(expr.integral == null){
+        CreateInlineMathFieldError({
+          mfID: mfID,
+          error: "Editor couldn't evaluate a definite integral on this line",
+        });
+        return null;
       }
 
 
@@ -3371,12 +3393,6 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
 
     if(expression.other != "0"){
       //if there is other stuff in the integral that was not able to be integrated then we need to throw an error
-      EL.addLog({error: [{
-        error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
-        info: "",
-        lineNumber: lineNumber,
-        mfID: mfID,
-      }]});
 
       //we are going to add this information to the correct mathfield that has this error
       MathFields[mfID].log.error.push({
@@ -3390,14 +3406,6 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
     return ReplaceUniqueRIDStringWithVariableLs(nerdamer(expression.other + expression.integral).toString(), uniqueRIDStringArray);
   }
   else{
-    //if we couldn't find any differential variables and the user has typed out an integral we need to throw an error
-    EL.addLog({error: [{
-      error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
-      info: "",
-      lineNumber: lineNumber,
-      mfID: mfID,
-    }]});
-
     //we are going to add this information to the correct mathfield that has this error
     MathFields[mfID].log.error.push({
       error: EL.createLoggerErrorFromMathJsError("Expressions found inside integral without differential variable"),
@@ -3424,7 +3432,7 @@ function ExactConversionFromLatexStringToNerdamerReadableString(opts){
   let returnFinalObject = (opts.returnFinalObject != undefined) ? opts.returnFinalObject: false;//default is to return a matrix if the exprssion is a vector
   let convertVectorsToNerdamerMatrices = (opts.convertVectorsToNerdamerMatrices != undefined) ? opts.convertVectorsToNerdamerMatrices : false;
   
-  ls = FormatAbsoluteValuesSqrtOfDotProduct(ls);
+  ls = FormatAbsoluteValuesSqrtOfDotProduct(ls,mfID);
   if(ls == null){return null;}
 
   if(convertVectorsToNerdamerMatrices){
@@ -3503,7 +3511,7 @@ function ExactConversionFromLatexStringToNerdamerReadableString(opts){
   }
 }
 
-function FormatAbsoluteValuesSqrtOfDotProduct(ls){
+function FormatAbsoluteValuesSqrtOfDotProduct(ls,mfID){
   //this function needs to find every instance of \\left| and \\right| and replace whats inside with the sqrt of the dot product which is mathematically the absoulte value is
   
   let i = 0;
@@ -3516,7 +3524,15 @@ function FormatAbsoluteValuesSqrtOfDotProduct(ls){
     if(i2 != null){
       i2 += i + "\\left|".length
       stringInsideAbsoluteValue = ls.substring(i + "\\left|".length, i2);
-      ls = `${ls.substring(0,i)} (\\sqrt(${stringInsideAbsoluteValue} \\cdot ${stringInsideAbsoluteValue})) ${ls.substring(i2 + "\\right|".length)}`;
+      if(stringInsideAbsoluteValue.replace(/(\s*)/g,"").replace(/\\/g,"").length == 0){
+        //there is nothing inside the absolute value signs
+        CreateInlineMathFieldError({
+          mfID: mfID,
+          error: "Empty absolute value sign",
+        });
+        return null;
+      }
+      ls = `${ls.substring(0,i)} \\left(\\sqrt{\\left(${stringInsideAbsoluteValue}\\right) \\cdot \\left(${stringInsideAbsoluteValue}\\right)}\\right) ${ls.substring(i2 + "\\right|".length)}`;
     }else{
       mismatchAbsoluteValueSign = true;
       break;
@@ -3531,6 +3547,80 @@ function FormatAbsoluteValuesSqrtOfDotProduct(ls){
       error: "Mismatched absolute value sign",
     });
     return null;
+  }
+
+  return ls;
+}
+
+function ReformatTrigonmetryRaisedToAPower(ls){
+  let trigFunctionsAndInverses = {
+    "\\sin": "\\arcsin",
+    "\\sinh": "\\operatorname{arcsinh}",
+    "\\arcsin": "\\sin",
+    "\\operatorname{arcsinh}": "\\sinh",
+    "\\sec": "\\operatorname{arcsec}",
+    "\\operatorname{sech}": "\\operatorname{arcsech}",
+    "\\operatorname{arcsec}": "\\sec",
+    "\\operatorname{arcsech}": "\\operatorname{sech}",
+    "\\cos": "\\arccos",
+    "\\cosh": "\\operatorname{arccosh}",
+    "\\arccos": "\\cos",
+    "\\operatorname{arccosh}": "\\cosh",
+    "\\csc": "\\operatorname{arccsc}",
+    "\\operatorname{csch}": "\\operatorname{arccsch}",
+    "\\operatorname{arccsc}": "\\csc",
+    "\\operatorname{arccsch}": "\\operatorname{csch}",
+    "\\tan": "\\arctan",
+    "\\tanh": "\\arctanh",
+    "\\arctan": "\\tan",
+    "\\arctanh": "\\tanh",
+    "\\cot": "\\operatorname{arccot}",
+    "\\coth": "\\operatorname{arccoth}",
+    "\\operatorname{arccot}": "\\cot",
+    "\\operatorname{arccoth}": "\\coth",
+  };
+  for(const [trigFunc, inverseTrigFunc] of Object.entries(trigFunctionsAndInverses)){
+    
+    let i1 = 0;
+    let i2 = 0;
+    let i3 = 0;
+    let stringInsidePow = "";
+    while(ls.indexOf(`${trigFunc}^{`) != -1){
+      i1 = ls.indexOf(`${trigFunc}^{`);
+      i2 = FindIndexOfClosingBracket(ls.substring(i1 + `${trigFunc}^{`.length))
+      if(i2 != null){
+        i2 += i1 + `${trigFunc}^{`.length;//accounts for shift because we used a substring of ls
+        stringInsidePow = ls.substring(i1 + `${trigFunc}^{`.length, i2);
+        //next we need to see if the user has put parenthesis after the trig function
+        if(ls.substring(i2+1).indexOf("\\left(") == 0){
+          //if there are parentheses after the trig function then we need to find the closing parentheses and wrap
+          //the whole function in parentheses and raise it to the exponent we found earlier
+          i3 = FindIndexOfClosingParenthesis(ls.substring(i2 + 1 + "\\left(".length));
+          if(i3 != null){
+            i3 += i2 + 1 + "\\left(".length;//accounts for the shift because we used a substring of ls
+            if(stringInsidePow == "-1"){//we need to assume the user is referring to the inverse of the function
+              ls = `${ls.substring(0, i1)}\\left(${inverseTrigFunc}${ls.substring(i2+1,i3+1)}\\right)${ls.substring(i3+1)}`;
+            }else{
+              ls = `${ls.substring(0, i1)}\\left(${trigFunc}${ls.substring(i2+1,i3+1)}\\right)^{${stringInsidePow}}${ls.substring(i3+1)}`;
+            }
+            
+          }else{
+            break;
+          }
+        }else{
+          //if there are not opening parentheses after the trig function we will put some in and raise the trig function to the exponent we found
+          if(stringInsidePow == "-1"){//we need to assume the user is referring to the inverse of the function
+            ls = `${ls.substring(0,i1)}\\left(${inverseTrigFunc}\\left(\\right)\\right)${ls.substring(i2+1)}`;
+          }else{
+            ls = `${ls.substring(0,i1)}\\left(${trigFunc}\\left(\\right)\\right)^{${stringInsidePow}}${ls.substring(i2+1)}`;
+          }  
+          
+        }
+      }else{
+        break;
+      }
+    }
+
   }
 
   return ls;
@@ -3796,8 +3886,25 @@ function ReturnDefiniteIntegralExpressionAndOtherExpression(dividedString, diffe
     i++;
   }
 
+  //we have to first evaluate the integral using integral not a definite integral because that creates unnecessary huge fractions and then plug in the bounds
+  let evaluatedIntegral = nerdamer(`integrate(${expression.integral},${variableRidString})`).toString();
+  let definiteIntegral = null;
+  let upperboundObj = {};
+  upperboundObj[variableRidString] = upperbound;
+  let lowerboundObj = {};
+  lowerboundObj[variableRidString] = lowerbound;
+  //we are going to create a definite integral using nerdamer integrate function and then evaluate the integral at two different points and subtract them. We do it this way because the "defint" function evaluates fractions wierd. For example if the answer is suppose to be 4/3 "defint" will produce 1.3333 then convert that to a hug fraction -> "1333214809761/999911107321"
+  //when we do it this way the intefrals so far always return clean fractions
+  try{
+    //evaluating the integral at the upperbound then subtracting the evalaution at the lowerbound of the same integral to create the answer fr othe definite integral
+    definiteIntegral = nerdamer(evaluatedIntegral).evaluate(upperboundObj).subtract(nerdamer(evaluatedIntegral).evaluate(lowerboundObj).toString()).toString();
+  }catch(err){
+    //we couldn't calculate the definite integral
+    definiteIntegral = null;
+  }
+
   return {
-    integral: nerdamer(`defint(${expression.integral},${lowerbound},${upperbound},${variableRidString})`).toString(),//now that we have gathered the information we need for the integral, we need to format the information properly so nerdamer can understand
+    integral: definiteIntegral,
     other: nerdamer(expression.other).multiply(differentialVariableRidString).expand().toString(),//we need to multiply everything that was left over by the differntial variable so that it goes back to how it was before it was part of the "dividedString"
   };
 }

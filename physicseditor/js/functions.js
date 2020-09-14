@@ -231,10 +231,12 @@ function UpdateImportedVariables(){
   $("#modal_import_variable_definition").modal("close");
 
   //we need to run error logger again because we have updated the imported variables
+  console.log("UpdateImportedVariables");
   DisplayLoadingBar(true);
   ExecutionID = RID();
   (debounce(function(executionID){
     if(executionID == ExecutionID){
+      //console.log("currently parsing", EL.currentlyParsing);
       EL.GenerateEditorErrorMessages();
       DisplayLoadingBar(false);
     }
@@ -389,15 +391,26 @@ function UpdateDefinedVariables(opts){
 
   if(opts.updateErrorMessages != false){
     //after editing we need to check if there are any new Editor errors
+    //console.log("UpdateDefinedVariables");
+    //we are not debouncing this "EL.GenerateEditorErrorMessages()" because every call done to "UpdateDefinedVariables()" stems
+    //from a manual action meaning that if we write blocking code that has to run error checking before it renders the next thing
+    //the user types its ok because the user is not typing. Additionally, for some reason we were getting some weird "ghost"
+    //variables popuping up when we debounced it. I think a Global Object representing one of the many types of variables was
+    //getting edited while a debounced function was using it to render the "variables collection"
     DisplayLoadingBar(true);
     ExecutionID = RID();
+    EL.GenerateEditorErrorMessages();
+    DisplayLoadingBar(false);
+    /*
     (debounce(function(executionID){
       if(executionID == ExecutionID){
+        console.log("UpdateDefinedVariables got through");
+        console.log("currently parsing", EL.currentlyParsing);
         EL.GenerateEditorErrorMessages();
         DisplayLoadingBar(false);
       }
       
-    }, 500))(ExecutionID);
+    }, 10))(ExecutionID);*/
   }
 
 }
@@ -1074,13 +1087,14 @@ function OrderCompileAndRenderMyVariablesCollection(){
             $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip({html: valueFormattingError});
             $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("open");
           }
-          FindAndUpateVariableByRID($(mathField.el()).attr("rid"),{value: mathField.latex(), valueFormattingError: valueFormattingError});
+          FindAndUpdateVariableByRID($(mathField.el()).attr("rid"),{value: mathField.latex(), valueFormattingError: valueFormattingError});
         },
         enter: function(){
           DisplayLoadingBar(true);
           ExecutionID = RID();
           (debounce(function(executionID){
             if(executionID == ExecutionID){
+              //console.log("currently parsing", EL.currentlyParsing);
               EL.GenerateEditorErrorMessages();
               DisplayLoadingBar(false);
             }
@@ -1158,7 +1172,7 @@ function FindFormattingErrorInVariableValueMathField(ls){
   
 }
 
-function FindAndUpateVariableByRID(rid,opts = {}){
+function FindAndUpdateVariableByRID(rid,opts = {}){
   let foundVariable = false;
   
   for(const [key, value] of Object.entries(DefinedVariables)){
@@ -1192,10 +1206,12 @@ function FindAndUpateVariableByRID(rid,opts = {}){
     }
   }
 
+  console.log("FindAndUpdateVariableByRID");
   DisplayLoadingBar(true);
   ExecutionID = RID();
   (debounce(function(executionID){
     if(executionID == ExecutionID){
+      //console.log("currently parsing", EL.currentlyParsing);
       EL.GenerateEditorErrorMessages({dontRenderMyVariablesCollection: true});
       DisplayLoadingBar(false);
     }
@@ -1249,7 +1265,6 @@ function UpdateMyVariablesCollection(opts = {ls: "", rid: "", update: true, add:
       //if it is being used then we just show a notitication that the variable can't be deleted
       M.toast({html: "This variable can't be removed because it is being used", displayLength: 3000});
     }
-
 
   }
 
