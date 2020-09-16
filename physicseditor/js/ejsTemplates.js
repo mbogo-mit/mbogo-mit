@@ -127,7 +127,7 @@ let Templates = {
     <div class="variable-row <%= (opts.unused) ? "unused-variable" : "" %>">
       <span class="static-physics-equation tooltipped" data-position="left" data-tooltip="<%= opts.ls%>" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
       <span class="variable-tag constant-info"><span latex="<%= opts.variable.value %>" rid="<%= opts.variable.rid %>"></span></span>
-      <span class="variable-tag constant-info"><span latex="<%= opts.variable.unit %>" rid="<%= opts.variable.rid %>"></span></span>
+      <span class="variable-tag constant-info"><span latex="<%= opts.variable.unitsLatex %>" rid="<%= opts.variable.rid %>"></span></span>
       <span class="variable-tag physics-constant"><%= opts.variable.quantityDescription %></span>
       <span class="right delete-var" onclick="UpdateMyVariablesCollection({ls: '<%= opts.ls %>', rid: '<%= opts.variable.rid %>',remove: true, uncheckbox: true, editable: false})"><i class="material-icons">close</i></span>
     </div>

@@ -822,6 +822,7 @@ function TryToAssignDefinitionsToUndefinedVariables(undefinedVars){
         if(obj.custom){
           props = Object.assign(JSON.parse(JSON.stringify(SimilarDefinedVariables[keys[index]])),{
             unitsMathjs: obj.unitsMathjs,
+            unitsLatex: nerdamer.convertToLaTeX(obj.units).toString(),//if it is a custom unit then we have to generate the unit latex from the "units" value in obj
             units: obj.units,
             quantity: "custom",
           });
@@ -829,6 +830,7 @@ function TryToAssignDefinitionsToUndefinedVariables(undefinedVars){
         else{
           props = Object.assign(JSON.parse(JSON.stringify(SimilarDefinedVariables[keys[index]])),{
             unitsMathjs: obj.unitsMathjs,
+            unitsLatex: obj.unitsLatex, 
             units: obj.units,
             quantity: obj.quantity,
           });
@@ -1206,7 +1208,6 @@ function FindAndUpdateVariableByRID(rid,opts = {}){
     }
   }
 
-  console.log("FindAndUpdateVariableByRID");
   DisplayLoadingBar(true);
   ExecutionID = RID();
   (debounce(function(executionID){
@@ -1236,6 +1237,7 @@ function UpdateMyVariablesCollection(opts = {ls: "", rid: "", update: true, add:
         unit: opts.pc.unit,
         value: opts.pc.value,
         unitsMathjs: opts.pc.unitsMathjs,
+        unitsLatex: opts.pc.unitsLatex,
         quantity: opts.pc.quantity,
         quantityDescription: opts.pc.quantityDescription
       },
@@ -1854,6 +1856,7 @@ function UpdateVariableUnits(el){
       props.fullUnitsString = fullUnitsString;
       props.units = TrimUnitInputValue(fullUnitsString);
       props.unitsMathjs = UnitReference[fullUnitsString].unitsMathjs;
+      props.unitsLatex = UnitReference[fullUnitsString].unitsLatex;
       props.quantity = UnitReference[fullUnitsString].quantity;
       props.canBeVector = UnitReference[fullUnitsString].canBeVector;
 

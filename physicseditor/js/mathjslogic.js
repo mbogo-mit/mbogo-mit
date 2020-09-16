@@ -217,7 +217,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
       parsed: false,
       str: RemoveDifferentialOperatorDFromLatexString(str.substring(startIndex, i)).replace(/\\oint/g,"\\int"),
       rawStr: str.substring(startIndex, i),
-      operation: null,
+      operator: null,
     });
 
     return splittedExpressions;
@@ -259,17 +259,18 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
     for(let j = 0; j < exprs[i].length; j++){
       //we first have to check if the string we are evaluating has been parsed. If it hasn't then it has an undefined variables in it so it can't be parsed
       if(exprs[i][j].parsed){
+        let unitsLatexExpression = ReplaceVariablesWithUnitsInLatex(RemoveDifferentialOperatorDFromLatexString(exprs[i][j].rawStr));
         //now that we have parsed the latex string into a mathjs readable string we evaluate it and grab any errors
         //that math js throws and interprets them for the user
         try {
           math.evaluate(exprs[i][j].str).toString();
-          results[i].push({success: exprs[i][j].str});//we are passing in the raw string because in the raw format we can replace radians, steradians and vectors and we don't have to worry about them being a part of some division. For example the evaluate str could be "1 m/rad" so replacing "rad" with "" would break it. the unevaluated will never break "(1 m)/(1 rad)" -> "(1 m)/(1 )"
+          results[i].push({success: exprs[i][j].str, operator: exprs[i][j].operator, latexExpression: exprs[i][j].rawStr, unitsLatexExpression: unitsLatexExpression});//we are passing in the raw string because in the raw format we can replace radians, steradians and vectors and we don't have to worry about them being a part of some division. For example the evaluate str could be "1 m/rad" so replacing "rad" with "" would break it. the unevaluated will never break "(1 m)/(1 rad)" -> "(1 m)/(1 )"
         }
         catch(err){
           //if it throws an error then we can try evaluating the string but taking out radians and steradians because they are untiless pretty much but the editor see them as units
           try {
             math.evaluate(exprs[i][j].str.replace(/rad/g,"").replace(/sr/g,"")).toString();
-            results[i].push({success: exprs[i][j].str});//we are passing in the raw string because in the raw format we can replace radians, steradians and vectors and we don't have to worry about them being a part of some division. For example the evaluate str could be "1 m/rad" so replacing "rad" with "" would break it. the unevaluated will never break "(1 m)/(1 rad)" -> "(1 m)/(1 )"
+            results[i].push({success: exprs[i][j].str, operator: exprs[i][j].operator, latexExpression: exprs[i][j].rawStr, unitsLatexExpression: unitsLatexExpression});//we are passing in the raw string because in the raw format we can replace radians, steradians and vectors and we don't have to worry about them being a part of some division. For example the evaluate str could be "1 m/rad" so replacing "rad" with "" would break it. the unevaluated will never break "(1 m)/(1 rad)" -> "(1 m)/(1 )"
           }
           catch(err2){
             try{
@@ -278,7 +279,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
               results[i].push({error: "Adding a scalar with a vector"});
             }
             catch(err3){
-              results[i].push({error: err2.message});
+              results[i].push({error: err2.message, latexExpression: exprs[i][j].rawStr, unitsLatexExpression: unitsLatexExpression});
             }
             
           }
@@ -310,15 +311,23 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
   //keeps track of wheter we have recorded any new defined undefined variables because if we have then we need to parse previous lines that uses these newly defined variables
   let recordedDefinitionForUndefinedVariable = false;
 
-  results.map(function(r, index){
+  results.map(function(r){
 
-    let successes = [];
+    let successes = {
+      str: [],
+      operators: [],
+      latexExpressions: [],
+      unitsLatexExpressions: [],
+    };
     let possiblySolvableExpressions = [];
     let errors = [];
-    r.map(function(data, i){
+    r.map(function(data){
 
       if(data.success != undefined){
-        successes.push(data.success);
+        successes.str.push(data.success);
+        successes.operators.push(data.operator);
+        successes.latexExpressions.push(data.latexExpression);
+        successes.unitsLatexExpressions.push(data.unitsLatexExpression);
       }
 
       if(data.undefinedExpression != undefined && data.undefinedVariables.length == 1){
@@ -326,87 +335,96 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
       }
 
       if(data.error != undefined){
-        errors.push(data.error);
+        errors.push({error: data.error, latexExpression: data.latexExpression, unitsLatexExpression: data.unitsLatexExpression});
       }
 
     });
 
     let equationUnits = "";
-    if(successes.length > 1){
+    if(successes.str.length > 1){
 
-      //check if units match for success equations
-      let equationUnitsMatch = false;
-      let settingScalarToVector = false;
+      console.log("successes",successes);
 
-      try {
-        //trying to add the units of each equation and see if they add if they don't then they are not the same unit so an error will occur
-        equationUnits = math.evaluate(successes.join(" + ")).toString();
-        equationUnitsMatch = true;
-      }
-      catch(err){
-        let editedSuccesses = [];
-        //removing rad and steradian from equations to see if they will equal each other because the editor can't recorgnize the arc formula  s=r\theta cuz units wise you are saying 1m=1m*rad
-        for(var i = 0; i < successes.length; i++){
-          editedSuccesses.push(successes[i].replace(/rad/g,"").replace(/sr/g,""));
-        }
-        try{
-          equationUnits = math.evaluate(editedSuccesses.join(" + ")).toString();
+      let allExpressionsUnitsEqual = true;
+      for(let i = 0; i + 1 < successes.str.length; i++){
+        let stringToBeComparedForUnits = [successes.str[i], successes.str[i+1]];
+        console.log("stringToBeComparedForUnits",stringToBeComparedForUnits);
+        //check if units match for success equations
+        let equationUnitsMatch = false;
+        let settingScalarToVector = false;
+
+        try {
+          //trying to add the units of each equation and see if they add if they don't then they are not the same unit so an error will occur
+          equationUnits = math.evaluate(stringToBeComparedForUnits.join(" + ")).toString();
           equationUnitsMatch = true;
         }
-        catch(err2){
-          equationUnitsMatch = false;
+        catch(err){
+
+          //removing rad and steradian from equations to see if they will equal each other because the editor can't recorgnize the arc formula  s=r\theta cuz units wise you are saying 1m=1m*rad
+          let editedSuccesses = [
+            stringToBeComparedForUnits[0].replace(/rad/g,"").replace(/sr/g,""),
+            stringToBeComparedForUnits[1].replace(/rad/g,"").replace(/sr/g,""),
+          ];
+
           try{
-            for(var i = 0; i < editedSuccesses.length; i++){
-              editedSuccesses[i] = editedSuccesses[i].replace(/vector/g,"");
+            equationUnits = math.evaluate(editedSuccesses.join(" + ")).toString();
+            equationUnitsMatch = true;
+          }
+          catch(err2){
+            equationUnitsMatch = false;
+            try{
+              //removing vector math js key words to see if the problem is setting scalar equal to a vector
+              editedSuccesses[0] = editedSuccesses[0].replace(/vector/g,"");
+              editedSuccesses[1] = editedSuccesses[1].replace(/vector/g,"");
+
+              math.evaluate(editedSuccesses.join(" + ")).toString();
+              settingScalarToVector = true;
+
             }
-            math.evaluate(editedSuccesses.join(" + ")).toString();
-            settingScalarToVector = true;
+            catch(err3){
+              //console.log(err3);
+              settingScalarToVector = false;
+            }
           }
-          catch(err3){
-            //console.log(err3);
-            settingScalarToVector = false;
+
+        }
+
+        if(!equationUnitsMatch){
+          if(settingScalarToVector){
+            //we are going to add this information to the correct mathfield that has this error
+            MathFields[mfID].log.error.push({
+              error: EL.createLoggerErrorFromMathJsError("Setting a vector equal to scalar"),
+            });
+            
+            //if we got an error then one of the expressions units don't equal anothers
+            allExpressionsUnitsEqual = false;
+            break;
+          }
+          else{
+            //we are going to add this information to the correct mathfield that has this error
+            MathFields[mfID].log.error.push({
+              error: EL.createLoggerErrorFromMathJsError("Units do not equal each other"),
+              latexExpressions: [
+                `\\text{${successes.operators[i] == '=' ? 'Equation' : 'Inequality'}}\\ ${successes.latexExpressions[i]} ${successes.operators[i]} ${successes.latexExpressions[i+1]}`,
+                `\\text{${successes.operators[i] == '=' ? 'Equation' : 'Inequality'} Units}\\ ${successes.unitsLatexExpressions[i]} \\neq ${successes.unitsLatexExpressions[i+1]}`,
+              ],
+            });
+
+            //if we got an error then one of the expressions units don't equal anothers
+            allExpressionsUnitsEqual = false;
+            break;
           }
         }
 
       }
 
-      if(!equationUnitsMatch){
-        if(settingScalarToVector){
-          log.error.push({
-            error: EL.createLoggerErrorFromMathJsError("Setting a vector equal to scalar"),
-            info: successes,
-            lineNumber: lineNumber,
-            mfID: mfID,
-          });
-
-          //we are going to add this information to the correct mathfield that has this error
-          MathFields[mfID].log.error.push({
-            error: EL.createLoggerErrorFromMathJsError("Setting a vector equal to scalar"),
-            info: successes,
-          });
-          
-        }
-        else{
-          log.error.push({
-            error: EL.createLoggerErrorFromMathJsError("Units do not equal each other"),
-            info: successes,
-            lineNumber: lineNumber,
-            mfID: mfID,
-          });
-
-          //we are going to add this information to the correct mathfield that has this error
-          MathFields[mfID].log.error.push({
-            error: EL.createLoggerErrorFromMathJsError("Units do not equal each other"),
-            info: successes,
-          });
-
-        }
-        
-      }
-      else{
-        //if the units match then we should do a high level self consistency check
+      //after the for loop if "allExpressionsUnitsEqual" is still true then that means that we didn't have any errors comparing all the expressions on this line
+      if(allExpressionsUnitsEqual){
+        //if all the expressions units match then we should do a high level self consistency check
         EL.linesToCheckForSelfConsistency.push(lineNumber);
       }
+
+
 
     }
     else{
@@ -479,16 +497,12 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
 
     if(errors.length > 0){
       errors.map(function(error, index){
-        log.error.push({
-          error: EL.createLoggerErrorFromMathJsError(error),
-          info: "",
-          lineNumber: lineNumber,
-          mfID: mfID,
-        });
-
         //we are going to add this information to the correct mathfield that has this error
         MathFields[mfID].log.error.push({
-          error: EL.createLoggerErrorFromMathJsError(error),
+          error: EL.createLoggerErrorFromMathJsError(error.error),
+          latexExpressions: [
+            `\\text{Expression}\\ ${error.latexExpression}\\ \\Rightarrow ${error.unitsLatexExpression}`,
+          ],
         });
       });
     }
@@ -517,6 +531,103 @@ function GetTrulyUndefinedVariables(ls){
   }
 
   return trulyUndefinedVars;
+}
+
+function ReplaceVariablesWithUnitsInLatex(ls){
+  let vars = Object.keys(DefinedVariables).concat(Object.keys(PreDefinedVariables)).concat(Object.keys(EL.undefinedVars.defined)).concat(Object.keys(VectorMagnitudeVariables));
+  //sorting them by length so the longer string are the ones that get tested first because the longer strings
+  //may have pieces of shorter string in them so if we are trying to find the variable "a_{r}"", and we defined "a" and "a_{r}"
+  //if "a" comes before "a_{r}" it will find instances of "a_{r}". But if "a_{r}" goes first than those variables will be already
+  //taken care of before "a" can screw things up
+  vars.sort(function(a,b){
+  	if(a.length > b.length){
+    	return -1;
+    }
+    else{
+    	return 1;
+    }
+  });
+
+  //now we have to go character by character and replace variables with their unitsMathjs string
+  let i = 0;
+  let delta = 0;
+  let s = "";
+  let newLs = "";
+  let foundMatch = false;
+  while(i < ls.length){
+    foundMatch = false;
+    s = ls.substring(i);
+    //we need to identify what set of characters is at the index we are at
+
+    //lets first check if its a Defined Variable
+    for(var c = 0; c < vars.length; c++){
+      if(s.indexOf(vars[c]) == 0){
+        let variable = {};
+        if(Object.keys(DefinedVariables).includes(vars[c])){
+          variable = Object.assign({}, DefinedVariables[vars[c]]);
+        }
+        else if(Object.keys(PreDefinedVariables).includes(vars[c])){
+          variable = Object.assign({}, PreDefinedVariables[vars[c]]);
+        }
+        else if(Object.keys(EL.undefinedVars.defined).includes(vars[c])){
+          variable = Object.assign({}, EL.undefinedVars.defined[vars[c]]);
+        }
+        else if(Object.keys(VectorMagnitudeVariables).includes(vars[c])){
+          variable = Object.assign({}, VectorMagnitudeVariables[vars[c]]);
+        }
+
+        //we need to check if this variable is a vector and if so then we have to format unitsMathjs variable differently
+        let unitsLatex = variable.unitsLatex;
+        foundMatch = true;
+        delta = vars[c].length;
+
+        newLs += `\\mathrm{${unitsLatex}}`;
+
+        break;
+      }
+    }
+
+    if(!foundMatch && s[0] == "\\"){
+      //it is possible that it is an operator or a greek letter
+      for(var c = 0; c < ListOfOperators.length; c++){
+        if(s.indexOf(ListOfOperators[c]) == 0){
+          foundMatch = true;
+          newLs += ListOfOperators[c];
+          delta = ListOfOperators[c].length;
+          break;
+        }
+      }
+
+      if(!foundMatch){
+        for(var c = 0; c < LatexGreekLetters.length; c++){
+          if(s.indexOf(LatexGreekLetters[c]) == 0){
+            foundMatch = true;
+            newLs += LatexGreekLetters[c];
+            delta = LatexGreekLetters[c].length;
+            break;
+          }
+        }
+      }
+
+    }
+
+    if(!foundMatch){
+      delta = 1;
+      newLs += s[0];//just pass the value directly to the new latex string
+    }
+
+    i += delta;
+
+  }
+
+  //before we return this string we want to take care of one edge case where two variables are being multiplied by each other but the multiplication is not explicit. For example v*v -> vv which would return \\mathrm{v}\\mathrm{v} which doesn't look good unless there is a \\cdot multplication in between
+  //first we need to take out any unnecessary spaces 
+  newLs = newLs.replace(/\\\s/g,"");
+  //then we need to replace "}\\mathrm{" with "} \\cdot \\mathrm{"
+  newLs = newLs.replace(/\}\\mathrm\{/g,"}\\cdot\\mathrm{")
+
+  return newLs;
+
 }
 
 function ReplaceVariablesWithMathjsUnits(ls){
@@ -2759,6 +2870,13 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
         }
   
         if(knownVariableValue != undefined){
+          /* this piece of code would eventually create latex to show what the known variable solution is rather than just saying the variable is known
+          console.log("knownVariableValue",knownVariableValue);
+          try{
+            console.log("solution", nerdamer.convertToLaTeX(knownVariableValue).toString());
+          }catch(err){
+            console.log(err);
+          }*/
           EquationSet.push({
             equation: `${exp1} = ${exp2}`,
             uniqueRIDStringArray: uniqueRIDStringArray,

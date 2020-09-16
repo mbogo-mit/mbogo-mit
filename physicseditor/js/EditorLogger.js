@@ -46,7 +46,7 @@ function EditorLogger(){
       
     },
     "Units do not equal each other": {
-      description: "You have expressions that are set equal to each other that don't have the same units",
+      description: "You have an equation or inequality that don't have the same units",
       
     },
     "Incorrect equations": {
@@ -456,6 +456,7 @@ function EditorLogger(){
       canBeVector: fullUnitsString.canBeVector,
       fullUnitsString: fullUnitsString.str,
       units: (fullUnitsString.custom) ? fullUnitsString.str : TrimUnitInputValue(fullUnitsString.str),
+      unitsLatex: (fullUnitsString.custom) ? nerdamer.convertToLaTeX(fullUnitsString.str).toString() : UnitReference[fullUnitsString.str].unitsLatex,
       unitsMathjs: GetUnitsFromMathJsVectorString(unitsMathjs),//if it is not a vector it won't effect the string
       rid: (savedVariable.rid) ? savedVariable.rid : RID(),
       quantity: (fullUnitsString.custom) ? undefined : UnitReference[fullUnitsString.str].quantity,
