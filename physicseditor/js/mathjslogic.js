@@ -430,7 +430,7 @@ function ParseResultsArrayAndGenerateLoggerList(results, lineNumber, mfID){
     else{
       try {
         //trying to add the units of each equation and see if they add if they don't then they are not the same unit so an error will occur
-        equationUnits = math.evaluate(successes[0]).toString();
+        equationUnits = math.evaluate(successes.str[0]).toString();
       }
       catch(err){
         equationUnits = "";//couldn't get unit information from mathjs equation with all defined units

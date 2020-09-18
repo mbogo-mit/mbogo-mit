@@ -40,12 +40,22 @@ $(document).ready(function(){
   $('.tabs').tabs();
   $('.dropdown-trigger').dropdown();
 
-  $("#modal-physics-equation-more-information, #modal-user-guide").modal();
+  $("#modal-physics-equation-more-information, #modal-user-guide, #modal-create-custom-unit").modal();
   $("#modal_import_variable_definition").modal({
     onOpenStart: function(){
       $("#btn-update-imported-variables").addClass("disabled");
     },
-  })
+  });
+  $("#modal-create-custom-unit").modal({
+    onOpenEnd: function(){
+      // copying whatever the user wrote in the units dropdown into the custom si units modal
+      $("#input-custom-unit").val($("#input-user-units-search").val());
+      // focusing on the input so the user can get to editing and creating the custom unit
+      $("#input-custom-unit").focus();
+      ParseAndRenderCustomUnit();
+    },
+  });
+
   $('.collapsible').collapsible();
   $("#physics_equations .collapsible").collapsible({
     onOpenEnd: function(){
@@ -111,6 +121,10 @@ $(document).ready(function(){
   //when user is searching for units in the units dropdown
   $("#input-user-units-search").on("input",function(){
     RenderSIUnitsSearch();
+  });
+
+  $("#input-custom-unit").on("input",function(){
+    ParseAndRenderCustomUnit();
   });
 
   $("#main-screen").click(function(e){

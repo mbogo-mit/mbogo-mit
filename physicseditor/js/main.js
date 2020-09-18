@@ -1,6 +1,7 @@
 
 var MQ = MathQuill.getInterface(2); // keeps the API stable
 
+let StaticMathFieldCustomUnit = MQ.StaticMath(document.getElementById("staticMathFieldCustomUnit"));
 
 function CreateNewMathField(id){
   //el is a jquery Element

@@ -1757,6 +1757,9 @@ function DisplayUnitDropdownSearchMenu(el, rid){
 
   //setting value so that the menu knowns what to update once the user has chosen the unit they want
   $("#units-search-results").attr("rid",rid);
+
+  //the element could have a search attribute which tells the dropdown what should by default already be searched in the dropdown
+  $("#input-user-units-search").val(el.attr("search") != null ? el.attr("search") : "");
   //focusing the input field so the user doesn't have to click they can just start typing
   $("#input-user-units-search").focus();
 
@@ -1770,11 +1773,19 @@ function DisplayUnitDropdownSearchMenu(el, rid){
 function RenderSIUnitsSearch(){
   //everytime you search you should disable the updated button because no si unit is selected
   $("#btn-update-variable-units").addClass("disabled");
-  let search = $("#input-user-units-search").val().toLowerCase();
-  results = [];
+  let search = $("#input-user-units-search").val();
+  let searchMathJsUnits = ParseStringIntoMathJsString(search);
+  search = search.toLowerCase();// we apply make everything lower case after we have attempted to get the searches units because some SI Units for example Hertz (Hz) are case sensitive
+  let results = [];
   for(const [key, value] of Object.entries(UnitReference)){
-    if(key.toLowerCase().search(search) != -1){
+    if(key.toLowerCase().indexOf(search) != -1){
       results.push(key);
+    }else if(searchMathJsUnits != null){
+      // we are seeing if we can figure out the units of this search and see if the units of the search match the units of this specific variable
+      try{
+        math.evaluate(`${searchMathJsUnits} + ${value.unitsMathjs}`);
+        results.push(key);
+      }catch(err){}//don't do anything if there is an error
     }
   }
   let html = ejs.render(Templates["units-search-results"], {results: results});
@@ -1791,7 +1802,90 @@ function CloseUnitDropdownSearchMenu(){
   ToggleVariableBadgeUnitsSize();
 }
 
+function UpdateVariableUnitsWithCustomVariable(){
+
+  if($("#btn-create-custom-unit").hasClass("disabled") || NewCustomUnit.mathjs == null || NewCustomUnit.latex == null){
+    return;
+  }
+
+  // if the custom unit modal is open we need to close it. This function could have been called from dom elements that reside in it
+  $("#modal-create-custom-unit").modal("close");
+
+  let rid = $("#units-search-results").attr("rid");
+
+  let foundVariable = false;
+  let ls = "";
+  let props = {};
+
+  for(const [key, value] of Object.entries(DefinedVariables)){
+    if(value.rid == rid){
+      foundVariable = true;
+      ls = key;
+      //copying over data
+      props.type = value.type;
+      props.state = value.state;
+      props.value = value.value;
+      props.valueFormattingError = value.valueFormattingError;
+      
+      break;
+    }
+  }
+
+  if(!foundVariable){
+    for(const [key, value] of Object.entries(EL.undefinedVars.undefined)){
+      if(value.rid == rid){
+        foundVariable = true;
+        ls = key;
+        //copying over data
+        props.type = value.type;
+        props.state = value.state;
+        props.value = value.value;
+        props.valueFormattingError = value.valueFormattingError;
+        break;
+      }
+    }
+  }
+
+  if(!foundVariable){
+    for(const [key, value] of Object.entries(EL.undefinedVars.defined)){
+      if(value.rid == rid){
+        foundVariable = true;
+        ls = key;
+        //copying over data
+        props.type = value.type;
+        props.state = value.state;
+        props.value = value.value;
+        props.valueFormattingError = value.valueFormattingError;
+        break;
+      }
+    }
+  }
+
+  props.fullUnitsString = (NewCustomUnit.mathjs == "1") ? "unitless" : NewCustomUnit.mathjs.substring(1);//remove the coefficient 1 in front of the units
+  props.units = (NewCustomUnit.mathjs == "1") ? "unitless" : NewCustomUnit.mathjs.substring(1);//remove the coefficient 1 in front of the units
+  props.unitsMathjs = NewCustomUnit.mathjs;
+  props.unitsLatex = NewCustomUnit.latex;
+  props.quantity = "custom";
+  props.canBeVector = true;
+
+  UpdateDefinedVariables({
+    type: "update",
+    ls: ls,
+    editable: true,
+    props: props,
+  });
+
+  CloseUnitDropdownSearchMenu();
+
+  //then after we have edited either DefinedVariables or EL.undefinedVars.defined then we need to update the collection with the new information
+  UpdateMyVariablesCollection({update: true});
+
+}
+
 function UpdateVariableUnits(el){
+
+    // if the custom unit modal is open we need to close it. This function could have been called from dom elements that reside in it
+    $("#modal-create-custom-unit").modal("close");
 
     let rid = $("#units-search-results").attr("rid");
     let fullUnitsString = el.attr("fullUnitssString");
@@ -1875,6 +1969,175 @@ function UpdateVariableUnits(el){
     UpdateMyVariablesCollection({update: true});
 
 }
+
+function ParseAndRenderCustomUnit(){
+  let error = null;
+  let customUnitString = $("#input-custom-unit").val();
+  let latexCustomUnitString = null;
+  let formattedLatexCustomUnitString = null;
+  let mathJsCustomUnitString = null;
+  //first we need to make sure that there are no + or - in the string
+  if(customUnitString.indexOf("+") != -1){
+    error = "Addition or subtraction is not allowed in string";
+  }else if(customUnitString.replace(/\s*/g,"").length == 0){
+    error = "empty string";
+  }
+  //next we need to make sure that all the characters in the string are either representing units or are some type of multiplication, division, or exponent
+  if(error == null){
+    // we will check that all the characters in the string are supported by removing all the supported characters and then seeing if there is anything left in the string
+    let strReplaceEverything = customUnitString;
+    let r;
+    let thingsToReplace = SupportedSIUnits.concat([/\^\d\d*/,/\^-\d\d*/, /\^\(-\d\d*\)/, /\^\(\d\d*\)/, /\//,/\*/,/\s*/,/\(/,/\)/]);
+    for(let i = 0; i < thingsToReplace.length; i++){
+      r = new RegExp(thingsToReplace[i], 'g');
+      strReplaceEverything = strReplaceEverything.replace(r,"")
+    }
+    console.log("strReplaceEverything",strReplaceEverything);
+
+    if(strReplaceEverything.length > 0){
+      error = "String is formatted incorrectly or has unsupported character";
+    }
+  }
+
+  // if error still equals null then we need to see if nerdamer can parse the string and if it can then we will run the string in math js and then convert it to a latex to display
+  if(error == null){
+    try{
+      mathJsCustomUnitString = nerdamer(customUnitString).toString();
+    }catch(err){
+      mathJsCustomUnitString = null;
+      error = "String is formatted incorrectly";
+    }
+
+    console.log("mathJsCustomUnitString",mathJsCustomUnitString);
+
+    if(mathJsCustomUnitString != null){
+      mathJsCustomUnitString = math.evaluate(isNaN(mathJsCustomUnitString) ? `1 ${mathJsCustomUnitString}` : mathJsCustomUnitString).toString();
+      latexCustomUnitString = nerdamer.convertToLaTeX(isNaN(mathJsCustomUnitString) ? WrapAllNegativeExponentsWithParentheses(mathJsCustomUnitString.substring(1)) : mathJsCustomUnitString).toString();
+      // we replace "\\cdot" with "\\y" because "\\cdot" because the "cd" part of "\\cdot" was getting parsed as the unit candela
+      formattedLatexCustomUnitString = latexCustomUnitString.replace(/\\cdot/,"\\y");
+      // after we need to rap each unit with \\mathrm{}
+      let r;
+      for(let i = 0; i < SupportedSIUnits.length; i++){
+        r = new RegExp(SupportedSIUnits[i], 'g');
+        //we replace it with \\x because if we replace it with \\mathrm the "m" could be caught up in the replace
+        formattedLatexCustomUnitString = formattedLatexCustomUnitString.replace(r,`\\x{${SupportedSIUnits[i]}}`);
+      }
+
+
+      formattedLatexCustomUnitString = formattedLatexCustomUnitString.replace(/\\x\{/g,`\\mathrm{`).replace(/\\y/g,`\\cdot`);
+
+
+      console.log("mathJsCustomUnitString",mathJsCustomUnitString);
+      console.log("formattedLatexCustomUnitString",formattedLatexCustomUnitString);
+    }
+  }
+
+  // now that we have all the data we need we need to display the data
+  StaticMathFieldCustomUnit.latex(formattedLatexCustomUnitString != null ? formattedLatexCustomUnitString : "");
+  $("#helper-text-input-custom-unit").html(error != null ? error : "");
+
+  // saving the data if everything is formatted correctly
+  if(mathJsCustomUnitString != null && latexCustomUnitString != null){
+    NewCustomUnit = {
+      mathjs: mathJsCustomUnitString,
+      latex: latexCustomUnitString,
+    }
+    //enabling button if everything is formatted correctly
+    $("#btn-create-custom-unit").removeClass("disabled");
+
+    let results = [];
+    for(const [key, value] of Object.entries(UnitReference)){
+      try{
+        math.evaluate(`${mathJsCustomUnitString} + ${value.unitsMathjs}`);
+        results.push(key);
+      }catch(err){
+        
+      }
+    }
+
+    let html = ejs.render(Templates["units-search-results"], {results: results});
+    $("#quantities-match-custom-units").html(html);
+
+  }else{
+    NewCustomUnit = {
+      mathjs: null,
+      latex: null,
+    };
+
+    //disabling button if the string is not formatted correctly
+    $("#btn-create-custom-unit").addClass("disabled");
+
+    $("#quantities-match-custom-units").html("");
+  }
+
+}
+
+function ParseStringIntoMathJsString(str){//this is a spin off of ParseAndRenderCustomUnit function. Except we are only interested in getting a mathjs unit string from the input string
+  let error = null;
+  let mathJsCustomUnitString = null;
+  //first we need to make sure that there are no + or - in the string
+  if(str.indexOf("+") != -1){
+    error = "Addition or subtraction is not allowed in string";
+  }else if(str.replace(/\s*/g,"").length == 0){
+    error = "empty string";
+  }
+  //next we need to make sure that all the characters in the string are either representing units or are some type of multiplication, division, or exponent
+  if(error == null){
+    // we will check that all the characters in the string are supported by removing all the supported characters and then seeing if there is anything left in the string
+    let strReplaceEverything = str;
+    let r;
+    let thingsToReplace = SupportedSIUnits.concat([/\^\d\d*/,/\^-\d\d*/, /\^\(-\d\d*\)/, /\^\(\d\d*\)/, /\//,/\*/,/\s*/,/\(/,/\)/]);
+    for(let i = 0; i < thingsToReplace.length; i++){
+      r = new RegExp(thingsToReplace[i], 'g');
+      strReplaceEverything = strReplaceEverything.replace(r,"")
+    }
+    console.log("strReplaceEverything",strReplaceEverything);
+
+    if(strReplaceEverything.length > 0){
+      error = "String is formatted incorrectly or has unsupported character";
+    }
+  }
+
+  // if error still equals null then we need to see if nerdamer can parse the string and if it can then we will run the string in math js and then convert it to a latex to display
+  if(error == null){
+    try{
+      mathJsCustomUnitString = nerdamer(str).toString();
+    }catch(err){
+      mathJsCustomUnitString = null;
+      error = "String is formatted incorrectly";
+    }
+
+    //console.log("mathJsCustomUnitString",mathJsCustomUnitString);
+
+    if(mathJsCustomUnitString != null){
+      mathJsCustomUnitString = math.evaluate(isNaN(mathJsCustomUnitString) ? `1 ${mathJsCustomUnitString}` : mathJsCustomUnitString).toString();
+    }
+  }
+
+  return mathJsCustomUnitString;
+
+}
+
+function WrapAllNegativeExponentsWithParentheses(str){
+  //this function takes a math js string and wraps all of the negative exponents with parentheses
+  let i1;
+  let i2;
+  let numString = "";
+  while(str.indexOf("^-") != -1){
+    i1 = str.indexOf("^-");
+    i2 = str.substring(i1 + "^-".length).indexOf(" ");
+    if(i2 == -1){
+      // this means we have reached the end of the string so the number we are trying to grab resides after "^-" till the end of the string
+      str = `${str.substring(0, i1 + 1)}(-${str.substring(i1 + "^-".length)})`;
+    }else{
+      i2 += i1 + "^-".length;//accounts for the shift because we used a substring of str
+      str = `${str.substring(0, i1 + 1)}(-${str.substring(i1 + "^-".length, i2)}) ${str.substring(i2+1)}`;
+    }
+  }
+
+  return str;
+}
+
 
 function MainScreenClicked(e){
   if(UnitsDropdownMenuOpen){

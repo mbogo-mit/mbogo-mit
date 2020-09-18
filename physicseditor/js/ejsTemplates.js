@@ -150,7 +150,7 @@ let Templates = {
         <%}%>    
 
         <% if(opts.variable.dynamicUnits){%>
-          <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info units dynamic-units tooltipped" data-position="bottom" data-tooltip="This unit was dynamically created by the editor"><%= opts.variable.units %></span>
+          <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info units dynamic-units tooltipped" search="<%= opts.variable.fullUnitsString %>" data-position="bottom" data-tooltip="This unit was dynamically created by the editor"><%= opts.variable.units %></span>
         <%}else{%>
           <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info units tooltipped" data-position="bottom" data-tooltip="This unit was set by the user or imported"><%= opts.variable.units %></span>
         <%}%>

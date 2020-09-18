@@ -332,6 +332,11 @@ let PreDefinedVariables = {
     unitsLatex: "1",
   },
 }
+const SupportedSIUnits = ["degC","kat","rad","ohm","mol","cd","sr","Wb","Hz","Pa","T","H","F","S","m","kg","s","A","K","N","J","W","C","V"];
+let NewCustomUnit = {
+  mathjs: null,
+  latex: null,
+};
 
 let UniqueRIDStringObj = {
 
