@@ -795,6 +795,21 @@ body {
   cursor: pointer;
 }
 
+#quantities-match-custom-units .si-unit-row .col {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+#quantities-match-custom-units .si-unit-row:hover {
+  background-color: #e0f2f1;
+  cursor: pointer;
+}
+
+#quantities-match-custom-units .si-unit-row.active {
+  background-color: #b2dfdb !important;
+  cursor: pointer;
+}
+
 .error-log .log-static-latex .mq-scaled.mq-paren, #my-keyboard-container .mq-scaled.mq-paren {
   transform: scale(0.8, 1.3) !important;/*this fixes brackets for static math fields in the editor logger*/
 }
@@ -892,3 +907,57 @@ body {
 }
 
 
+#modal-create-custom-unit {
+  width: 70% !important;
+  height: 70% !important;
+}
+
+#modal-create-custom-unit .modal-content {
+  height: 100%;
+}
+
+#modal-create-custom-unit .modal-content > .row {
+  height: 100%;
+}
+
+#modal-create-custom-unit .modal-content > .row > .col {
+  height: 100%;
+}
+
+#supported-si-units-container {
+  border-left: 1px solid #e0e0e0;
+  height: 100%;
+}
+
+#supported-si-units-container > .row {
+  height: 100%;
+}
+
+#quantities-match-custom-units-container {
+  border-top: 1px solid #e0e0e0;
+}
+
+#btn-create-custom-unit {
+  margin-bottom: 10px;
+  background-color: #5680e9 !important;
+  color: white;
+}
+
+#btn-create-custom-unit.disabled {
+  background-color: #e0e0e0 !important;
+}
+
+#badge-create-custom-unit {
+  cursor: pointer;
+  background-image: linear-gradient(to bottom right, #5680e9, #84ceeb);
+}
+
+input[type=text]:focus {
+  border-bottom: 1px solid #5680e9 !important;
+  box-shadow: 0 1px 0 0 #5680e9 !important;
+}
+
+input.valid[type=text]:not(.browser-default) {
+  border-bottom: 1px solid #9e9e9e !important;
+  box-shadow: 0 1px 0 0 #9e9e9e !important;
+}
