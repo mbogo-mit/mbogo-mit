@@ -12,7 +12,8 @@ function InitEditorWithEditorData(){
   let data = JSON.parse(JSON.stringify(EditorData));
   SimilarDefinedVariables = (data.SimilarDefinedVariables) ? data.SimilarDefinedVariables : {};
   DefinedVariables = (data.DefinedVariables) ? data.DefinedVariables : {};
-  PreDefinedVariables = (data.PreDefinedVariables) ? data.PreDefinedVariables : {};
+  //using object.assign because PreDefinedVariables already has stuff in it so if the user wants to add more stuff they can
+  Object.assign(PreDefinedVariables, (data.PreDefinedVariables ? data.PreDefinedVariables : {}));
   EL.undefinedVars = (data.UndefinedVars) ? data.UndefinedVars : {undefined: {}, defined: {},};
   LastVariableRIDChangedToGiven = data.LastVariableRIDChangedToGiven;
   SelectPhysicsConstants(PreDefinedVariables);
