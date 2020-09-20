@@ -10,12 +10,12 @@ Error: dimensional analysis fails on a line
 
 function InitEditorWithEditorData(){
   let data = JSON.parse(JSON.stringify(EditorData));
-  SimilarDefinedVariables = data.SimilarDefinedVariables;
-  DefinedVariables = data.DefinedVariables;
-  PreDefinedVariables, data.PreDefinedVariables;
-  EL.undefinedVars = data.UndefinedVars;
+  SimilarDefinedVariables = (data.SimilarDefinedVariables) ? data.SimilarDefinedVariables : {};
+  DefinedVariables = (data.DefinedVariables) ? data.DefinedVariables : {};
+  PreDefinedVariables = (data.PreDefinedVariables) ? data.PreDefinedVariables : {};
+  EL.undefinedVars = (data.UndefinedVars) ? data.UndefinedVars : {};
   LastVariableRIDChangedToGiven = data.LastVariableRIDChangedToGiven;
-  SelectPhysicsConstants(data.PreDefinedVariables);
+  SelectPhysicsConstants(PreDefinedVariables);
   InitMathFields(data.MathFieldsLatex, data.OrderedIds);
   //FocusOnThisMathField(data.FocusedMathFieldId);
 }
