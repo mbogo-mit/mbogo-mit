@@ -12,10 +12,9 @@ function RID(){
 
 let EditorData = {
   SimilarDefinedVariables: {},
-  SimilarVectorMagnitudeVariables: {},
   DefinedVariables: {},
   PreDefinedVariables: {},
-  VectorMagnitudeVariables: {},
+  UndefinedVars: {},
   MathFieldsLatex: {},
   OrderedIds: {1: "first_math_field"},
   FocusedMathFieldId: "first_math_field",
@@ -205,9 +204,6 @@ let ImportVariableDefinitions = {
   },
 
 };
-
-let VectorMagnitudeVariables = {};
-let SimilarVectorMagnitudeVariables = {};
 
 let SaveEditorData = true;
 let PreDefinedVariables = {

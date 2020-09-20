@@ -534,7 +534,7 @@ function GetTrulyUndefinedVariables(ls){
 }
 
 function ReplaceVariablesWithUnitsInLatex(ls){
-  let vars = Object.keys(DefinedVariables).concat(Object.keys(PreDefinedVariables)).concat(Object.keys(EL.undefinedVars.defined)).concat(Object.keys(VectorMagnitudeVariables));
+  let vars = Object.keys(DefinedVariables).concat(Object.keys(PreDefinedVariables)).concat(Object.keys(EL.undefinedVars.defined));
   //sorting them by length so the longer string are the ones that get tested first because the longer strings
   //may have pieces of shorter string in them so if we are trying to find the variable "a_{r}"", and we defined "a" and "a_{r}"
   //if "a" comes before "a_{r}" it will find instances of "a_{r}". But if "a_{r}" goes first than those variables will be already
@@ -571,9 +571,6 @@ function ReplaceVariablesWithUnitsInLatex(ls){
         }
         else if(Object.keys(EL.undefinedVars.defined).includes(vars[c])){
           variable = Object.assign({}, EL.undefinedVars.defined[vars[c]]);
-        }
-        else if(Object.keys(VectorMagnitudeVariables).includes(vars[c])){
-          variable = Object.assign({}, VectorMagnitudeVariables[vars[c]]);
         }
 
         //we need to check if this variable is a vector and if so then we have to format unitsMathjs variable differently
@@ -631,7 +628,7 @@ function ReplaceVariablesWithUnitsInLatex(ls){
 }
 
 function ReplaceVariablesWithMathjsUnits(ls){
-  let vars = Object.keys(DefinedVariables).concat(Object.keys(PreDefinedVariables)).concat(Object.keys(EL.undefinedVars.defined)).concat(Object.keys(VectorMagnitudeVariables));
+  let vars = Object.keys(DefinedVariables).concat(Object.keys(PreDefinedVariables)).concat(Object.keys(EL.undefinedVars.defined));
   //sorting them by length so the longer string are the ones that get tested first because the longer strings
   //may have pieces of shorter string in them so if we are trying to find the variable "a_{r}"", and we defined "a" and "a_{r}"
   //if "a" comes before "a_{r}" it will find instances of "a_{r}". But if "a_{r}" goes first than those variables will be already
@@ -668,9 +665,6 @@ function ReplaceVariablesWithMathjsUnits(ls){
         }
         else if(Object.keys(EL.undefinedVars.defined).includes(vars[c])){
           variable = Object.assign({}, EL.undefinedVars.defined[vars[c]]);
-        }
-        else if(Object.keys(VectorMagnitudeVariables).includes(vars[c])){
-          variable = Object.assign({}, VectorMagnitudeVariables[vars[c]]);
         }
 
         //we need to check if this variable is a vector and if so then we have to format unitsMathjs variable differently
@@ -790,9 +784,6 @@ function ReplaceUniqueRIDStringWithMathjsUnits(ls, uniqueRIDStringArray){//this 
         }
         else if(Object.keys(EL.undefinedVars.defined).includes(uniqueRIDStringArray[c].variable)){
           variable = Object.assign({}, EL.undefinedVars.defined[uniqueRIDStringArray[c].variable]);
-        }
-        else if(Object.keys(VectorMagnitudeVariables).includes(uniqueRIDStringArray[c].variable)){
-          variable = Object.assign({}, VectorMagnitudeVariables[uniqueRIDStringArray[c].variable]);
         }
 
         //we don't care if this variable is a vector or scalar so the only thing we will record is its units
