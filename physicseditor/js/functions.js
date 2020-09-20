@@ -13,7 +13,7 @@ function InitEditorWithEditorData(){
   SimilarDefinedVariables = (data.SimilarDefinedVariables) ? data.SimilarDefinedVariables : {};
   DefinedVariables = (data.DefinedVariables) ? data.DefinedVariables : {};
   PreDefinedVariables = (data.PreDefinedVariables) ? data.PreDefinedVariables : {};
-  EL.undefinedVars = (data.UndefinedVars) ? data.UndefinedVars : {};
+  EL.undefinedVars = (data.UndefinedVars) ? data.UndefinedVars : {undefined: {}, defined: {},};
   LastVariableRIDChangedToGiven = data.LastVariableRIDChangedToGiven;
   SelectPhysicsConstants(PreDefinedVariables);
   InitMathFields(data.MathFieldsLatex, data.OrderedIds);
