@@ -279,6 +279,14 @@ let PreDefinedVariables = {
     unitsMathjs: "1",
     unitsLatex: "1",
   },
+  "\\vec{0}": {
+    state: "given",
+    type: "vector",
+    units: "unitless",
+    value: undefined,
+    unitsMathjs: "1",
+    unitsLatex: "1",
+  },
   "\\nabla": {
     state: "given",
     type: "vector",

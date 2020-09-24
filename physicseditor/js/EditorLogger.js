@@ -202,6 +202,12 @@ function EditorLogger(){
     "Dimension mismatch. Matrix A": {
       description: "You are adding vectors that don't have the same number of demensions",
     },
+    "Dimension mismatch. Adding vectors with different amount of demension": {
+      description: "You can only add vectors with the same number of demensions",
+    },
+    "Demension mismatch. Setting to vectors with a different number of demensions equal to each other": {
+      description: "Vectors must have the same number of demensions to be set equal to each other",
+    },
     "Vectors with length 3 expected": {
       description: "You have a cross product on this line that is not with a 3 demensional vector",
     },
@@ -263,7 +269,6 @@ function EditorLogger(){
     this.UpdateKnownUnknownVariables();
     //after this function runs it will populate "this.expressionsThatDontActuallyEqualEachOther" with information about equations that don't actually equal each other so we need to add the errors that this object represents
     this.AddErrorsFromExpressionsThatDontActuallyEqualEachOther();
-
     //after parsing through everything and building up the list of defined undefined variables we need to check if there are any relevant equations for the set of variables we have in DefinedVariables and this.undefinedVars.defined
     CheckForAndDisplayRelevantEquations();
 
@@ -289,7 +294,6 @@ function EditorLogger(){
       });
 
     }
-    this.addLog({error: errors});//adding errors to the log
   }
 
   this.ParsePreviousLinesAgainWithNewInfoAboutUndefinedVariables = function(endingLineNumber){
@@ -342,13 +346,6 @@ function EditorLogger(){
             }
           }
           else{
-            this.addLog({error: [{
-              error: this.createLoggerErrorFromMathJsError("Integral bounds not formatted properly"),
-              info: "",
-              lineNumber: lineNumber,
-              mfID: mfID,
-            }]});
-
             //we are going to add this information to the correct mathfield that has this error
             MathFields[mfID].log.error.push({
               error: this.createLoggerErrorFromMathJsError("Integral bounds not formatted properly"),
@@ -375,14 +372,6 @@ function EditorLogger(){
             
             return `(${value.expression1} ${oppositeOperator[value.operator]} ${value.expression2}) \\rightarrow (${value.calculatedExpression1} ${oppositeOperator[value.operator]} ${value.calculatedExpression2})`;
           });
-          //console.log(latexExpressions);
-          this.addLog({error: [{
-            error: this.createLoggerErrorFromMathJsError("Incorrect equations"),
-            info: "",
-            latexExpressions: latexExpressions,
-            lineNumber: lineNumber,
-            mfID: mfID,
-          }]});
 
           //we are going to add this information to the correct mathfield that has this error
           MathFields[mfID].log.error.push({
@@ -413,6 +402,7 @@ function EditorLogger(){
     //we need to first reset all unknown variables current state to "unknown" so that they have to prove that they are known every time the user makes an edit in the editor
     if(reset){
       this.ResetAllUnknownVariblesToCurrentStateUnknown();
+      this.TryToCheckAndSetVectorsAndVectorMagnitudes();
     }
     this.expressionsThatDontActuallyEqualEachOther = {};//we have to reset this object everytime we run this function because this.CheckLinesForKnownVariables() will populuate this object with the most up to date expressions that don't actually equal each other
     this.CheckLinesForKnownVariables();
@@ -433,6 +423,7 @@ function EditorLogger(){
             units: "undefined units (none)",
             value: (savedVariable.value) ? savedVariable.value: undefined,
             valueFormattingError: (savedVariable.valueFormattingError) ? savedVariable.valueFormattingError: undefined,
+            components: (savedVariable.components) ? (savedVariable.components) : undefined,
             unitsMathjs: "1 undefinedunit",
             rid: (savedVariable.rid) ? savedVariable.rid : RID(),
           };
@@ -468,6 +459,7 @@ function EditorLogger(){
       state: (savedVariable.state) ? savedVariable.state : "unknown",
       type: (isVariableVector) ? "vector" : "scalar",
       value: (savedVariable.value) ? savedVariable.value: undefined,
+      components: (savedVariable.components) ? savedVariable.components: undefined,
       valueFormattingError: (savedVariable.valueFormattingError) ? savedVariable.valueFormattingError: undefined,
       canBeVector: fullUnitsString.canBeVector,
       fullUnitsString: fullUnitsString.str,
@@ -480,17 +472,6 @@ function EditorLogger(){
     };
     //then after giving this variable a definiton we need to remove it from the undefined object of this.undefinedVars
     delete this.undefinedVars.undefined[definedUndefinedVariable];
-
-  }
-
-  this.addLog = function(log){
-    this.log.success = this.log.success.concat((log.success) ? log.success : []);
-    this.log.info = this.log.info.concat((log.info) ? log.info : []);
-    this.log.warning = this.log.warning.concat((log.warning) ? log.warning : []);
-    this.log.error = this.log.error.concat((log.error) ? log.error : []);
-  }
-
-  this.addToMathFieldsLog = function(log){
 
   }
 
@@ -537,6 +518,7 @@ function EditorLogger(){
         DefinedVariables[key].currentState = "unknown";
         //if the value is unknown by definition then the value of the variable must be "undefined"
         DefinedVariables[key].value = undefined;
+        DefinedVariables[key].components = undefined;
       }
     }
 
@@ -549,6 +531,7 @@ function EditorLogger(){
         this.undefinedVars.undefined[key].currentState = "unknown";
         //if the value is unknown by definition then the value of the variable must be "undefined"
         this.undefinedVars.undefined[key].value = undefined;
+        this.undefinedVars.undefined[key].components = undefined;
       }
     }
     for(const [key, value] of Object.entries(this.undefinedVars.defined)){
@@ -556,7 +539,44 @@ function EditorLogger(){
         this.undefinedVars.defined[key].currentState = "unknown";
         //if the value is unknown by definition then the value of the variable must be "undefined"
         this.undefinedVars.defined[key].value = undefined;
+        this.undefinedVars.defined[key].components = undefined;
       }
+    }
+
+  }
+
+  this.TryToCheckAndSetVectorsAndVectorMagnitudes = function(){
+    
+    // this function goes through every variable and tries to see if it can check or set the corresponding vector magnitude and we do this
+    // right after we have set all known unknowns to unknown and before "CheckLinesForKnownVariables" so that we can have some unknowns
+    // possibly known already by first trying to calculate a vectors magnitude and setting the vector magnitude equal to this value if
+    //the variable exists
+
+    for(const [key, value] of Object.entries(DefinedVariables)){
+      // we will try to set and compare vector magnitudes and vectors
+      CheckThatVectorMagnitudeVariableEqualsVectorMagnitude({
+        variables: DefinedVariables,
+        vectorLs: value.type == "vector" ? key : `\\vec{${key}}`,
+        vectorMagnitudeLs: value.type == "vector" ? RemoveVectorLatexString(key) : key,
+      });
+    }
+
+    for(const [key, value] of Object.entries(this.undefinedVars.undefined)){
+      // we will try to set and compare vector magnitudes and vectors
+      CheckThatVectorMagnitudeVariableEqualsVectorMagnitude({
+        variables: this.undefinedVars.undefined,
+        vectorLs: value.type == "vector" ? key : `\\vec{${key}}`,
+        vectorMagnitudeLs: value.type == "vector" ? RemoveVectorLatexString(key) : key,
+      });
+    }
+
+    for(const [key, value] of Object.entries(this.undefinedVars.defined)){
+      // we will try to set and compare vector magnitudes and vectors
+      CheckThatVectorMagnitudeVariableEqualsVectorMagnitude({
+        variables: this.undefinedVars.defined,
+        vectorLs: value.type == "vector" ? key : `\\vec{${key}}`,
+        vectorMagnitudeLs: value.type == "vector" ? RemoveVectorLatexString(key) : key,
+      });
     }
 
   }
@@ -613,11 +633,6 @@ function EditorLogger(){
   this.display = function(opts = {}){
 
     RenderAllMathFieldLogs();
-
-    //initialize static math fields that are used in the log
-    $(".log-static-latex").each(function(){
-      MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
-    });
 
     if(!opts.dontRenderMyVariablesCollection){
       //after generating errors and defined undefined and defined undefined variables we need to rerender my variable collection

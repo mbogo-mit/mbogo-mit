@@ -140,17 +140,21 @@ let Templates = {
     `
     <div class="variable-row valign-wrapper <%= (opts.unused) ? "unused-variable" : "" %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
-      <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+        <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
         <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
           <% if(opts.variable.value != undefined){%>
-            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variable.rid %>" latex="<%= opts.variable.value %>"></span>
+            <span class="variable-value-container">
+              <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= opts.variable.value %>"></span>
+            </span>
           <%}%>  
         <%}else if(opts.variable.state == "unknown"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variable.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+          <span class="variable-value-container">
+            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+          </span>
         <%}%>    
 
         <% if(opts.variable.dynamicUnits){%>
@@ -184,27 +188,35 @@ let Templates = {
         <span class="static-physics-equation editable-variable" latex="<%= opts.vectorLs + "=" %>" rid="<%= opts.variableVector.rid %>"></span>
         <% if(opts.variableVector.state == "unknown" && opts.variableVector.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
-          <% if(opts.variable.value != undefined){%>
-            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variableVector.rid %>" latex="<%= opts.variableVector.value %>"></span>
+          <% if(opts.variableVector.value != undefined){%>
+            <span class="variable-value-container">
+              <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= opts.variableVector.value %>"></span>
+            </span>
           <%}%>  
         <%}else if(opts.variableVector.state == "unknown"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variableVector.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
+          <span class="variable-value-container">
+            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
+          </span>
         <%}%>  
         <!--vector magnitude portion of the pair-->  
         <span class="static-physics-equation editable-variable" latex="<%= opts.vectorMagnitudeLs + "=" %>" rid="<%= opts.variableVectorMagnitude.rid %>"></span>
         <% if(opts.variableVectorMagnitude.state == "unknown" && opts.variableVectorMagnitude.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
           <% if(opts.variableVectorMagnitude.value != undefined){%>
-            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= opts.variableVectorMagnitude.value %>"></span>
+            <span class="variable-value-container">
+              <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= opts.variableVectorMagnitude.value %>"></span>
+            </span>
           <%}%>  
         <%}else if(opts.variableVectorMagnitude.state == "unknown"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variableVectorMagnitude.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
+          <span class="variable-value-container">
+            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
+          </span>
         <%}%> 
 
         <% if(opts.variableVectorMagnitude.dynamicUnits){%>
@@ -234,17 +246,21 @@ let Templates = {
     `
     <div class="variable-row valign-wrapper undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
-      <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
+        <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
         <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
           <% if(opts.variable.value != undefined){%>
-            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variable.rid %>" latex="<%= opts.variable.value %>"></span>
+            <span class="variable-value-container">
+              <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= opts.variable.value %>"></span>
+            </span>
           <%}%>  
         <%}else if(opts.variable.state == "unknown"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variable.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+          <span class="variable-value-container">
+            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+          </span>
         <%}%>  
         <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info undefined-units units"><%= opts.variable.units %></span>
       </div>
@@ -262,26 +278,34 @@ let Templates = {
         <% if(opts.variableVector.state == "unknown" && opts.variableVector.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
           <% if(opts.variableVector.value != undefined){%>
-            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variableVector.rid %>" latex="<%= opts.variableVector.value %>"></span>
+            <span class="variable-value-container">
+              <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= opts.variableVector.value %>"></span>
+            </span>
           <%}%>  
         <%}else if(opts.variableVector.state == "unknown"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variableVector.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
+          <span class="variable-value-container">
+            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
+          </span>
         <%}%>
         <!--vector magnitude portion of the pair-->
         <span class="static-physics-equation editable-variable" latex="<%= opts.vectorMagnitudeLs + "=" %>" rid="<%= opts.variableVectorMagnitude.rid %>"></span>
         <% if(opts.variableVectorMagnitude.state == "unknown" && opts.variableVectorMagnitude.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
           <% if(opts.variableVectorMagnitude.value != undefined){%>
-            <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= opts.variableVectorMagnitude.value %>"></span>
+            <span class="variable-value-container">
+              <span class="variable-value static-mathfield tooltipped" data-position="bottom" data-tooltip="This value was calculated and can not be edited" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= opts.variableVectorMagnitude.value %>"></span>
+            </span>
           <%}%>  
         <%}else if(opts.variableVectorMagnitude.state == "unknown"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag unknown tooltipped" data-position="bottom" data-tooltip="This variable is an unknown variable">unknown</span>
         <%}else if(opts.variableVectorMagnitude.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
-          <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
+          <span class="variable-value-container">
+            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
+          </span>
         <%}%>
         <span onclick="DefineVariableUnits($(this), '<%= opts.variableVector.rid %>', '<%= opts.variableVectorMagnitude.rid %>' )" class="variable-tag info undefined-units units"><%= opts.variableVectorMagnitude.units %></span>
       </div>
