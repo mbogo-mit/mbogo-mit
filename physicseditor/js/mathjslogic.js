@@ -1518,6 +1518,62 @@ function FindAndConvertAllVectorsIntoNerdamerMatrixesForLs(ls){
       newLs += ` matrix([0*\\dim{1}, 0*\\dim{2}, 0*\\dim{3}])`
     }
 
+    if(!foundMatch && s.indexOf("\\partial\\vec{") == 0){
+      //trying to convert generic vectors to nerdamer matrix
+      i2 = FindIndexOfClosingBracket(s.substring("\\partial\\vec{".length));
+      if(i2 != null){
+        foundMatch = true;
+        i2 += "\\partial\\vec{".length;
+        delta = i2 + 1;
+        let generalVectorStr = s.substring("\\partial".length, i2 + 1);
+        let vectorComponents = GetStoredVariableInfo(generalVectorStr).components;
+        let coordinateSystemUsedInVector = vectorComponents != undefined ? vectorComponents.coordinateSystem : undefined;
+        let vectorMatrixString = "";
+        //based on the coordinate system used by the vector we will add a different matrix string to the newLs
+        if(coordinateSystemUsedInVector == "cartesianXYZ"){
+          vectorMatrixString = ` matrix([\\partial\\comp1{${generalVectorStr}}\\hat{x}, \\partial\\comp2{${generalVectorStr}}\\hat{y}, \\partial\\comp3{${generalVectorStr}}\\hat{z}])`;
+        }else if(coordinateSystemUsedInVector == "cartesianIJK"){
+          vectorMatrixString = ` matrix([\\partial\\comp1{${generalVectorStr}}\\hat{i}, \\partial\\comp2{${generalVectorStr}}\\hat{j}, \\partial\\comp3{${generalVectorStr}}\\hat{k}])`;
+        }else if(coordinateSystemUsedInVector == "cylindrical"){
+          vectorMatrixString = ` matrix([\\partial\\comp1{${generalVectorStr}}\\hat{r}, \\partial\\comp2{${generalVectorStr}}\\hat{\\theta}, \\partial\\comp3{${generalVectorStr}}\\hat{z}])`;
+        }else if(coordinateSystemUsedInVector == "spherical"){
+          vectorMatrixString = ` matrix([\\partial\\comp1{${generalVectorStr}}\\hat{r}, \\partial\\comp2{${generalVectorStr}}\\hat{\\theta}, \\partial\\comp3{${generalVectorStr}}\\theta{\\phi}])`;
+        }else{
+          // if "coordinateSystemUsedInVector" doesn't equal any of those values then it either equals "generic" or undefined. Either way the default string is the one below
+          vectorMatrixString = ` matrix([\\partial\\comp1{${generalVectorStr}}\\dim{1}, \\partial\\comp2{${generalVectorStr}}\\dim{2}, \\partial\\comp3{${generalVectorStr}}\\dim{3}])`;
+        }
+        newLs += vectorMatrixString;
+      }else{return null;}
+    }
+
+    if(!foundMatch && s.indexOf("d\\vec{") == 0){
+      //trying to convert generic vectors to nerdamer matrix
+      i2 = FindIndexOfClosingBracket(s.substring("d\\vec{".length));
+      if(i2 != null){
+        foundMatch = true;
+        i2 += "d\\vec{".length;
+        delta = i2 + 1;
+        let generalVectorStr = s.substring(1, i2 + 1);
+        let vectorComponents = GetStoredVariableInfo(generalVectorStr).components;
+        let coordinateSystemUsedInVector = vectorComponents != undefined ? vectorComponents.coordinateSystem : undefined;
+        let vectorMatrixString = "";
+        //based on the coordinate system used by the vector we will add a different matrix string to the newLs
+        if(coordinateSystemUsedInVector == "cartesianXYZ"){
+          vectorMatrixString = ` matrix([d\\comp1{${generalVectorStr}}\\hat{x}, d\\comp2{${generalVectorStr}}\\hat{y}, d\\comp3{${generalVectorStr}}\\hat{z}])`;
+        }else if(coordinateSystemUsedInVector == "cartesianIJK"){
+          vectorMatrixString = ` matrix([d\\comp1{${generalVectorStr}}\\hat{i}, d\\comp2{${generalVectorStr}}\\hat{j}, d\\comp3{${generalVectorStr}}\\hat{k}])`;
+        }else if(coordinateSystemUsedInVector == "cylindrical"){
+          vectorMatrixString = ` matrix([d\\comp1{${generalVectorStr}}\\hat{r}, d\\comp2{${generalVectorStr}}\\hat{\\theta}, d\\comp3{${generalVectorStr}}\\hat{z}])`;
+        }else if(coordinateSystemUsedInVector == "spherical"){
+          vectorMatrixString = ` matrix([d\\comp1{${generalVectorStr}}\\hat{r}, d\\comp2{${generalVectorStr}}\\hat{\\theta}, d\\comp3{${generalVectorStr}}\\theta{\\phi}])`;
+        }else{
+          // if "coordinateSystemUsedInVector" doesn't equal any of those values then it either equals "generic" or undefined. Either way the default string is the one below
+          vectorMatrixString = ` matrix([d\\comp1{${generalVectorStr}}\\dim{1}, d\\comp2{${generalVectorStr}}\\dim{2}, d\\comp3{${generalVectorStr}}\\dim{3}])`;
+        }
+        newLs += vectorMatrixString;
+      }else{return null;}
+    }
+
     if(!foundMatch && s.indexOf("\\vec{") == 0){
       //trying to convert generic vectors to nerdamer matrix
       i2 = FindIndexOfClosingBracket(s.substring("\\vec{".length));
@@ -3259,7 +3315,6 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
 }
 
 function CheckThatVectorMagnitudeVariableEqualsVectorMagnitude(opts){
-  console.log("CheckThatVectorMagnitudeVariableEqualsVectorMagnitude");
   // this function takes a vectorLs, vectorMagnitudeLs, and a location where these variables are stored and checks that vector magnitude and vector variable equal each other
   // when you calculated the magnitude of the vector variable. And if the vector magnitude is not known then we set its value to known and calculate its value
 
@@ -3301,27 +3356,39 @@ function CheckThatVectorMagnitudeVariableEqualsVectorMagnitude(opts){
       let calculatedVectorMagnitudeValueMathJs = math.evaluate(calculatedVectorMagnitudeValue);
       //making sure that there is a specific number of sig fig precision
       calculatedVectorMagnitudeValue = Number(calculatedVectorMagnitudeValueMathJs.toString()).toFixed(PrecisionSigFigs);
+      let calculatedVectorMagnitudeValueLs = ConvertStringToScientificNotation(calculatedVectorMagnitudeValue);
+      variables[vectorLs].vectorMagnitude = calculatedVectorMagnitudeValueLs;
       // now we need to check if the vector magnitude has a value and if it does then we need to compare the values. If it doesn't then we set the value to what we calculated -> "calculatedVectorMagnitudeValue"
       if(variables[vectorMagnitudeLs].value == undefined || variables[vectorMagnitudeLs].value == ""){
-        variables[vectorMagnitudeLs].value = ConvertStringToScientificNotation(calculatedVectorMagnitudeValue);
+        variables[vectorMagnitudeLs].value = calculatedVectorMagnitudeValueLs;
       }else{
         // we need to check if the two values equal
-        let vectorMagnitudeValue; 
-
-        let num1 = calculatedVectorMagnitudeValueMathJs.toExponential().split("e");
-        let num2 = math.evaluate(nerdamer.convertFromLaTeX(variables[vectorMagnitudeLs].value).evaluate().toString()).toExponential().split("e");
-        let isEqual = nerdamer(`${Number(num1[0]).toFixed(PrecisionSigFigs)}e${num1[1]}`).eq(`${Number(num2[0]).toFixed(PrecisionSigFigs)}e${num2[1]}`);
-        if(!isEqual){
-          ThrowErrorVectorMagnitudeAndVectorDontEqual();
-        }
+        try{
+          // we are going to try to compare the value of the vector magnitude and the magnitude of the vector 
+          let num1 = calculatedVectorMagnitudeValueMathJs.toExponential().split("e");
+          //we need to convert variable value latex to a string that nerdamer and mathjs can read and understand
+          let expressionObj = ExactConversionFromLatexStringToNerdamerReadableString({
+            ls: variables[vectorMagnitudeLs].value,
+            uniqueRIDStringArray: [],
+            lineNumber: 0,
+            mfID: "none",
+            throwError: false,
+            convertVectorsToNerdamerMatrices: false,
+            returnFinalObject: true,//if the expression evaulates to a vector we want to return an array
+          });
+          let num2 = math.evaluate(expressionObj.array[0]).toExponential().split("e");
+          let isEqual = nerdamer(`${Number(num1[0]).toFixed(PrecisionSigFigs)}e${num1[1]}`).eq(`${Number(num2[0]).toFixed(PrecisionSigFigs)}e${num2[1]}`);
+          variables[vectorLs].magnitudeOfVectorEqualsVectorMagnitude = isEqual;
+          variables[vectorMagnitudeLs].magnitudeOfVectorEqualsVectorMagnitude = isEqual;
+        }catch(err){}
+        
       }
     }
   }
 
-}
+  //after checking if the magnitude of a vector is equal to the vector magnitude variable we need to render any errors that may surface
+  RenderVariableCollectionErrors();
 
-function ThrowErrorVectorMagnitudeAndVectorDontEqual(){
-  console.log("ThrowErrorVectorMagnitudeAndVectorDontEqual");
 }
 
 
@@ -4156,6 +4223,11 @@ function EvaluateStringInsideDefiniteIntegralAndReturnNerdamerString(ls, uniqueR
 
 }
 
+function WrapAllInstancesOfPIInParentheses(ls){
+  // this function finds all instances of \\pi and puts latex parentheses around it
+  return ls.replace(/\\pi/,"\\left(\\pi\\right)");
+}
+
 function ExactConversionFromLatexStringToNerdamerReadableString(opts){
   //requried params: ls, uniqueRIDStringArray, lineNumber, mfID
   if(opts.ls == undefined || opts.uniqueRIDStringArray == undefined || opts.lineNumber == undefined || opts.mfID == undefined){
@@ -4171,7 +4243,12 @@ function ExactConversionFromLatexStringToNerdamerReadableString(opts){
   let throwError = (opts.throwError != undefined) ? opts.throwError : false;
   let returnFinalObject = (opts.returnFinalObject != undefined) ? opts.returnFinalObject: false;//default is to return a matrix if the exprssion is a vector
   let convertVectorsToNerdamerMatrices = (opts.convertVectorsToNerdamerMatrices != undefined) ? opts.convertVectorsToNerdamerMatrices : false;
-  
+  // we have this line because for example nerdamer converts this latex string incorrectly "\\pi\\sqrt{10}" -> "10*pisqrt" but if we put parentheses around
+  // pi it converts it correctly. And the reason why i am not worried about other variables is because "\\pi" is the only latex string that we don't convert
+  // to an RID string because nerdamer understands what it is, unlike the other latex string variables I am using. which i don't have to worry about because
+  // they are turned to RID strings
+  ls = WrapAllInstancesOfPIInParentheses(ls);
+
   ls = FormatAbsoluteValuesSqrtOfDotProduct(ls,mfID);
   if(ls == null){return null;}
 

@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178867755-1"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178867755-1"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-    gtag('config', 'UA-178867755-1');
-    </script>
-      <!-- Compiled and minified CSS -->
-      <title>Physics.io</title> 
-      <link rel="icon" type="image/png" href="images/physicsicon.png"> 
-      <link rel="stylesheet" href="lib/materialize/css/materialize.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-      <script src="lib/materialize/js/materialize.min.js"></script>
+      gtag('config', 'UA-178867755-1');
+      </script>
 
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <link type="text/css" rel="stylesheet" href="css/main.css"  media="screen,projection"/>
+<!-- Compiled and minified CSS -->
+<title>Physics.io</title> 
+<link rel="icon" type="image/png" href="images/physicsicon.png"> 
+<link rel="stylesheet" href="lib/materialize/css/materialize.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="lib/materialize/js/materialize.min.js"></script>
 
-      <!-- Mathquill -->
-      <link rel="stylesheet" href="lib/mathquill/css/mathquill.css">
-      <script src="lib/mathquill/js/mathquill.js"></script>
-      <script type="text/javascript" src="lib/ejs/ejs.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="css/main.css"  media="screen,projection"/>
 
-      <!-- AlgebraJs -->
-      <script src="lib/nerdamer/nerdamer.core.js"></script>
-      <script src="lib/nerdamer/Algebra.js"></script>
-      <script src="lib/nerdamer/Calculus.js"></script>
-      <script src="lib/nerdamer/Solve.js"></script>
-      <script src="lib/nerdamer/Extra.js"></script>
+<!-- Mathquill -->
+<link rel="stylesheet" href="lib/mathquill/css/mathquill.css">
+<script src="lib/mathquill/js/mathquill.js"></script>
+<script type="text/javascript" src="lib/ejs/ejs.js"></script>
 
-      <!-- MathJs -->
-      <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.1.0/math.js"></script>-->
-      <script type="text/javascript" src="lib/mathjs/mathjs.min.js"></script>
+<!-- AlgebraJs -->
+<script src="lib/nerdamer/nerdamer.core.js"></script>
+<script src="lib/nerdamer/Algebra.js"></script>
+<script src="lib/nerdamer/Calculus.js"></script>
+<script src="lib/nerdamer/Solve.js"></script>
+<script src="lib/nerdamer/Extra.js"></script>
 
-      <!--Let browser know website is optimized for mobile-->
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- MathJs -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.1.0/math.js"></script>-->
+<script type="text/javascript" src="lib/mathjs/mathjs.min.js"></script>
+
+<!--Let browser know website is optimized for mobile-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   </head>
   <body>
@@ -61,7 +62,7 @@
 
     <div id="main-screen" lopc="[{&#34;quantity&#34;:&#34;velocity&#34;,&#34;quantityDescription&#34;:&#34;speed of light in vacuum&#34;,&#34;symbol&#34;:&#34;c&#34;,&#34;value&#34;:&#34;299792458&#34;,&#34;unitsLatex&#34;:&#34;\\frac{m}{s}&#34;,&#34;unitString&#34;:&#34;m/s&#34;,&#34;unitsMathjs&#34;:&#34;1 m/s&#34;},{&#34;quantity&#34;:&#34;Planck constant&#34;,&#34;quantityDescription&#34;:&#34;Planck constant&#34;,&#34;symbol&#34;:&#34;h&#34;,&#34;value&#34;:&#34;6.62607004081\\times 10^{-34}&#34;,&#34;unitsLatex&#34;:&#34;J\\cdot s&#34;,&#34;unitString&#34;:&#34;J*s&#34;,&#34;unitsMathjs&#34;:&#34;1 J s&#34;},{&#34;quantity&#34;:&#34;Planck constant&#34;,&#34;quantityDescription&#34;:&#34;Reduced Plank&#39;s constant (h/2pi)&#34;,&#34;symbol&#34;:&#34;\\hbar&#34;,&#34;value&#34;:&#34;1.05457180027\\times 10^{-34}&#34;,&#34;unitsLatex&#34;:&#34;J\\cdot s&#34;,&#34;unitString&#34;:&#34;J*s&#34;,&#34;unitsMathjs&#34;:&#34;1 J s&#34;},{&#34;quantity&#34;:&#34;Newtonian constant of gravitation&#34;,&#34;quantityDescription&#34;:&#34;Newtonian constant of gravitation&#34;,&#34;symbol&#34;:&#34;G&#34;,&#34;value&#34;:&#34;6.6740831\\times 10^{-11}&#34;,&#34;unitsLatex&#34;:&#34;\\frac{m^{3}}{kg\\cdot s^{2}}&#34;,&#34;unitString&#34;:&#34;(m^3)/(kg*s^2)&#34;,&#34;unitsMathjs&#34;:&#34;1 m^3 / (kg s^2)&#34;},{&#34;quantity&#34;:&#34;acceleration&#34;,&#34;quantityDescription&#34;:&#34;Acceleration due to gravity&#34;,&#34;symbol&#34;:&#34;g&#34;,&#34;value&#34;:&#34;9.8&#34;,&#34;unitsLatex&#34;:&#34;\\frac{m}{s^2}&#34;,&#34;unitString&#34;:&#34;m/s^2&#34;,&#34;unitsMathjs&#34;:&#34;1 m / s^2&#34;},{&#34;quantity&#34;:&#34;Boltzmann constant&#34;,&#34;quantityDescription&#34;:&#34;Boltzmann constant&#34;,&#34;symbol&#34;:&#34;k_{b}&#34;,&#34;value&#34;:&#34;1.380658\\times 10^{-23}&#34;,&#34;unitsLatex&#34;:&#34;\\frac{J}{K}&#34;,&#34;unitString&#34;:&#34;J/K&#34;,&#34;unitsMathjs&#34;:&#34;1 J/K&#34;},{&#34;quantity&#34;:&#34;molar gas constant&#34;,&#34;quantityDescription&#34;:&#34;molar gas constant&#34;,&#34;symbol&#34;:&#34;R&#34;,&#34;value&#34;:&#34;8.314510&#34;,&#34;unitsLatex&#34;:&#34;\\frac{J}{mol}\\cdot K&#34;,&#34;unitString&#34;:&#34;(J*K)/(mol)&#34;,&#34;unitsMathjs&#34;:&#34;1 J K / mol&#34;},{&#34;quantity&#34;:&#34;Avogadro&#39;s number&#34;,&#34;quantityDescription&#34;:&#34;Avogadro&#39;s number&#34;,&#34;symbol&#34;:&#34;N_{A}&#34;,&#34;value&#34;:&#34;6.0221367\\times 10^{23}&#34;,&#34;unitsLatex&#34;:&#34;mol^{-1}&#34;,&#34;unitString&#34;:&#34;1/mol&#34;,&#34;unitsMathjs&#34;:&#34;1 / mol&#34;},{&#34;quantity&#34;:&#34;electric charge&#34;,&#34;quantityDescription&#34;:&#34;Charge of electron&#34;,&#34;symbol&#34;:&#34;e&#34;,&#34;value&#34;:&#34;1.602176620898\\times 10^{-19}&#34;,&#34;unitsLatex&#34;:&#34;C&#34;,&#34;unitString&#34;:&#34;C&#34;,&#34;unitsMathjs&#34;:&#34;1 C&#34;},{&#34;quantity&#34;:&#34;Permeability of vacuum&#34;,&#34;quantityDescription&#34;:&#34;Permeability of vacuum&#34;,&#34;symbol&#34;:&#34;\\mu_{0}&#34;,&#34;value&#34;:&#34;4\\pi\\times 10^{-7}&#34;,&#34;unitsLatex&#34;:&#34;\\frac{N}{A^{2}}&#34;,&#34;unitString&#34;:&#34;N/(A^2)&#34;,&#34;unitsMathjs&#34;:&#34;1 N / A^2&#34;},{&#34;quantity&#34;:&#34;Permittivity of vacuum&#34;,&#34;quantityDescription&#34;:&#34;Permittivity of vacuum&#34;,&#34;symbol&#34;:&#34;\\epsilon_{0}&#34;,&#34;value&#34;:&#34;8.854187817\\times 10^{-12}&#34;,&#34;unitsLatex&#34;:&#34;\\frac{F}{m}&#34;,&#34;unitString&#34;:&#34;F/m&#34;,&#34;unitsMathjs&#34;:&#34;1 F / m&#34;},{&#34;quantity&#34;:&#34;Coulomb constant&#34;,&#34;quantityDescription&#34;:&#34;Coulomb constant&#34;,&#34;symbol&#34;:&#34;k&#34;,&#34;value&#34;:&#34;8.987552\\times 10^{9}&#34;,&#34;unitsLatex&#34;:&#34;N\\cdot\\frac{m^{2}}{C^{2}}&#34;,&#34;unitString&#34;:&#34;N*(m^2)/(C^2)&#34;,&#34;unitsMathjs&#34;:&#34;1 N m^2 / C^2&#34;},{&#34;quantity&#34;:&#34;Faraday constant&#34;,&#34;quantityDescription&#34;:&#34;Faraday constant&#34;,&#34;symbol&#34;:&#34;F&#34;,&#34;value&#34;:&#34;96485.309&#34;,&#34;unitsLatex&#34;:&#34;\\frac{C}{mol}&#34;,&#34;unitString&#34;:&#34;C/mol&#34;,&#34;unitsMathjs&#34;:&#34;1 C / mol&#34;},{&#34;quantity&#34;:&#34;mass&#34;,&#34;quantityDescription&#34;:&#34;electron mass&#34;,&#34;symbol&#34;:&#34;m_{e}&#34;,&#34;value&#34;:&#34;9.1093835611\\times 10^{-31}&#34;,&#34;unitsLatex&#34;:&#34;kg&#34;,&#34;unitString&#34;:&#34;kg&#34;,&#34;unitsMathjs&#34;:&#34;1 kg&#34;},{&#34;quantity&#34;:&#34;mass&#34;,&#34;quantityDescription&#34;:&#34;proton mass&#34;,&#34;symbol&#34;:&#34;m_{p}&#34;,&#34;value&#34;:&#34;1.67262189821\\times 10^{-27}&#34;,&#34;unitsLatex&#34;:&#34;kg&#34;,&#34;unitString&#34;:&#34;kg&#34;,&#34;unitsMathjs&#34;:&#34;1 kg&#34;},{&#34;quantity&#34;:&#34;mass&#34;,&#34;quantityDescription&#34;:&#34;neutron mass&#34;,&#34;symbol&#34;:&#34;m_{n}&#34;,&#34;value&#34;:&#34;1.6726231\\times 10^{-27}&#34;,&#34;unitsLatex&#34;:&#34;kg&#34;,&#34;unitString&#34;:&#34;kg&#34;,&#34;unitsMathjs&#34;:&#34;1 kg&#34;},{&#34;quantity&#34;:&#34;mass&#34;,&#34;quantityDescription&#34;:&#34;Atomic mass unit&#34;,&#34;symbol&#34;:&#34;u&#34;,&#34;value&#34;:&#34;1.6605402\\times 10^{-27}&#34;,&#34;unitsLatex&#34;:&#34;kg&#34;,&#34;unitString&#34;:&#34;kg&#34;,&#34;unitsMathjs&#34;:&#34;1 kg&#34;},{&#34;quantity&#34;:&#34;Stefan-Boltzmann constant&#34;,&#34;quantityDescription&#34;:&#34;Stefan-Boltzmann constant&#34;,&#34;symbol&#34;:&#34;\\sigma&#34;,&#34;value&#34;:&#34;5.67051\\times 10^{-8}&#34;,&#34;unitsLatex&#34;:&#34;\\frac{W}{m^{2}}\\cdot K^{4}&#34;,&#34;unitString&#34;:&#34;W/(m^2)*K^4&#34;,&#34;unitsMathjs&#34;:&#34;1 W K^4 / m^2&#34;},{&#34;quantity&#34;:&#34;Rydberg constant&#34;,&#34;quantityDescription&#34;:&#34;Rydberg constant&#34;,&#34;symbol&#34;:&#34;R_{\\infty}&#34;,&#34;value&#34;:&#34;10973731.534&#34;,&#34;unitsLatex&#34;:&#34;m^{-1}&#34;,&#34;unitString&#34;:&#34;1/m&#34;,&#34;unitsMathjs&#34;:&#34;1 / m&#34;},{&#34;quantity&#34;:&#34;Bohr magneton&#34;,&#34;quantityDescription&#34;:&#34;Bohr magneton&#34;,&#34;symbol&#34;:&#34;\\mu_{B}&#34;,&#34;value&#34;:&#34;9.2740154\\times 10^{-24}&#34;,&#34;unitsLatex&#34;:&#34;\\frac{J}{T}&#34;,&#34;unitString&#34;:&#34;J/T&#34;,&#34;unitsMathjs&#34;:&#34;1 J / T&#34;},{&#34;quantity&#34;:&#34;magnetic flux&#34;,&#34;quantityDescription&#34;:&#34;magnetic flux quantum h/2e&#34;,&#34;symbol&#34;:&#34;\\Phi_{0}&#34;,&#34;value&#34;:&#34;2.06783383113\\times 10^{-15}&#34;,&#34;unitsLatex&#34;:&#34;Wb&#34;,&#34;unitString&#34;:&#34;Wb&#34;,&#34;unitsMathjs&#34;:&#34;1 Wb&#34;},{&#34;quantity&#34;:&#34;Wien displacement constant&#34;,&#34;quantityDescription&#34;:&#34;Wien displacement constant&#34;,&#34;symbol&#34;:&#34;b&#34;,&#34;value&#34;:&#34;2.897756\\times 10^{-3}&#34;,&#34;unitsLatex&#34;:&#34;m\\cdot K&#34;,&#34;unitString&#34;:&#34;m*K&#34;,&#34;unitsMathjs&#34;:&#34;1 m K&#34;}]">
       <div id="my-navbar" onclick="UnfocusMathFields()">
-    <a href="index.html">Physics.io</a>
+    <a href="/">Physics.io</a>
     <!--<a class="waves-effect waves-light btn right" href="#">Report an error</a>-->
     <a class="waves-effect waves-light btn modal-trigger right" href="#modal-user-guide">User Guide</a>
     <a onclick="ClearEditorData();" class="waves-effect waves-light btn right">Clear Editor Data</a>
@@ -4006,8 +4007,8 @@
             <td><span class="static-physics-equation" latex="\frac{m}{s}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="70w3phisv7" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="70w3phisv7" symbol="c"></span>
+                <input class="physics-constant-checkbox-input" rid="zs7avsycy9" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="zs7avsycy9" symbol="c"></span>
               </label>
             </td>
           </tr>
@@ -4019,8 +4020,8 @@
             <td><span class="static-physics-equation" latex="J\cdot s"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="ropfjsnzje" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="ropfjsnzje" symbol="h"></span>
+                <input class="physics-constant-checkbox-input" rid="yws8kzcl8l" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="yws8kzcl8l" symbol="h"></span>
               </label>
             </td>
           </tr>
@@ -4032,8 +4033,8 @@
             <td><span class="static-physics-equation" latex="J\cdot s"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="sk47b16u5u" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="sk47b16u5u" symbol="\hbar"></span>
+                <input class="physics-constant-checkbox-input" rid="m5ejjyp9ev" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="m5ejjyp9ev" symbol="\hbar"></span>
               </label>
             </td>
           </tr>
@@ -4045,8 +4046,8 @@
             <td><span class="static-physics-equation" latex="\frac{m^{3}}{kg\cdot s^{2}}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="mxn39sf9f5" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="mxn39sf9f5" symbol="G"></span>
+                <input class="physics-constant-checkbox-input" rid="1ds8cdu5i8" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="1ds8cdu5i8" symbol="G"></span>
               </label>
             </td>
           </tr>
@@ -4058,8 +4059,8 @@
             <td><span class="static-physics-equation" latex="\frac{m}{s^2}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="dorowliuc7" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="dorowliuc7" symbol="g"></span>
+                <input class="physics-constant-checkbox-input" rid="mpnhynpioy" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="mpnhynpioy" symbol="g"></span>
               </label>
             </td>
           </tr>
@@ -4071,8 +4072,8 @@
             <td><span class="static-physics-equation" latex="\frac{J}{K}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="y1bc6ao001" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="y1bc6ao001" symbol="k_{b}"></span>
+                <input class="physics-constant-checkbox-input" rid="a8ckyu49id" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="a8ckyu49id" symbol="k_{b}"></span>
               </label>
             </td>
           </tr>
@@ -4084,8 +4085,8 @@
             <td><span class="static-physics-equation" latex="\frac{J}{mol}\cdot K"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="qznnvi87xs" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="qznnvi87xs" symbol="R"></span>
+                <input class="physics-constant-checkbox-input" rid="un8sf01nra" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="un8sf01nra" symbol="R"></span>
               </label>
             </td>
           </tr>
@@ -4097,8 +4098,8 @@
             <td><span class="static-physics-equation" latex="mol^{-1}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="6bp2tussdq" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="6bp2tussdq" symbol="N_{A}"></span>
+                <input class="physics-constant-checkbox-input" rid="9ubimgffjp" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="9ubimgffjp" symbol="N_{A}"></span>
               </label>
             </td>
           </tr>
@@ -4110,8 +4111,8 @@
             <td><span class="static-physics-equation" latex="C"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="iispvz0p3f" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="iispvz0p3f" symbol="e"></span>
+                <input class="physics-constant-checkbox-input" rid="qiv2tms1ue" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="qiv2tms1ue" symbol="e"></span>
               </label>
             </td>
           </tr>
@@ -4123,8 +4124,8 @@
             <td><span class="static-physics-equation" latex="\frac{N}{A^{2}}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="v5nc5xmfd3" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="v5nc5xmfd3" symbol="\mu_{0}"></span>
+                <input class="physics-constant-checkbox-input" rid="sptdqh15dk" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="sptdqh15dk" symbol="\mu_{0}"></span>
               </label>
             </td>
           </tr>
@@ -4136,8 +4137,8 @@
             <td><span class="static-physics-equation" latex="\frac{F}{m}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="zvyv3v3uth" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="zvyv3v3uth" symbol="\epsilon_{0}"></span>
+                <input class="physics-constant-checkbox-input" rid="1ktzfpk6d1" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="1ktzfpk6d1" symbol="\epsilon_{0}"></span>
               </label>
             </td>
           </tr>
@@ -4149,8 +4150,8 @@
             <td><span class="static-physics-equation" latex="N\cdot\frac{m^{2}}{C^{2}}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="155eonkn66" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="155eonkn66" symbol="k"></span>
+                <input class="physics-constant-checkbox-input" rid="xhwk6r4j5i" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="xhwk6r4j5i" symbol="k"></span>
               </label>
             </td>
           </tr>
@@ -4162,8 +4163,8 @@
             <td><span class="static-physics-equation" latex="\frac{C}{mol}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="thhontjgny" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="thhontjgny" symbol="F"></span>
+                <input class="physics-constant-checkbox-input" rid="4koc99sl3p" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="4koc99sl3p" symbol="F"></span>
               </label>
             </td>
           </tr>
@@ -4175,8 +4176,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="62zjlutwo8" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="62zjlutwo8" symbol="m_{e}"></span>
+                <input class="physics-constant-checkbox-input" rid="wvkmy6ny8m" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="wvkmy6ny8m" symbol="m_{e}"></span>
               </label>
             </td>
           </tr>
@@ -4188,8 +4189,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="d02rfnsflx" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="d02rfnsflx" symbol="m_{p}"></span>
+                <input class="physics-constant-checkbox-input" rid="eijxv93h39" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="eijxv93h39" symbol="m_{p}"></span>
               </label>
             </td>
           </tr>
@@ -4201,8 +4202,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="cev1tys0y7" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="cev1tys0y7" symbol="m_{n}"></span>
+                <input class="physics-constant-checkbox-input" rid="xxaf7sfx0i" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="xxaf7sfx0i" symbol="m_{n}"></span>
               </label>
             </td>
           </tr>
@@ -4214,8 +4215,8 @@
             <td><span class="static-physics-equation" latex="kg"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="7kooe2bpqm" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="7kooe2bpqm" symbol="u"></span>
+                <input class="physics-constant-checkbox-input" rid="gbmwth1rfe" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="gbmwth1rfe" symbol="u"></span>
               </label>
             </td>
           </tr>
@@ -4227,8 +4228,8 @@
             <td><span class="static-physics-equation" latex="\frac{W}{m^{2}}\cdot K^{4}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="i9iltzg9ff" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="i9iltzg9ff" symbol="\sigma"></span>
+                <input class="physics-constant-checkbox-input" rid="g5pyybq1bf" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="g5pyybq1bf" symbol="\sigma"></span>
               </label>
             </td>
           </tr>
@@ -4240,8 +4241,8 @@
             <td><span class="static-physics-equation" latex="m^{-1}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="v9qx05wt2p" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="v9qx05wt2p" symbol="R_{\infty}"></span>
+                <input class="physics-constant-checkbox-input" rid="l31qli38q5" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="l31qli38q5" symbol="R_{\infty}"></span>
               </label>
             </td>
           </tr>
@@ -4253,8 +4254,8 @@
             <td><span class="static-physics-equation" latex="\frac{J}{T}"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="glz3ny7316" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="glz3ny7316" symbol="\mu_{B}"></span>
+                <input class="physics-constant-checkbox-input" rid="f5awcmklzw" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="f5awcmklzw" symbol="\mu_{B}"></span>
               </label>
             </td>
           </tr>
@@ -4266,8 +4267,8 @@
             <td><span class="static-physics-equation" latex="Wb"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="rg3sxn68lf" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="rg3sxn68lf" symbol="\Phi_{0}"></span>
+                <input class="physics-constant-checkbox-input" rid="15w3w5f0q7" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="15w3w5f0q7" symbol="\Phi_{0}"></span>
               </label>
             </td>
           </tr>
@@ -4279,8 +4280,8 @@
             <td><span class="static-physics-equation" latex="m\cdot K"></span></td>
             <td>
               <label>
-                <input class="physics-constant-checkbox-input" rid="m2yj7szd7j" type="checkbox" />
-                <span class="physics-constant-checkbox-span" rid="m2yj7szd7j" symbol="b"></span>
+                <input class="physics-constant-checkbox-input" rid="49kfncu98o" type="checkbox" />
+                <span class="physics-constant-checkbox-span" rid="49kfncu98o" symbol="b"></span>
               </label>
             </td>
           </tr>

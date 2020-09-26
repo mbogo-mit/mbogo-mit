@@ -26,11 +26,11 @@ $(document).ready(function(){
 
 
   $(".static-physics-equation").each(function(i){
-    MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+    MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
   });
 
   $(".keyboard-latex").each(function(i){
-    MQ.StaticMath($(this)[0],{});
+    MQ.StaticMath($(this).get(0),{});
   });
 
   //setting the mathfields for the warning message box
@@ -167,7 +167,7 @@ $(document).ready(function(){
         //this means that more information Popup hasn't been created so we will create it
         CreateInfoPopup(id, JSON.parse(el.attr("info")));
       }
-      DisplayInfoPopup(id, $(this)[0].getBoundingClientRect());
+      DisplayInfoPopup(id, $(this).get(0).getBoundingClientRect());
     }
   });
 

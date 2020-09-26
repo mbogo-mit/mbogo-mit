@@ -132,7 +132,7 @@ function RenderImportedVariablesTable(type, index){
   $("#import-variable-definition-modal-content").html(html);
   //render the latex strings
   $("#modal_import_variable_definition .static-physics-equation").each(function(i){
-    MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+    MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
   });
   //add event listeners for checkboxes
   $("#import-all-variables").change(function(){
@@ -652,23 +652,143 @@ function ToggleKeyboard(){
   }
 }
 
-function RenderMessageUI(id){
+function RenderVariableCollectionErrors(){
+  console.log("RenderVariableCollectionErrors");
+  // this function goes through all the objects holding variable data and creates errors and displays them in the ui through tooltips exactly like mathfields
+  // the first thing we need to do is create for loops that go through each object that holds variable data
+  // next we need to find any errors that exist and format them into an object that the ejs template "mathfield-error" can understand to create a tooltip for the error
+  // then we need to figure out which ".variable-collection-error-container" span to attach the tooltip onto
 
-  let elmnt = $(`#${id}`).parents(".editor_line");
-  elmnt.find(".line_label span").removeClass('active');
+  let errorsInVariableCollection = {};
 
-  if(MathFields[id].message.question != null){
-    elmnt.find(".line_label span.line-question").addClass('active');
+  for(const [key, value] of Object.entries(DefinedVariables)){
+    let errors = [];
+    if(value.type == "vector"){
+      if(!value.canBeVector){
+        errors.push({
+          error: {
+            type: "This unit can't be a vector",
+            description: "This vector has units that can only be mesaured using a scalar"
+          },
+          latexExpressions: undefined,
+        });
+      }
+      if(value.magnitudeOfVectorEqualsVectorMagnitude == false){
+        let vectorMagnitudeLs = RemoveVectorLatexString(key);
+        // we have to make sure that the vector magnitude variable doesn't have an empty string, a string filled with spaces, or "undefined" for its value. if it does we just say its equal to 0
+        let vectorMagnitudeValue = (DefinedVariables[vectorMagnitudeLs].value.replace(/\\\s|\s*/g,"") == "" || DefinedVariables[vectorMagnitudeLs].value == undefined) ? "0" : DefinedVariables[vectorMagnitudeLs].value;
+        errors.push({
+          error: {
+            type: "Magnitude of vector and vector magnitude don't equal",
+            description: "Calculating the magnitude of the vector doesn't evaluate to the value of the vector magnitude variable."
+          },
+          latexExpressions: [`\\left(\\left|${key}\\right|=${vectorMagnitudeLs}\\right)\\ \\Rightarrow\\ \\left(${value.vectorMagnitude}\\neq ${vectorMagnitudeValue}\\right)`],
+        });
+      }
+    }
+
+    // now that we have possibly populated errors array with data we need to add the errors to the "errorsInVariableCollection" object using the variables ls as the key
+    if(errors.length > 0){
+      errorsInVariableCollection[key] = {errors: errors, rid: value.rid};
+    }
   }
-  else if(MathFields[id].message.warning != null){
-    elmnt.find(".line_label span.line-warning").addClass('active');
+
+  for(const [key, value] of Object.entries(EL.undefinedVars.undefined)){
+    let errors = [];
+    if(value.type == "vector"){
+      if(!value.canBeVector){
+        errors.push({
+          error: {
+            type: "This unit can't be a vector",
+            description: "This vector has units that can only be a mesaured using a scalar"
+          },
+          latexExpressions: undefined,
+        });
+      }
+      if(value.magnitudeOfVectorEqualsVectorMagnitude == false){
+        let vectorMagnitudeLs = RemoveVectorLatexString(key);
+        // we have to make sure that the vector magnitude variable doesn't have an empty string, a string filled with spaces, or "undefined" for its value. if it does we just say its equal to 0
+        let vectorMagnitudeValue = (EL.undefinedVars.undefined[vectorMagnitudeLs].value.replace(/\\\s|\s*/g,"") == "" || EL.undefinedVars.undefined[vectorMagnitudeLs].value == undefined) ? "0" : EL.undefinedVars.undefined[vectorMagnitudeLs].value;
+        errors.push({
+          error: {
+            type: "Magnitude of vector and vector magnitude don't equal",
+            description: "Calculating the magnitude of the vector doesn't evaluate to the value of the vector magnitude variable."
+          },
+          latexExpressions: [`\\left|${key}\\right|=${vectorMagnitudeLs}\\ \\Rightarrow\\ ${value.vectorMagnitude}\\neq ${vectorMagnitudeValue}`],
+        });
+      }
+    }
+
+    // now that we have possibly populated errors array with data we need to add the errors to the "errorsInVariableCollection" object using the variables ls as the key
+    if(errors.length > 0){
+      errorsInVariableCollection[key] = {errors: errors, rid: value.rid};
+    }
   }
-  else if(MathFields[id].message.error != null){
-    elmnt.find(".line_label span.line-error").addClass('active');
+
+  for(const [key, value] of Object.entries(EL.undefinedVars.defined)){
+    let errors = [];
+    if(value.type == "vector"){
+      if(!value.canBeVector){
+        errors.push({
+          error: {
+            type: "This unit can't be a vector",
+            description: "This vector has units that can only be a mesaured using a scalar"
+          },
+          latexExpressions: undefined,
+        });
+      }
+      if(value.magnitudeOfVectorEqualsVectorMagnitude == false){
+        let vectorMagnitudeLs = RemoveVectorLatexString(key);
+        // we have to make sure that the vector magnitude variable doesn't have an empty string, a string filled with spaces, or "undefined" for its value. if it does we just say its equal to 0
+        let vectorMagnitudeValue = (EL.undefinedVars.defined[vectorMagnitudeLs].value.replace(/\\\s|\s*/g,"") == "" || EL.undefinedVars.defined[vectorMagnitudeLs].value == undefined) ? "0" : EL.undefinedVars.defined[vectorMagnitudeLs].value;
+        errors.push({
+          error: {
+            type: "Magnitude of vector and vector magnitude don't equal",
+            description: "Calculating the magnitude of the vector doesn't evaluate to the value of the vector magnitude variable."
+          },
+          latexExpressions: [`\\left|${key}\\right|=${vectorMagnitudeLs}\\ \\Rightarrow\\ ${value.vectorMagnitude}\\neq ${vectorMagnitudeValue}`],
+        });
+      }
+    }
+
+    // now that we have possibly populated errors array with data we need to add the errors to the "errorsInVariableCollection" object using the variables ls as the key
+    if(errors.length > 0){
+      errorsInVariableCollection[key] = {errors: errors, rid: value.rid};
+    }
   }
-  else{
-    elmnt.find(".line_label span.line-number").addClass('active');
+
+  // before we add any errors we need to clear past errors
+  $("#my_variables-collection-container .variable-row .variable-collection-error-container").each(function(){
+    $(this).removeClass('active');
+    // we will try to destroy any tooltip that this "variable-collection-error-container" may have 
+    try{
+      $(this).tooltip('destroy');
+    }catch(err){}
+  });
+
+
+  console.log("errorsInVariableCollection",errorsInVariableCollection);
+
+  // now that we have collect all possible errors that may exist in the variable collection we need to clear any existing errors that are in the collection and remove class active and destroy any possible tooltips that may exist
+  for(const [key, value] of Object.entries(errorsInVariableCollection)){
+    // we need to find the correct ".variable-row" to attach the error too
+    let variableCollectionErrorContainer = $(`#my_variables-collection-container .variable-row[${IsVariableLatexStringVector(key) ? "vector-rid" : "scalar-rid"}='${value.rid}'] .variable-collection-error-container`);
+    console.log("variableCollectionErrorContainer",variableCollectionErrorContainer);
+    console.log(`#my_variables-collection-container .variable-row[${IsVariableLatexStringVector(key) ? "vector-rid" : "scalar-rid"}='${value.rid}'] .variable-collection-error-container`);
+    variableCollectionErrorContainer.addClass('active');// this makes the error bug visible
+    variableCollectionErrorContainer.tooltip({html: ejs.render(Templates["mathfield-error"], {errors: value.errors})});
+
+    // now we need to put a hover event that opens the tooltip and renders the latex inside the tooltip
+    variableCollectionErrorContainer.hover(function(){
+      $(this).tooltip("open");
+      $(".log-static-latex").each(function(){
+        MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
+      });
+    });
   }
+
+  //after we create the and attached the tooltips we have to initialize the latex inside them into static math field
+  
 }
 
 function RenderAllMathFieldLogs(){
@@ -693,7 +813,7 @@ function RenderAllMathFieldLogs(){
       $(`.line_label > .line-warning[mf='${key}']`).hover(function(){
         $(this).tooltip("open");
         $(".log-static-latex").each(function(){
-          MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+          MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
         });
       });
     }
@@ -704,7 +824,7 @@ function RenderAllMathFieldLogs(){
       $(`.line_label > .line-error[mf='${key}']`).hover(function(){
         $(this).tooltip("open");
         $(".log-static-latex").each(function(){
-          MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+          MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
         });
       });
     }
@@ -1007,9 +1127,7 @@ function GetDefinedPhysicsConstants(){
   return vars;
 }
 
-
 function OrderCompileAndRenderMyVariablesCollection(){
-  console.log("OrderCompileAndRenderMyVariablesCollection");
   //ORDER
   //get all the variables we need
   let trulyUndefinedVars = Object.keys(EL.undefinedVars.undefined);
@@ -1176,7 +1294,7 @@ function OrderCompileAndRenderMyVariablesCollection(){
   }
 
   //we need to remove all tooltips in the collection before we create new ones
-  $('#my_variables-collection-container .tooltipped').each(function(){
+  $('#my_variables-collection-container .tooltipped, #my_variables-collection-container .variable-collection-error-container.active').each(function(){
     try{
       $(this).tooltip("destroy");
     }catch(err){console.log(err);}
@@ -1187,7 +1305,7 @@ function OrderCompileAndRenderMyVariablesCollection(){
   //Add event listeners and initialize static math fields
   $("#my_variables .my-collection span").each(function(){
     if($(this).attr("rid") != undefined && $(this).attr("latex") != undefined){
-      MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+      MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
     }
   });
 
@@ -1202,8 +1320,6 @@ function OrderCompileAndRenderMyVariablesCollection(){
       charsThatBreakOutOfSupSub: '+-=<>',
       handlers: {
         edit: function(mathField) {
-          console.log("edit.....................");
-          console.log("mathField.latex()",mathField.latex());
           // it seems like the "edit" event listener  is triggered when the mathField is initialized which happens every time the my
           // variables collection is update. We don't consider this an edit so the below if statements are checking if the "edit" was
           // triggered because of an initialization or because the user actually changed something
@@ -1222,9 +1338,11 @@ function OrderCompileAndRenderMyVariablesCollection(){
             $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("open");
           }else{
             //if there are no formatting errors in the text then we can show the default tooltip
+            /*
             $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).attr("data-tooltip","Edit value and press enter to update editor");
             $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip();
             $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("open");
+            */
           }
           FindAndUpdateVariableByRID({rid: $(mathField.el()).attr("rid"), value: mathField.latex(), valueFormattingError: valueFormattingError, type: $(mathField.el()).attr("type") });
         },
@@ -1245,17 +1363,17 @@ function OrderCompileAndRenderMyVariablesCollection(){
     
     if($(this).hasClass("static-mathfield")){
       //this means we are displaying a variable value for a known variable meaning the value shouldn't be able to be edited because the value was generated by the program
-      MQ.StaticMath($(this)[0]).latex($(this).attr("latex"));
+      MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
     }
     else{
       let mf;
       if($(this).attr("latex") == ""){// if the latex equals nothing then all we have to do is initialize the mathField  
         // for some reason this element has html inside of it eventhough we haven't created the mathfield so we are removing any html before we initialize the math field
         $(this).html("");
-        mf = MQ.MathField($(this)[0], opts);
+        mf = MQ.MathField($(this).get(0), opts);
         console.log("mf.latex()",mf.latex())
       }else{// if the latex attribute actually equals something then we need to initialize the mathfield with its correct latex information
-        mf = MQ.MathField($(this)[0], opts).latex($(this).attr("latex"));
+        mf = MQ.MathField($(this).get(0), opts).latex($(this).attr("latex"));
       }
 
       if(LastVariableRIDChangedToGiven == $(this).attr("rid")){
@@ -1268,6 +1386,339 @@ function OrderCompileAndRenderMyVariablesCollection(){
     
     
   });
+  //tooltipping everything that was just created and needs a tooltip
+  $("#my_variables .tooltipped").tooltip();
+
+  //updating hover event
+  $("#my_variables .variable-row").unbind("mouseout mouseover");
+  $("#my_variables .variable-row").hover(function(){
+    $("#my_variables .variable-row").removeClass('active');
+    $(this).addClass('active');
+  },function(){
+    $(this).removeClass('active');
+  });
+  //checking how many variables are defined and if there are none adding the no-variables-defined class to the collection
+  //this helps with ui look and feel
+  if($("#my_variables .variable-row").length == 0){
+    $("#my_variables .my-collection").addClass("no-variables-defined");
+  }
+  else{
+    $("#my_variables .my-collection").removeClass("no-variables-defined");
+  }
+
+}
+
+
+function OrderCompileAndUpdateMyVariablesCollection(updatedVariableInfo = undefined){
+  
+  // this function is an exact copy of "OrderCompileAndRenderMyVariablesCollection" except instead of clearing everything and rendering the variable collection
+  // from scratch this function re renders all the variables except the variable that the user is current updating because we don't want to mess with their
+  // typing in the ".variable-value" mathfield
+  if(updatedVariableInfo == undefined){return;}
+  console.log("updatedVariableInfo",updatedVariableInfo);
+  if(updatedVariableInfo.ls == undefined || updatedVariableInfo.rid == undefined){return;}
+  //ORDER
+  //get all the variables we need
+  let trulyUndefinedVars = Object.keys(EL.undefinedVars.undefined);
+  let orderedTrulyUndefinedVars = [];
+  let definedVars = GetDefinedPhysicsConstants().concat(Object.keys(DefinedVariables)).concat(Object.keys(EL.undefinedVars.defined));
+
+  let orderedDefinedVars = [];
+  //now we have to order them by when they show up in the editor
+  let orderedIds = OrderMathFieldIdsByLineNumber(Object.keys(MathFields));
+  for(const [lineNumber, id] of Object.entries(orderedIds)){
+    //before we do anything there are some edge case we need to take care of specifically \nabla^2 need to be formatted as \nabla \cdot \nabla
+    let variables = GetVariablesFromLatexString(MathFields[id].mf.latex());
+    for(var i = 0; i < variables.length; i++){
+      let index = trulyUndefinedVars.indexOf(variables[i]);
+      if(index != -1){
+        orderedTrulyUndefinedVars.push(variables[i]);
+        trulyUndefinedVars.splice(index,1);//remove it form array because we have accounted for it in the ordered list
+      }
+      else{
+        index = definedVars.indexOf(variables[i]);
+        if(index != -1){
+          orderedDefinedVars.push(variables[i]);
+          definedVars.splice(index,1);//remove it form array because we have accounted for it in the ordered list
+        }
+      }
+
+    }
+  }
+
+  //if there is anything left in the unorded arrays then just append it to the ordered lists
+  orderedTrulyUndefinedVars = orderedTrulyUndefinedVars.concat(trulyUndefinedVars);//trulyUndefinedVars should be empty because all of the undefined variables should appear somewhere in the editor and shouldn't be unused
+  orderedDefinedVars = orderedDefinedVars.concat(definedVars);
+  let unusedDefinedVars = [].concat(definedVars);
+
+  //before we compile and render these list of undefined and defined variables we want to pair up vectors with vector magnitudes so that we can display them slightly different then just a lone vector or scalar variable
+  
+  //Creating pairs for undefined variables
+  for(let i = 0; i < orderedTrulyUndefinedVars.length; i++){
+    let index;
+    if(IsVariableLatexStringVector(orderedTrulyUndefinedVars[i])){
+      // if the variable stirng is a vector then we will look at all the other indexes and see if we can find a vector magnitude of this variable
+      let vectorMagnitudeLs = RemoveVectorLatexString(orderedTrulyUndefinedVars[i]);
+      index = orderedTrulyUndefinedVars.indexOf(vectorMagnitudeLs);
+      if(index != -1){
+        //changing this index to equal an object and not a string which holds data about a vector and its magnitude
+        orderedTrulyUndefinedVars[i] = {
+          vectorMagnitudeLs: vectorMagnitudeLs, 
+          vectorLs: orderedTrulyUndefinedVars[i],
+        }
+        //after we store the vector magnitude value we need to remove it from the array because we have already accountted for it
+        orderedTrulyUndefinedVars.splice(index, 1);// we don't have to worry about a shift in the "orderedTrulyUndefinedVars" array because all the indexes we are taking out will always be greater than the current index "i" we are at
+      } 
+    }else{
+      // if the variable is not a vector then we need to try to look for the variables vector counter part 
+      let vectorLs = `\\vec{${orderedTrulyUndefinedVars[i]}}`;
+      index = orderedTrulyUndefinedVars.indexOf(vectorLs);
+      if(index != -1){
+        //changing this index to equal an object and not a string which holds data about a vector and its magnitude
+        orderedTrulyUndefinedVars[i] = {
+          vectorMagnitudeLs: orderedTrulyUndefinedVars[i], 
+          vectorLs: vectorLs,
+        }
+        //after we store the vector counter part of this vector magnitude we need to remove it from the array because we have already accountted for it
+        orderedTrulyUndefinedVars.splice(index, 1);// we don't have to worry about a shift in the "orderedTrulyUndefinedVars" array because all the indexes we are taking out will always be greater than the current index "i" we are at
+      }
+    }
+  }
+
+  //Creating pairs for defined variables
+  for(let i = 0; i < orderedDefinedVars.length; i++){
+    let index;
+    if(IsVariableLatexStringVector(orderedDefinedVars[i])){
+      // if the variable stirng is a vector then we will look at all the other indexes and see if we can find a vector magnitude of this variable
+      let vectorMagnitudeLs = RemoveVectorLatexString(orderedDefinedVars[i]);
+      index = orderedDefinedVars.indexOf(vectorMagnitudeLs);
+      if(index != -1){
+        //changing this index to equal an object and not a string which holds data about a vector and its magnitude
+        orderedDefinedVars[i] = {
+          vectorMagnitudeLs: vectorMagnitudeLs, 
+          vectorLs: orderedDefinedVars[i],
+        }
+        //after we store the vector magnitude value we need to remove it from the array because we have already accountted for it
+        orderedDefinedVars.splice(index, 1);// we don't have to worry about a shift in the "orderedTrulyUndefinedVars" array because all the indexes we are taking out will always be greater than the current index "i" we are at
+      } 
+    }else{
+      // if the variable is not a vector then we need to try to look for the variables vector counter part 
+      let vectorLs = `\\vec{${orderedDefinedVars[i]}}`;
+      index = orderedDefinedVars.indexOf(vectorLs);
+      if(index != -1){
+        //changing this index to equal an object and not a string which holds data about a vector and its magnitude
+        orderedDefinedVars[i] = {
+          vectorMagnitudeLs: orderedDefinedVars[i], 
+          vectorLs: vectorLs,
+        }
+        //after we store the vector counter part of this vector magnitude we need to remove it from the array because we have already accountted for it
+        orderedDefinedVars.splice(index, 1);// we don't have to worry about a shift in the "orderedTrulyUndefinedVars" array because all the indexes we are taking out will always be greater than the current index "i" we are at
+      }
+    }
+  }
+
+  //COMPILE
+  html = "";
+  for(var i = 0; i < orderedTrulyUndefinedVars.length; i++){
+    let opts = {};
+
+    if(typeof(orderedTrulyUndefinedVars[i]) == "object"){
+      opts = {
+        vectorLs: orderedTrulyUndefinedVars[i].vectorLs,
+        variableVector: Object.assign({}, EL.undefinedVars.undefined[orderedTrulyUndefinedVars[i].vectorLs]),
+        vectorMagnitudeLs: orderedTrulyUndefinedVars[i].vectorMagnitudeLs,
+        variableVectorMagnitude: Object.assign({}, EL.undefinedVars.undefined[orderedTrulyUndefinedVars[i].vectorMagnitudeLs]),
+        unused: false,
+      }
+
+      // render a pair of variables: vector and its vector magintude
+      html += ejs.render(Templates["VariableCollection"]["undefined-variable-pair"], {opts: opts});
+
+    }else{
+      opts = {
+        ls: orderedTrulyUndefinedVars[i],
+        variable: Object.assign({}, EL.undefinedVars.undefined[orderedTrulyUndefinedVars[i]]),
+        unused: false,
+      }
+
+      html += ejs.render(Templates["VariableCollection"]["undefined-variable"], {opts: opts});
+    }
+    
+  }
+
+  for(var i = 0; i < orderedDefinedVars.length; i++){
+
+    let opts = {};
+
+    if(typeof(orderedDefinedVars[i]) == "object"){
+      opts = {
+        vectorLs: orderedDefinedVars[i].vectorLs,
+        variableVector: GetStoredVariableInfo(orderedDefinedVars[i].vectorLs),
+        vectorMagnitudeLs: orderedDefinedVars[i].vectorMagnitudeLs,
+        variableVectorMagnitude: GetStoredVariableInfo(orderedDefinedVars[i].vectorMagnitudeLs),
+        unused: unusedDefinedVars.includes(orderedDefinedVars[i].vectorLs) && unusedDefinedVars.includes(orderedDefinedVars[i].vectorMagnitudeLs),// if both the vector and its vector magnitude are both unused then we can return true for unused
+      };
+
+      html += ejs.render(Templates["VariableCollection"]["defined-variable-pair"], {opts: opts});
+
+    }else{
+      opts = {
+        ls: orderedDefinedVars[i],
+        variable: GetStoredVariableInfo(orderedDefinedVars[i]),
+        unused: unusedDefinedVars.includes(orderedDefinedVars[i]),
+      };
+
+      if(DefinedVariables[orderedDefinedVars[i]] != undefined || EL.undefinedVars.defined[orderedDefinedVars[i]] != undefined){
+        html += ejs.render(Templates["VariableCollection"]["defined-variable"], {opts: opts});
+      }else if(PreDefinedVariables[orderedDefinedVars[i]] != undefined){
+        html += ejs.render(Templates["VariableCollection"]["physics-constant"], {opts: opts});
+      }
+    }
+
+  }
+
+  //RENDER
+
+  // first thing we need to do is figure out all the html that should come before the variable the user is trying to update and all the html that comes after the variable the user is trying to update
+  let container = $("<div>").append(html);
+  let variableRIDAttribute = IsVariableLatexStringVector(updatedVariableInfo.ls) ? "vector-rid" : "scalar-rid";
+  // now we have to go through this jquery dom element and figure out the html that comes before and after
+  let collectionHTML = {
+    before: "",
+    after: "",
+    currentVariableBeingUpdated: undefined,
+  }
+  let beforeVariable = true;
+  container.children(".variable-row").each(function(){
+    if($(this).attr(variableRIDAttribute) == updatedVariableInfo.rid){
+      collectionHTML.currentVariableBeingUpdated = $(this).clone();
+      beforeVariable = false;
+    }else{
+      // we are adding the variabl-row html to the collectionHTML object
+      let htmlToAdd = $('<div>').append($(this).clone()).html();// this line doens't just get the inner html but all so the information inside the ".variabl-row" html tag
+      if(beforeVariable){
+        collectionHTML.before += htmlToAdd;
+      }else{
+        collectionHTML.after += htmlToAdd;
+      }
+    }
+  });
+
+  // before we remove "variable-row" that we want to update we have to destroy any tooltips that these dom elements may have
+  //we need to remove all tooltips in the collection before we create new ones
+  $('#my_variables-collection-container .tooltipped, #my_variables-collection-container .variable-collection-error-container.active').each(function(){
+    if($(this).parents(".variable-row").attr(variableRIDAttribute) != updatedVariableInfo.rid){
+      try{
+        $(this).tooltip("destroy");
+      }catch(err){console.log(err);}
+    }
+  });
+
+  // now that we have the html that goes before and after the variable the user is updating we need to remove everything that is currently before and after this variable
+  $('#my_variables-collection-container .variable-row').each(function(){
+    if($(this).attr(variableRIDAttribute) != updatedVariableInfo.rid){
+      // this means that this "variable-row" is not the one the user is editing so we need to remove it
+      $(this).remove();
+    }
+  });
+
+  // now that we have removed everything before and after the variable we need to add variable rows before and after the variable the user is updating
+  $('#my_variables-collection-container .my-collection').prepend(collectionHTML.before);
+  $('#my_variables-collection-container .my-collection').append(collectionHTML.after);
+
+  
+  //Add event listeners and initialize static math fields
+  $("#my_variables .my-collection span").each(function(){
+    // we should only create new static mathfields for ".variable-row" that is not the one that the user is updating at the moment
+    if($(this).parents(".variable-row").attr(variableRIDAttribute) != updatedVariableInfo.rid){
+      if($(this).attr("rid") != undefined && $(this).attr("latex") != undefined){
+        MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
+      }
+    }
+  });
+
+  $(".variable-value").each(function(){
+    if($(this).parents(".variable-row").attr(variableRIDAttribute) != updatedVariableInfo.rid){
+      let opts = {
+        spaceBehavesLikeTab: false,
+        restrictMismatchedBrackets: true,
+        sumStartsWithNEquals: true,
+        supSubsRequireOperand: true,
+        autoCommands: `sqrt pi`,
+        autoOperatorNames: 'sin cos csc sec tan arcsin arccos cot sinh cosh tanh log ln',
+        charsThatBreakOutOfSupSub: '+-=<>',
+        handlers: {
+          edit: function(mathField) {
+            // it seems like the "edit" event listener  is triggered when the mathField is initialized which happens every time the my
+            // variables collection is update. We don't consider this an edit so the below if statements are checking if the "edit" was
+            // triggered because of an initialization or because the user actually changed something
+  
+  
+            let valueFormattingError = FindFormattingErrorInVariableValueMathField(mathField.latex(), $(mathField.el()).attr("type"));
+            $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).removeClass("error");
+            try{//the input field may not have a tooltip connected to it so this line may not work
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("destroy");
+            }catch(err){}
+            if(valueFormattingError != undefined){
+              //we found an error so we need to display it as a tooltip
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).addClass("error");
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).attr("data-tooltip",valueFormattingError);
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip();
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("open");
+            }else{
+              //if there are no formatting errors in the text then we can show the default tooltip
+              /*
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).attr("data-tooltip","Edit value and press enter to update editor");
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip();
+              $(`.variable-value[rid='${$(mathField.el()).attr("rid")}']`).tooltip("open");
+              */
+            }
+            FindAndUpdateVariableByRID({rid: $(mathField.el()).attr("rid"), value: mathField.latex(), valueFormattingError: valueFormattingError, type: $(mathField.el()).attr("type") });
+          },
+          enter: function(){
+            DisplayLoadingBar(true);
+            ExecutionID = RID();
+            (debounce(function(executionID){
+              if(executionID == ExecutionID){
+                //console.log("currently parsing", EL.currentlyParsing);
+                EL.GenerateEditorErrorMessages();
+                DisplayLoadingBar(false);
+              }
+              
+            }, 100))(ExecutionID);
+          },
+        }
+      };
+      
+      if($(this).hasClass("static-mathfield")){
+        //this means we are displaying a variable value for a known variable meaning the value shouldn't be able to be edited because the value was generated by the program
+        MQ.StaticMath($(this).get(0)).latex($(this).attr("latex"));
+      }
+      else{
+        let mf;
+        if($(this).attr("latex") == ""){// if the latex equals nothing then all we have to do is initialize the mathField  
+          // for some reason this element has html inside of it eventhough we haven't created the mathfield so we are removing any html before we initialize the math field
+          $(this).html("");
+          mf = MQ.MathField($(this).get(0), opts);
+          console.log("mf.latex()",mf.latex())
+        }else{// if the latex attribute actually equals something then we need to initialize the mathfield with its correct latex information
+          mf = MQ.MathField($(this).get(0), opts).latex($(this).attr("latex"));
+        }
+   
+      }
+    }
+    
+  });
+
+  // one last thing we need to do is update the variable row of the variable the user is currently updating. This only involves any static mathfield that may be from a second variable on the same row or changing the units of the variable
+  // first we are going to update any static variable-value mathfields
+  let variableRowBeingUpdated = $(`#my_variables-collection-container .variable-row[${variableRIDAttribute}='${updatedVariableInfo.rid}']`);
+  if(variableRowBeingUpdated.find('.variable-value.static-mathfield').length > 0){
+    variableRowBeingUpdated.find('.variable-value.static-mathfield').attr('latex',collectionHTML.currentVariableBeingUpdated.find('.variable-value.static-mathfield').attr('latex'))
+    // now that we have updated the latex of the static mathfield that may exist in the variable row we need to initialized the static mathfield again
+    MQ.StaticMath(variableRowBeingUpdated.find('.variable-value.static-mathfield').get(0)).latex(variableRowBeingUpdated.find('.variable-value.static-mathfield').attr("latex"));
+  }
+  
   //tooltipping everything that was just created and needs a tooltip
   $("#my_variables .tooltipped").tooltip();
 
@@ -1405,13 +1856,17 @@ function GetComponentsForVectorFromVariableValue(ls, variableLs){
 }
 
 function FindAndUpdateVariableByRID(opts = {}){
-
   let foundVariable = false;
   let updatedVariable = false;
+  let updatedVariableInfo = {
+    rid: opts.rid,
+    ls: undefined,
+  };
   
   for(const [key, value] of Object.entries(DefinedVariables)){
     if(value.rid == opts.rid){
       foundVariable = true;
+      updatedVariableInfo.ls = key;
       // we should only updated the variable if the value or valueFormattingError has actually changed
       //console.log("DefinedVariables[key].value != opts.value", DefinedVariables[key].value != opts.value);
       //console.log("DefinedVariables[key].valueFormattingError != opts.valueFormattingError", DefinedVariables[key].valueFormattingError != opts.valueFormattingError);
@@ -1434,6 +1889,7 @@ function FindAndUpdateVariableByRID(opts = {}){
     for(const [key, value] of Object.entries(EL.undefinedVars.undefined)){
       if(value.rid == opts.rid){
         foundVariable = true;
+        updatedVariableInfo.ls = key;
         // we should only updated the variable if the value or valueFormattingError has actually changed
         if(EL.undefinedVars.undefined[key].value != opts.value || EL.undefinedVars.undefined[key].valueFormattingError != opts.valueFormattingError){
           updatedVariable = true;
@@ -1455,6 +1911,7 @@ function FindAndUpdateVariableByRID(opts = {}){
     for(const [key, value] of Object.entries(EL.undefinedVars.defined)){
       if(value.rid == opts.rid){
         foundVariable = true;
+        updatedVariableInfo.ls = key;
         // we should only updated the variable if the value or valueFormattingError has actually changed
         if(EL.undefinedVars.defined[key].value != opts.value || EL.undefinedVars.defined[key].valueFormattingError != opts.valueFormattingError){
           updatedVariable = true;
@@ -1475,13 +1932,13 @@ function FindAndUpdateVariableByRID(opts = {}){
   if(updatedVariable){
     DisplayLoadingBar(true);
     ExecutionID = RID();
-    (debounce(function(executionID){
+    (debounce(function(executionID, updatedVariableInfo){
       if(executionID == ExecutionID){
-        EL.GenerateEditorErrorMessages({dontRenderMyVariablesCollection: true});
+        EL.GenerateEditorErrorMessages({dontRenderMyVariablesCollection: true, updatedVariableInfo: updatedVariableInfo,});
         DisplayLoadingBar(false);
       }
       
-    }, 1000))(ExecutionID);
+    }, 1000))(ExecutionID, updatedVariableInfo);
   }
 
 }
@@ -1549,6 +2006,8 @@ function UpdateMyVariablesCollection(opts = {ls: "", rid: "", update: true, add:
 
   //after the variables have been edited we need to rerender the my variables collection
   OrderCompileAndRenderMyVariablesCollection();
+  //after compiling a new variable collection we need to render any errors that may exist with the variable collection variables
+  RenderVariableCollectionErrors();
 
 }
 
@@ -2007,7 +2466,6 @@ function DefineVariableUnits(el, rid, rid2){
     //displaying dropdown search menu
     DisplayUnitDropdownSearchMenu(el, rid, rid2);
   }
-
 }
 
 function ToggleVariableBadgeUnitsSize(el = null, rid = "", rid2 = null,  expand = false){

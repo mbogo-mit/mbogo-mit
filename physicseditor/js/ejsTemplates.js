@@ -138,8 +138,13 @@ let Templates = {
     `,
     "defined-variable":
     `
-    <div class="variable-row valign-wrapper <%= (opts.unused) ? "unused-variable" : "" %>">
+    <div class="variable-row valign-wrapper <%= (opts.unused) ? "unused-variable" : "" %>" vector-rid="<%= opts.variable.type == "vector" ? opts.variable.rid : "" %>" scalar-rid="<%= opts.variable.type == "scalar" ? opts.variable.rid : "" %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
+        <span class="variable-collection-error-container">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="red-text text-lighten-2 bi bi-bug-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.978.855a.5.5 0 1 0-.956.29l.41 1.352A4.985 4.985 0 0 0 3 6h10a4.985 4.985 0 0 0-1.432-3.503l.41-1.352a.5.5 0 1 0-.956-.29l-.291.956A4.978 4.978 0 0 0 8 1a4.979 4.979 0 0 0-2.731.811l-.29-.956zM13 6v1H8.5v8.975A5 5 0 0 0 13 11h.5a.5.5 0 0 1 .5.5v.5a.5.5 0 1 0 1 0v-.5a1.5 1.5 0 0 0-1.5-1.5H13V9h1.5a.5.5 0 0 0 0-1H13V7h.5A1.5 1.5 0 0 0 15 5.5V5a.5.5 0 0 0-1 0v.5a.5.5 0 0 1-.5.5H13zm-5.5 9.975V7H3V6h-.5a.5.5 0 0 1-.5-.5V5a.5.5 0 0 0-1 0v.5A1.5 1.5 0 0 0 2.5 7H3v1H1.5a.5.5 0 0 0 0 1H3v1h-.5A1.5 1.5 0 0 0 1 11.5v.5a.5.5 0 1 0 1 0v-.5a.5.5 0 0 1 .5-.5H3a5 5 0 0 0 4.5 4.975z"/>
+          </svg>
+        </span>
         <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
         <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
@@ -153,7 +158,7 @@ let Templates = {
         <%}else if(opts.variable.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
           <span class="variable-value-container">
-            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+            <span class="variable-value" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
           </span>
         <%}%>    
 
@@ -161,14 +166,6 @@ let Templates = {
           <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info units dynamic-units tooltipped" search="<%= opts.variable.fullUnitsString %>" data-position="bottom" data-tooltip="This unit was dynamically created by the editor"><%= opts.variable.units %></span>
         <%}else{%>
           <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info units tooltipped" data-position="bottom" data-tooltip="This unit was set by the user or imported"><%= opts.variable.units %></span>
-        <%}%>
-        <% if(opts.variable.type == "vector" && !opts.variable.canBeVector){%>
-          <span class="info cantBeVector btn-floating pulse tooltipped" data-position="bottom" data-tooltip="This unit can't be a vector">
-            <%= opts.variable.type %>
-            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bug" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M4.355.522a.5.5 0 0 1 .623.333l.291.956A4.979 4.979 0 0 1 8 1c1.007 0 1.946.298 2.731.811l.29-.956a.5.5 0 1 1 .957.29l-.41 1.352A4.985 4.985 0 0 1 13 6h.5a.5.5 0 0 0 .5-.5V5a.5.5 0 0 1 1 0v.5A1.5 1.5 0 0 1 13.5 7H13v1h1.5a.5.5 0 0 1 0 1H13v1h.5a1.5 1.5 0 0 1 1.5 1.5v.5a.5.5 0 1 1-1 0v-.5a.5.5 0 0 0-.5-.5H13a5 5 0 0 1-10 0h-.5a.5.5 0 0 0-.5.5v.5a.5.5 0 1 1-1 0v-.5A1.5 1.5 0 0 1 2.5 10H3V9H1.5a.5.5 0 0 1 0-1H3V7h-.5A1.5 1.5 0 0 1 1 5.5V5a.5.5 0 0 1 1 0v.5a.5.5 0 0 0 .5.5H3c0-1.364.547-2.601 1.432-3.503l-.41-1.352a.5.5 0 0 1 .333-.623zM4 7v4a4 4 0 0 0 3.5 3.97V7H4zm4.5 0v7.97A4 4 0 0 0 12 11V7H8.5zM12 6H4a3.99 3.99 0 0 1 1.333-2.982A3.983 3.983 0 0 1 8 2c1.025 0 1.959.385 2.666 1.018A3.989 3.989 0 0 1 12 6z"/>
-            </svg>
-          </span>
         <%}%>
       </div>
       <div class="valign-wrapper" style="width: 30px; height:100%;">
@@ -182,8 +179,13 @@ let Templates = {
     `,
     "defined-variable-pair":
     `
-    <div class="variable-row valign-wrapper <%= (opts.unused) ? "unused-variable" : "" %>">
+    <div class="variable-row valign-wrapper <%= (opts.unused) ? "unused-variable" : "" %>" vector-rid="<%= opts.variableVector.rid %>" scalar-rid="<%= opts.variableVectorMagnitude.rid %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
+        <span class="variable-collection-error-container">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="red-text text-lighten-2 bi bi-bug-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.978.855a.5.5 0 1 0-.956.29l.41 1.352A4.985 4.985 0 0 0 3 6h10a4.985 4.985 0 0 0-1.432-3.503l.41-1.352a.5.5 0 1 0-.956-.29l-.291.956A4.978 4.978 0 0 0 8 1a4.979 4.979 0 0 0-2.731.811l-.29-.956zM13 6v1H8.5v8.975A5 5 0 0 0 13 11h.5a.5.5 0 0 1 .5.5v.5a.5.5 0 1 0 1 0v-.5a1.5 1.5 0 0 0-1.5-1.5H13V9h1.5a.5.5 0 0 0 0-1H13V7h.5A1.5 1.5 0 0 0 15 5.5V5a.5.5 0 0 0-1 0v.5a.5.5 0 0 1-.5.5H13zm-5.5 9.975V7H3V6h-.5a.5.5 0 0 1-.5-.5V5a.5.5 0 0 0-1 0v.5A1.5 1.5 0 0 0 2.5 7H3v1H1.5a.5.5 0 0 0 0 1H3v1h-.5A1.5 1.5 0 0 0 1 11.5v.5a.5.5 0 1 0 1 0v-.5a.5.5 0 0 1 .5-.5H3a5 5 0 0 0 4.5 4.975z"/>
+          </svg>
+        </span>
         <!--vector portion of the pair-->
         <span class="static-physics-equation editable-variable" latex="<%= opts.vectorLs + "=" %>" rid="<%= opts.variableVector.rid %>"></span>
         <% if(opts.variableVector.state == "unknown" && opts.variableVector.currentState == "known"){%>
@@ -198,7 +200,7 @@ let Templates = {
         <%}else if(opts.variableVector.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
           <span class="variable-value-container">
-            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
+            <span class="variable-value" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
           </span>
         <%}%>  
         <!--vector magnitude portion of the pair-->  
@@ -215,7 +217,7 @@ let Templates = {
         <%}else if(opts.variableVectorMagnitude.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
           <span class="variable-value-container">
-            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
+            <span class="variable-value" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
           </span>
         <%}%> 
 
@@ -223,14 +225,6 @@ let Templates = {
           <span onclick="DefineVariableUnits($(this), '<%= opts.variableVector.rid %>', '<%= opts.variableVectorMagnitude.rid %>' )" class="variable-tag info units dynamic-units tooltipped" search="<%= opts.variableVectorMagnitude.fullUnitsString %>" data-position="bottom" data-tooltip="This unit was dynamically created by the editor"><%= opts.variableVectorMagnitude.units %></span>
         <%}else{%>
           <span onclick="DefineVariableUnits($(this), '<%= opts.variableVector.rid %>', '<%= opts.variableVectorMagnitude.rid %>' )" class="variable-tag info units tooltipped" data-position="bottom" data-tooltip="This unit was set by the user or imported"><%= opts.variableVectorMagnitude.units %></span>
-        <%}%>
-        <% if(opts.variableVector.type == "vector" && !opts.variableVector.canBeVector){%>
-          <span class="info cantBeVector btn-floating pulse tooltipped" data-position="bottom" data-tooltip="This unit can't be a vector">
-            <%= opts.variableVector.type %>
-            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bug" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M4.355.522a.5.5 0 0 1 .623.333l.291.956A4.979 4.979 0 0 1 8 1c1.007 0 1.946.298 2.731.811l.29-.956a.5.5 0 1 1 .957.29l-.41 1.352A4.985 4.985 0 0 1 13 6h.5a.5.5 0 0 0 .5-.5V5a.5.5 0 0 1 1 0v.5A1.5 1.5 0 0 1 13.5 7H13v1h1.5a.5.5 0 0 1 0 1H13v1h.5a1.5 1.5 0 0 1 1.5 1.5v.5a.5.5 0 1 1-1 0v-.5a.5.5 0 0 0-.5-.5H13a5 5 0 0 1-10 0h-.5a.5.5 0 0 0-.5.5v.5a.5.5 0 1 1-1 0v-.5A1.5 1.5 0 0 1 2.5 10H3V9H1.5a.5.5 0 0 1 0-1H3V7h-.5A1.5 1.5 0 0 1 1 5.5V5a.5.5 0 0 1 1 0v.5a.5.5 0 0 0 .5.5H3c0-1.364.547-2.601 1.432-3.503l-.41-1.352a.5.5 0 0 1 .333-.623zM4 7v4a4 4 0 0 0 3.5 3.97V7H4zm4.5 0v7.97A4 4 0 0 0 12 11V7H8.5zM12 6H4a3.99 3.99 0 0 1 1.333-2.982A3.983 3.983 0 0 1 8 2c1.025 0 1.959.385 2.666 1.018A3.989 3.989 0 0 1 12 6z"/>
-            </svg>
-          </span>
         <%}%>
       </div>
       <div class="valign-wrapper" style="width: 30px; height:100%;">
@@ -244,8 +238,13 @@ let Templates = {
     `,
     "undefined-variable":
     `
-    <div class="variable-row valign-wrapper undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>">
+    <div class="variable-row valign-wrapper undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>" vector-rid="<%= opts.variable.type == "vector" ? opts.variable.rid : "" %>" scalar-rid="<%= opts.variable.type == "scalar" ? opts.variable.rid : "" %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
+        <span class="variable-collection-error-container">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="red-text text-lighten-2 bi bi-bug-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.978.855a.5.5 0 1 0-.956.29l.41 1.352A4.985 4.985 0 0 0 3 6h10a4.985 4.985 0 0 0-1.432-3.503l.41-1.352a.5.5 0 1 0-.956-.29l-.291.956A4.978 4.978 0 0 0 8 1a4.979 4.979 0 0 0-2.731.811l-.29-.956zM13 6v1H8.5v8.975A5 5 0 0 0 13 11h.5a.5.5 0 0 1 .5.5v.5a.5.5 0 1 0 1 0v-.5a1.5 1.5 0 0 0-1.5-1.5H13V9h1.5a.5.5 0 0 0 0-1H13V7h.5A1.5 1.5 0 0 0 15 5.5V5a.5.5 0 0 0-1 0v.5a.5.5 0 0 1-.5.5H13zm-5.5 9.975V7H3V6h-.5a.5.5 0 0 1-.5-.5V5a.5.5 0 0 0-1 0v.5A1.5 1.5 0 0 0 2.5 7H3v1H1.5a.5.5 0 0 0 0 1H3v1h-.5A1.5 1.5 0 0 0 1 11.5v.5a.5.5 0 1 0 1 0v-.5a.5.5 0 0 1 .5-.5H3a5 5 0 0 0 4.5 4.975z"/>
+          </svg>
+        </span>
         <span class="static-physics-equation editable-variable" latex="<%= opts.ls + "=" %>" rid="<%= opts.variable.rid %>"></span>
         <% if(opts.variable.state == "unknown" && opts.variable.currentState == "known"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag known tooltipped" data-position="bottom" data-tooltip="This variable is defined using all known or given variables in your equations">known</span>
@@ -259,7 +258,7 @@ let Templates = {
         <%}else if(opts.variable.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variable.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
           <span class="variable-value-container">
-            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
+            <span class="variable-value" type="<%= opts.variable.type %>" rid="<%= opts.variable.rid %>" latex="<%= (opts.variable.value != undefined) ? opts.variable.value : "" %>"></span>
           </span>
         <%}%>  
         <span onclick="DefineVariableUnits($(this), '<%= opts.variable.rid %>')" class="variable-tag info undefined-units units"><%= opts.variable.units %></span>
@@ -271,8 +270,13 @@ let Templates = {
     `,
     "undefined-variable-pair": 
     `
-    <div class="variable-row valign-wrapper undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>">
+    <div class="variable-row valign-wrapper undefined-variable <%= (opts.unused) ? "unused-variable" : "" %>" vector-rid="<%= opts.variableVector.rid %>" scalar-rid="<%= opts.variableVectorMagnitude.rid %>">
       <div class="valign-wrapper" style="width: calc(100% - 30px); height:100%;">
+        <span class="variable-collection-error-container">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="red-text text-lighten-2 bi bi-bug-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.978.855a.5.5 0 1 0-.956.29l.41 1.352A4.985 4.985 0 0 0 3 6h10a4.985 4.985 0 0 0-1.432-3.503l.41-1.352a.5.5 0 1 0-.956-.29l-.291.956A4.978 4.978 0 0 0 8 1a4.979 4.979 0 0 0-2.731.811l-.29-.956zM13 6v1H8.5v8.975A5 5 0 0 0 13 11h.5a.5.5 0 0 1 .5.5v.5a.5.5 0 1 0 1 0v-.5a1.5 1.5 0 0 0-1.5-1.5H13V9h1.5a.5.5 0 0 0 0-1H13V7h.5A1.5 1.5 0 0 0 15 5.5V5a.5.5 0 0 0-1 0v.5a.5.5 0 0 1-.5.5H13zm-5.5 9.975V7H3V6h-.5a.5.5 0 0 1-.5-.5V5a.5.5 0 0 0-1 0v.5A1.5 1.5 0 0 0 2.5 7H3v1H1.5a.5.5 0 0 0 0 1H3v1h-.5A1.5 1.5 0 0 0 1 11.5v.5a.5.5 0 1 0 1 0v-.5a.5.5 0 0 1 .5-.5H3a5 5 0 0 0 4.5 4.975z"/>
+          </svg>
+        </span>
         <!--vector portion of the pair-->
         <span class="static-physics-equation editable-variable" latex="<%= opts.vectorLs + "=" %>" rid="<%= opts.variableVector.rid %>"></span>
         <% if(opts.variableVector.state == "unknown" && opts.variableVector.currentState == "known"){%>
@@ -287,7 +291,7 @@ let Templates = {
         <%}else if(opts.variableVector.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVector.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
           <span class="variable-value-container">
-            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
+            <span class="variable-value" type="<%= opts.variableVector.type %>" rid="<%= opts.variableVector.rid %>" latex="<%= (opts.variableVector.value != undefined) ? opts.variableVector.value : "" %>"></span>
           </span>
         <%}%>
         <!--vector magnitude portion of the pair-->
@@ -304,7 +308,7 @@ let Templates = {
         <%}else if(opts.variableVectorMagnitude.state == "given"){%>
           <span onclick="ToggleVariableState('<%= opts.variableVectorMagnitude.rid %>')" class="variable-tag given tooltipped" data-position="bottom" data-tooltip="This variable is known at the start of the problem">given</span>
           <span class="variable-value-container">
-            <span class="variable-value tooltipped" data-position="bottom" data-tooltip="Edit value and press enter to update editor" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
+            <span class="variable-value" type="<%= opts.variableVectorMagnitude.type %>" rid="<%= opts.variableVectorMagnitude.rid %>" latex="<%= (opts.variableVectorMagnitude.value != undefined) ? opts.variableVectorMagnitude.value : "" %>"></span>
           </span>
         <%}%>
         <span onclick="DefineVariableUnits($(this), '<%= opts.variableVector.rid %>', '<%= opts.variableVectorMagnitude.rid %>' )" class="variable-tag info undefined-units units"><%= opts.variableVectorMagnitude.units %></span>

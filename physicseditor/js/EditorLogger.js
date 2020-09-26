@@ -272,7 +272,7 @@ function EditorLogger(){
     //after parsing through everything and building up the list of defined undefined variables we need to check if there are any relevant equations for the set of variables we have in DefinedVariables and this.undefinedVars.defined
     CheckForAndDisplayRelevantEquations();
 
-    this.display({dontRenderMyVariablesCollection: opts.dontRenderMyVariablesCollection});
+    this.display({dontRenderMyVariablesCollection: opts.dontRenderMyVariablesCollection, updatedVariableInfo: opts.updatedVariableInfo});
     this.currentlyParsing = false;
   }
 
@@ -638,6 +638,13 @@ function EditorLogger(){
       //after generating errors and defined undefined and defined undefined variables we need to rerender my variable collection
       OrderCompileAndRenderMyVariablesCollection();
     }
+
+    if(opts.dontRenderMyVariablesCollection && opts.updatedVariableInfo != undefined){
+      OrderCompileAndUpdateMyVariablesCollection(opts.updatedVariableInfo);
+    }
+
+    //regardless if we update the variable collection we need to make sure the errors for the variable collection are up to date
+    RenderVariableCollectionErrors();
     
   }
 

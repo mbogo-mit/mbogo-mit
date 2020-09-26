@@ -966,3 +966,11 @@ input.valid[type=text]:not(.browser-default) {
   border-bottom: 1px solid #9e9e9e !important;
   box-shadow: 0 1px 0 0 #9e9e9e !important;
 }
+
+.variable-collection-error-container {
+  visibility: hidden;
+}
+
+.variable-collection-error-container.active {
+  visibility: visible;
+}
