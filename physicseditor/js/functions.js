@@ -230,7 +230,7 @@ function UpdateImportedVariables(){
   $("#modal_import_variable_definition").modal("close");
 
   //we need to run error logger again because we have updated the imported variables
-  console.log("UpdateImportedVariables");
+  //console.log("UpdateImportedVariables");
   DisplayLoadingBar(true);
   ExecutionID = RID();
   (debounce(function(executionID){
@@ -354,8 +354,8 @@ function UpdateDefinedVariables(opts){
     /*
     (debounce(function(executionID){
       if(executionID == ExecutionID){
-        console.log("UpdateDefinedVariables got through");
-        console.log("currently parsing", EL.currentlyParsing);
+        //console.log("UpdateDefinedVariables got through");
+        //console.log("currently parsing", EL.currentlyParsing);
         EL.GenerateEditorErrorMessages();
         DisplayLoadingBar(false);
       }
@@ -653,7 +653,7 @@ function ToggleKeyboard(){
 }
 
 function RenderVariableCollectionErrors(){
-  console.log("RenderVariableCollectionErrors");
+  //console.log("RenderVariableCollectionErrors");
   // this function goes through all the objects holding variable data and creates errors and displays them in the ui through tooltips exactly like mathfields
   // the first thing we need to do is create for loops that go through each object that holds variable data
   // next we need to find any errors that exist and format them into an object that the ejs template "mathfield-error" can understand to create a tooltip for the error
@@ -767,14 +767,14 @@ function RenderVariableCollectionErrors(){
   });
 
 
-  console.log("errorsInVariableCollection",errorsInVariableCollection);
+  //console.log("errorsInVariableCollection",errorsInVariableCollection);
 
   // now that we have collect all possible errors that may exist in the variable collection we need to clear any existing errors that are in the collection and remove class active and destroy any possible tooltips that may exist
   for(const [key, value] of Object.entries(errorsInVariableCollection)){
     // we need to find the correct ".variable-row" to attach the error too
     let variableCollectionErrorContainer = $(`#my_variables-collection-container .variable-row[${IsVariableLatexStringVector(key) ? "vector-rid" : "scalar-rid"}='${value.rid}'] .variable-collection-error-container`);
-    console.log("variableCollectionErrorContainer",variableCollectionErrorContainer);
-    console.log(`#my_variables-collection-container .variable-row[${IsVariableLatexStringVector(key) ? "vector-rid" : "scalar-rid"}='${value.rid}'] .variable-collection-error-container`);
+    //console.log("variableCollectionErrorContainer",variableCollectionErrorContainer);
+    //console.log(`#my_variables-collection-container .variable-row[${IsVariableLatexStringVector(key) ? "vector-rid" : "scalar-rid"}='${value.rid}'] .variable-collection-error-container`);
     variableCollectionErrorContainer.addClass('active');// this makes the error bug visible
     variableCollectionErrorContainer.tooltip({html: ejs.render(Templates["mathfield-error"], {errors: value.errors})});
 
@@ -1297,7 +1297,7 @@ function OrderCompileAndRenderMyVariablesCollection(){
   $('#my_variables-collection-container .tooltipped, #my_variables-collection-container .variable-collection-error-container.active').each(function(){
     try{
       $(this).tooltip("destroy");
-    }catch(err){console.log(err);}
+    }catch(err){}
   });
   
   
@@ -1371,7 +1371,7 @@ function OrderCompileAndRenderMyVariablesCollection(){
         // for some reason this element has html inside of it eventhough we haven't created the mathfield so we are removing any html before we initialize the math field
         $(this).html("");
         mf = MQ.MathField($(this).get(0), opts);
-        console.log("mf.latex()",mf.latex())
+        //console.log("mf.latex()",mf.latex())
       }else{// if the latex attribute actually equals something then we need to initialize the mathfield with its correct latex information
         mf = MQ.MathField($(this).get(0), opts).latex($(this).attr("latex"));
       }
@@ -1415,7 +1415,7 @@ function OrderCompileAndUpdateMyVariablesCollection(updatedVariableInfo = undefi
   // from scratch this function re renders all the variables except the variable that the user is current updating because we don't want to mess with their
   // typing in the ".variable-value" mathfield
   if(updatedVariableInfo == undefined){return;}
-  console.log("updatedVariableInfo",updatedVariableInfo);
+  //console.log("updatedVariableInfo",updatedVariableInfo);
   if(updatedVariableInfo.ls == undefined || updatedVariableInfo.rid == undefined){return;}
   //ORDER
   //get all the variables we need
@@ -1610,7 +1610,7 @@ function OrderCompileAndUpdateMyVariablesCollection(updatedVariableInfo = undefi
     if($(this).parents(".variable-row").attr(variableRIDAttribute) != updatedVariableInfo.rid){
       try{
         $(this).tooltip("destroy");
-      }catch(err){console.log(err);}
+      }catch(err){}
     }
   });
 
@@ -1700,7 +1700,7 @@ function OrderCompileAndUpdateMyVariablesCollection(updatedVariableInfo = undefi
           // for some reason this element has html inside of it eventhough we haven't created the mathfield so we are removing any html before we initialize the math field
           $(this).html("");
           mf = MQ.MathField($(this).get(0), opts);
-          console.log("mf.latex()",mf.latex())
+          //console.log("mf.latex()",mf.latex())
         }else{// if the latex attribute actually equals something then we need to initialize the mathfield with its correct latex information
           mf = MQ.MathField($(this).get(0), opts).latex($(this).attr("latex"));
         }
@@ -1815,15 +1815,12 @@ function FindFormattingErrorInVariableValueMathField(ls, type){
 }
 
 function GetComponentsForVectorFromVariableValue(ls, variableLs){
-  //console.log('GetComponentsForVectorFromVariableValue');
 
   // before we do anything we need to check that the ls is actually something and not just empty space
   if(ls.replace(/\\\s/g,"").replace(/\s*/g,"").length == 0){return;}
 
   // this object will hold the data about the different components that make up the vector
   let components = {};
-
-  //console.log("ls",ls);
   let expressionObj = ExactConversionFromLatexStringToNerdamerReadableString({
     ls: ls,
     uniqueRIDStringArray: UpdateUniqueRIDStringObjUsingLs(ls),
@@ -1833,8 +1830,6 @@ function GetComponentsForVectorFromVariableValue(ls, variableLs){
     convertVectorsToNerdamerMatrices: true,
     returnFinalObject: true,//return an array of the expressions we have to iterate through and the evaluated expression in latex
   });
-
-  //console.log("expressionObj",expressionObj);
 
   // we know by this point that the latex string we are parsing is a vector so we don't have to check if it has a unit vector in the string
   let componentData;
@@ -1868,8 +1863,6 @@ function FindAndUpdateVariableByRID(opts = {}){
       foundVariable = true;
       updatedVariableInfo.ls = key;
       // we should only updated the variable if the value or valueFormattingError has actually changed
-      //console.log("DefinedVariables[key].value != opts.value", DefinedVariables[key].value != opts.value);
-      //console.log("DefinedVariables[key].valueFormattingError != opts.valueFormattingError", DefinedVariables[key].valueFormattingError != opts.valueFormattingError);
       if(DefinedVariables[key].value != opts.value || DefinedVariables[key].valueFormattingError != opts.valueFormattingError){
         updatedVariable = true;
         DefinedVariables[key].value = opts.value;
@@ -2054,10 +2047,8 @@ function CopyPhysicsConstantToClipboard(el){
 }
 
 function CopyToClipboard(str) {
-  //console.log(str);
   const el = document.createElement('textarea');
   el.value = str;
-  //console.log(el.value);
   el.setAttribute('readonly', '');
   el.style.position = 'absolute';
   el.style.left = '-9999px';
@@ -2137,7 +2128,7 @@ function CheckForAndDisplayRelevantEquations(){
             else{
               isRelevantEquation = false;//the equation is not relevant because this equation needs a specific quantity a specific number of times and the user hasn't defined a quantity enough times
               if(logIt){
-                console.log(1);
+                //console.log(1);
               }
               break;
             }
@@ -2148,9 +2139,9 @@ function CheckForAndDisplayRelevantEquations(){
               if(!usedQuantities[PhysicsConstantToQuantity[key]].quantityDescriptions.includes(key)){//if this specified quantity is not even included in the quantityDescriptions array which keeps track of specifics about the physical quantity then the equation is not relevant
                 isRelevantEquation = false;//the equation is not relevant because there is a quantity that this equation needs that the user hasn't defined
                 if(logIt){
-                  console.log(2);
-                  console.log("key",key);
-                  console.log("array", usedQuantities[PhysicsConstantToQuantity[key]].quantityDescriptions);
+                  //console.log(2);
+                  //console.log("key",key);
+                  //console.log("array", usedQuantities[PhysicsConstantToQuantity[key]].quantityDescriptions);
                 }
                 break;
               }
@@ -2161,18 +2152,18 @@ function CheckForAndDisplayRelevantEquations(){
             else{
               isRelevantEquation = false;//the equation is not relevant because there is a quantity that this equation needs that the user hasn't defined
               if(logIt){
-                console.log(3);
-                console.log("key", key);
-                console.log("PhysicsConstantToQuantity[key]", PhysicsConstantToQuantity[key]);
-                console.log('usedQuantities[PhysicsConstantToQuantity[key]]', usedQuantities[PhysicsConstantToQuantity[key]]);
+                //console.log(3);
+                //console.log("key", key);
+                //console.log("PhysicsConstantToQuantity[key]", PhysicsConstantToQuantity[key]);
+                //console.log('usedQuantities[PhysicsConstantToQuantity[key]]', usedQuantities[PhysicsConstantToQuantity[key]]);
               }
               break;
             } 
           }
         }
         else{
-          console.log($(this).attr("latex"));
-          console.log(`misspelled key: ${key}`);
+          //console.log($(this).attr("latex"));
+          //console.log(`misspelled key: ${key}`);
           isRelevantEquation = false;//misspelled quantity
           break;
         }
@@ -2888,7 +2879,6 @@ function ParseAndRenderCustomUnit(){
       r = new RegExp(thingsToReplace[i], 'g');
       strReplaceEverything = strReplaceEverything.replace(r,"")
     }
-    //console.log("strReplaceEverything",strReplaceEverything);
 
     if(strReplaceEverything.length > 0){
       error = "String is formatted incorrectly or has unsupported character";
@@ -2923,8 +2913,8 @@ function ParseAndRenderCustomUnit(){
       formattedLatexCustomUnitString = formattedLatexCustomUnitString.replace(/\\x\{/g,`\\mathrm{`).replace(/\\y/g,`\\cdot`);
 
 
-      console.log("mathJsCustomUnitString",mathJsCustomUnitString);
-      console.log("formattedLatexCustomUnitString",formattedLatexCustomUnitString);
+      //console.log("mathJsCustomUnitString",mathJsCustomUnitString);
+      //console.log("formattedLatexCustomUnitString",formattedLatexCustomUnitString);
     }
   }
 

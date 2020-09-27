@@ -29,7 +29,7 @@ function RemoveSumsAndProdsFromLatexString(ls){
             ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing sum formatted as: \sum_{...}^{...}
           }
           else{//theere was trouble finding the closing bracket so just stop
-            console.log("trouble finding closing bracket for sum or prod");
+            //console.log("trouble finding closing bracket for sum or prod");
             break;
           }
         }
@@ -38,7 +38,7 @@ function RemoveSumsAndProdsFromLatexString(ls){
         }
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing bracket for sum or prod");
+        //console.log("trouble finding closing bracket for sum or prod");
         break;
       }
     }
@@ -51,7 +51,7 @@ function RemoveSumsAndProdsFromLatexString(ls){
         ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing integral formatted as: \int ^{...}
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing bracket for sum or prod");
+        //console.log("trouble finding closing bracket for sum or prod");
         break;
       }
     }

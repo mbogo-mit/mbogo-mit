@@ -1,5 +1,5 @@
 function ToggleGreekKeyboard(lowercase){
-  console.log(lowercase);
+  //console.log(lowercase);
   if(lowercase){
     $("#greek-letters-uppercase").css("display","none");
     $("#greek-letters-lowercase").css("display","block");

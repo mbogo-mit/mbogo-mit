@@ -113,7 +113,7 @@ function SplitLsIntoExpressions(ls){
         delta = i2 + 1;//adding one accounts for the shift because we used a substring
       }
       else{
-        console.log("couldn't find closing parentheses");
+        //console.log("couldn't find closing parentheses");
         return defaultExpressiosn;//if we can't parse one part of the ls right then we will not parse it at all and just send up a default expression
       }
     }
@@ -124,7 +124,7 @@ function SplitLsIntoExpressions(ls){
         delta = i2 + 1;//adding one accounts for the shift because we used a substring
       }
       else{
-        console.log("couldn't find closing bracket");
+        //console.log("couldn't find closing bracket");
         return defaultExpressiosn;//if we can't parse one part of the ls right then we will not parse it at all and just send up a default expression
       }
     }
@@ -135,7 +135,7 @@ function SplitLsIntoExpressions(ls){
         delta = i2 + 1;//adding one accounts for the shift because we used a substring
       }
       else{
-        console.log("couldn't find closing bracket");
+        //console.log("couldn't find closing bracket");
         return defaultExpressiosn;//if we can't parse one part of the ls right then we will not parse it at all and just send up a default expression
       }
     }
@@ -199,7 +199,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
             delta = i2 + 1;//adding one accounts for the shift because we used a substring
           }
           else{
-            console.log("couldn't find closing parentheses");
+            //console.log("couldn't find closing parentheses");
           }
         }
         else if(str[i] == "{"){
@@ -209,7 +209,7 @@ function CheckForErrorsInExpression(ls, lineNumber, mfID){
             delta = i2 + 1;//adding one accounts for the shift because we used a substring
           }
           else{
-            console.log("couldn't find closing bracket");
+            //console.log("couldn't find closing bracket");
           }
         }
       }
@@ -780,7 +780,7 @@ function FindAndFormatUnitsOfMathjsVector(ls){
         }
       }
       else{
-        console.log("couldn't find closing parentheses");
+        //console.log("couldn't find closing parentheses");
         return ls;
       }
     }
@@ -1267,7 +1267,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
             ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing integral formatted as: \int_(...)^(...)
           }
           else{//theere was trouble finding the closing bracket so just stop
-            console.log("trouble finding closing parenthesis for integral");
+            //console.log("trouble finding closing parenthesis for integral");
             break;
           }
         }
@@ -1276,7 +1276,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
         }
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing parenthesis for integral");
+        //console.log("trouble finding closing parenthesis for integral");
         break;
       }
     }
@@ -1289,7 +1289,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
         ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing integral formatted as: \int^(...)
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing bracket for integral");
+        //console.log("trouble finding closing bracket for integral");
         break;
       }
     }
@@ -1306,7 +1306,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
             ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing integral formatted as: \int_(...)^(...)
           }
           else{//theere was trouble finding the closing bracket so just stop
-            console.log("trouble finding closing parenthesis for integral");
+            //console.log("trouble finding closing parenthesis for integral");
             break;
           }
         }
@@ -1315,7 +1315,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
         }
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing parenthesis for integral");
+        //console.log("trouble finding closing parenthesis for integral");
         break;
       }
     }
@@ -1334,7 +1334,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
               ls = ls.substring(0,i1) + ls.substring(i3 + 1);//removing integral formatted as: \int_(...)^(...)
             }
             else{//theere was trouble finding the closing bracket so just stop
-              console.log("trouble finding closing parenthesis for integral");
+              //console.log("trouble finding closing parenthesis for integral");
               break;
             }
           }
@@ -1343,7 +1343,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
           }
         }
         else{//theere was trouble finding the closing bracket so just stop
-          console.log("trouble finding closing parenthesis for integral");
+          //console.log("trouble finding closing parenthesis for integral");
           break;
         }
       }
@@ -1356,7 +1356,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
           ls = ls.substring(0,i1) + ls.substring(i2 + 1);//removing integral formatted as: \int^(...)
         }
         else{//theere was trouble finding the closing bracket so just stop
-          console.log("trouble finding closing bracket for integral");
+          //console.log("trouble finding closing bracket for integral");
           break;
         }
       }
@@ -1390,7 +1390,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
         }
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing bracket");
+        //console.log("trouble finding closing bracket");
         break;
       }
     }
@@ -1420,7 +1420,7 @@ function ReplaceSpecialLatexCharacterWithBasicCharacterCounterpart(ls, types){
         }
       }
       else{//theere was trouble finding the closing bracket so just stop
-        console.log("trouble finding closing parenhesis");
+        //console.log("trouble finding closing parenhesis");
         break;
       }
     }
@@ -1698,7 +1698,7 @@ function FindAndEvaluateVectorMultiplication(opts){
         delta = i3 - "\\right".length;
       }
       else{
-        console.log("error couldn't find closing parentheses");
+        //console.log("error couldn't find closing parentheses");
         return null;
       }
       i += delta
@@ -2249,7 +2249,7 @@ function FindAndWrapVectorsThatAreBeingMultiplied(ls){
         delta = i3;
       }
       else{
-        console.log("error couldn't find closing parentheses");
+        //console.log("error couldn't find closing parentheses");
         return ls;
       }
       i += delta
@@ -2570,7 +2570,7 @@ function AreIntegralBoundsFormattedProperly(expressionArray){
             }
           }
           else{
-            console.log("trouble finding closing bracket for integral");
+            //console.log("trouble finding closing bracket for integral");
             return false;
           }
         }
@@ -3068,7 +3068,7 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
       try{
         status.variableValues[key] = nerdamer.convertFromLaTeX(CleanLatexString(v.value, ["multiplication"])).toString();
       }catch(err){//we couldn't convert latex string to something that nerdamer could understand so we cant be sure that this variable's value is known
-        console.log("couldn't convert variable value to nerdamer value");
+        //console.log("couldn't convert variable value to nerdamer value");
         status.undefinedValuesArray.push(null);
       }
     }else{
@@ -3142,11 +3142,11 @@ function TryToSolveForUnknownVariablesAndCheckIfExpressionsActuallyEqualEachOthe
   
         if(knownVariableValue != undefined){
           /* this piece of code would eventually create latex to show what the known variable solution is rather than just saying the variable is known
-          console.log("knownVariableValue",knownVariableValue);
+          //console.log("knownVariableValue",knownVariableValue);
           try{
-            console.log("solution", nerdamer.convertToLaTeX(knownVariableValue).toString());
+            //console.log("solution", nerdamer.convertToLaTeX(knownVariableValue).toString());
           }catch(err){
-            console.log(err);
+            //console.log(err);
           }*/
           EquationSet.push({
             equation: `${exp1.str} = ${exp2.str}`,
@@ -3643,7 +3643,7 @@ function FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, 
           ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{d}{${dv}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable})${ls.substring(i2+1)}`
         }
         else{
-          console.log("couldn't find closing parenthesis");
+          //console.log("couldn't find closing parenthesis");
           return null;
         }
       }
@@ -3664,7 +3664,7 @@ function FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, 
           ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{\\d^{2}}{${dv}^{2}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable}, 2)${ls.substring(i2+1)}`
         }
         else{
-          console.log("couldn't find closing parenthesis");
+          //console.log("couldn't find closing parenthesis");
           return null;
         }
       }
@@ -3685,7 +3685,7 @@ function FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, 
           ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{\\partial}{${pdv}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable})${ls.substring(i2+1)}`
         }
         else{
-          console.log("couldn't find closing parenthesis");
+          //console.log("couldn't find closing parenthesis");
           return null;
         }
       }
@@ -3706,7 +3706,7 @@ function FindAndParseDerivativesAndReturnLatexStringWithNerdamerDerivatives(ls, 
           ls = `${ls.substring(0, i1)} diff(${ls.substring(i1 + `\\frac{\\partial^{2}}{${pdv}^{2}}\\left(`.length, i2 - "\\right".length)}, ${uniqueRIDStringArray[index].variable}, 2)${ls.substring(i2+1)}`
         }
         else{
-          console.log("couldn't find closing parenthesis");
+          //console.log("couldn't find closing parenthesis");
           return null;
         }
       }
@@ -3815,7 +3815,7 @@ function FindAndParseLimitsAndReturnLatexStringWithNerdamerLimits(ls, uniqueRIDS
               
             }
             else{
-              console.log("trouble finding closing bracket");
+              //console.log("trouble finding closing bracket");
               return null;
             }
           }
@@ -3830,7 +3830,7 @@ function FindAndParseLimitsAndReturnLatexStringWithNerdamerLimits(ls, uniqueRIDS
           }
         }
         else{
-          console.log("trouble finding closing bracket");
+          //console.log("trouble finding closing bracket");
           return null;
         }
       }
@@ -3903,13 +3903,13 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
             newLs += `(${newString})`;
           }
           else{
-            console.log("couldn't evaluate string inside integral");
+            //console.log("couldn't evaluate string inside integral");
             return ls;
           }
         }
         else{
           //if we can't figure out where the parentheses is then a latex inegral expression won't be parsed and for this reason there is not reason to continue parsing so we will just return the original string we astarted with
-          console.log("trouble finding closing paraenthesis");
+          //console.log("trouble finding closing paraenthesis");
           return ls;
         }
       }
@@ -3969,12 +3969,12 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
                       newLs += `(${newString})`;
                     }
                     else{
-                      console.log("couldn't evaluate string inside integral");
+                      //console.log("couldn't evaluate string inside integral");
                       return ls;
                     }
                   }
                   else{
-                    console.log("trouble finding closing paraenthesis");
+                    //console.log("trouble finding closing paraenthesis");
                     return ls;
                   }
                 }
@@ -3996,17 +3996,17 @@ function FindAndParseLatexIntegralsAndReturnLatexStringWithNerdamerIntegrals(ls,
               }
             }
             else{
-              console.log("trouble finding closing bracket");
+              //console.log("trouble finding closing bracket");
               return ls;
             }
           }
           else{
-            console.log("couldn't find upperbound");
+            //console.log("couldn't find upperbound");
             return ls;
           }
         }
         else{
-          console.log("trouble finding closing bracket");
+          //console.log("trouble finding closing bracket");
           return ls;
         }
       }
@@ -4308,7 +4308,7 @@ function ExactConversionFromLatexStringToNerdamerReadableString(opts){
 
       return calculatedResults;
     }catch(err){
-      console.log(err);
+      //console.log(err);
       if(throwError){
         //we need to throw a general error that this expression couldn't be parsed so the editor can not verify if the line is correct or not
         
@@ -4365,7 +4365,7 @@ function FormatAbsoluteValuesSqrtOfDotProduct(ls,mfID){
 
   if(ls.indexOf("\\left|") != -1 || ls.indexOf("\\right|") != -1 || mismatchAbsoluteValueSign){
     //the user has mismatched absolute value signs
-    console.log("mismatched absolute value signs");
+    //console.log("mismatched absolute value signs");
     CreateInlineMathFieldError({
       mfID: mfID,
       error: "Mismatched absolute value sign",
@@ -4588,7 +4588,7 @@ function FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls, mfID){
                     //replacing the latex sum with a nerdamer sum with the form "sum(expression, variable, lowerbound, upperbound)"
                     ls = `${ls.substring(0,i1)} ${operation[1]}(${ls.substring(i3 + 1 + "\\left(".length, i4 - "\\right".length)}, ${params.variable}, ${params.lowerbound}, ${params.upperbound}) ${ls.substring(i4+1)}`;
                   }else{
-                    console.log("couldn't find index of closing parentheses");
+                    //console.log("couldn't find index of closing parentheses");
                     break;
                   }
                 }else{
@@ -4606,19 +4606,19 @@ function FindAndConvertLatexSumsAndProductsToNerdamerReadableStrings(ls, mfID){
                 break;
               }
             }else{
-              console.log("couldn't find index of closing bracket");
+              //console.log("couldn't find index of closing bracket");
               break;
             }
           }else{
-            console.log("no upper bound found");
+            //console.log("no upper bound found");
             break;
           }
         }else{
-          console.log("lower bound not formatted properly")
+          //console.log("lower bound not formatted properly")
           break;
         }
       }else{
-        console.log("couldn't find index of closing bracket");
+        //console.log("couldn't find index of closing bracket");
         break;
       }
     }
@@ -4649,7 +4649,7 @@ function FindAndConvertLatexLogsToNerdamerReadableStrings(ls){
       }
     }
     else{//theere was trouble finding the closing bracket so just stop
-      console.log("trouble finding closing bracket");
+      //console.log("trouble finding closing bracket");
       break;
     }
   }
